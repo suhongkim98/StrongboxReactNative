@@ -9,11 +9,17 @@ import {NavigationContainer} from '@react-navigation/native';
 import SQLite from 'react-native-sqlite-storage';
 let db;
 ///
+import styled from 'styled-components/native';
+//
 import {
   createStackNavigator,
 } from '@react-navigation/stack';
 
-
+const TestStyledTouchableOpacity = styled.TouchableOpacity`
+flex: 1;
+align-items: center;
+justify-content: center;
+`;
 const HomeScreen = ({ navigation }) => {
   const testConnectDB = () =>{
     SQLite.openDatabase({
@@ -32,9 +38,9 @@ const HomeScreen = ({ navigation }) => {
   }
   return (
     <>
-    <TouchableOpacity onPress={() => testConnectDB()} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <TestStyledTouchableOpacity onPress={() => testConnectDB()}>
       <Text>open db test btn</Text>
-    </TouchableOpacity>
+    </TestStyledTouchableOpacity>
     <TouchableOpacity onPress={() => navigation.navigate('Details')} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Detail Screen</Text>
     </TouchableOpacity>
