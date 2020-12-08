@@ -1,46 +1,49 @@
+import 'react-native-gesture-handler';
 import React, { Component } from 'react'
-import { Text, StyleSheet, View,Button } from 'react-native'
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import { Text, StyleSheet, View,Button, TouchableOpacity } from 'react-native'
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import rootReducer from './modules';
+import {NavigationContainer} from '@react-navigation/native';
 
-const Home = ({ navigation }) =>{
-  return <View style={styles.HomeView}>
-    <Text> 홈 화면 입니다.</Text>        
-    <Button
-          title="테스트 화면으로 가기"
-          onPress={() => navigation.navigate('Test2')}
-        />
-  </View>
+import {
+  createStackNavigator,
+} from '@react-navigation/stack';
+
+
+function HomeScreen({ navigation }) {
+  return (
+    <TouchableOpacity onPress={() => navigation.navigate('Details')} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Detail Screen</Text>
+    </TouchableOpacity>
+  );
 }
-const Test2 = () =>{
-  return <View style={styles.HomeView}>
-    <Text> test 입니다.</Text>
-  </View>
+
+function DetailsScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Detail Screen</Text>
+    </View>
+  );
 }
 
-const RouteContainer = createStackNavigator (
-  {
-    Home: {
-      screen: Home,
-    },
-    Test2:{
-      screen: Test2,
-    },
-  },
-  {
-    initialRouteName: 'Home' // 처음 보여 줄 화면을 설정합니다.
-  },
-);
+const Stack = createStackNavigator();
 
-const AppContainer = createAppContainer(RouteContainer);
 const store = createStore(rootReducer);
 const App = () =>{
   return <>
   <Provider store={store}>
-  <AppContainer/>
+  <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: '홈화면 타이틀!!' }}
+          initialParams={{ itemId: 42 }}
+        />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+  </NavigationContainer>
   </Provider>
   </>
 }
