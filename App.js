@@ -5,21 +5,44 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import rootReducer from './modules';
 import {NavigationContainer} from '@react-navigation/native';
-
+///
+import SQLite from 'react-native-sqlite-storage';
+let db;
+///
 import {
   createStackNavigator,
 } from '@react-navigation/stack';
 
 
-function HomeScreen({ navigation }) {
+const HomeScreen = ({ navigation }) => {
+  const testConnectDB = () =>{
+    SQLite.openDatabase({
+      name:'test.db', // assets/www 안에 있음
+      createFromLocation:1,
+    },
+    successToOpenDB,
+    failToOpenDB,
+    );
+  }
+  const successToOpenDB = () =>{
+    alert("success");
+  }
+  const failToOpenDB = (err) =>{
+    console.log(err);
+  }
   return (
+    <>
+    <TouchableOpacity onPress={() => testConnectDB()} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>open db test btn</Text>
+    </TouchableOpacity>
     <TouchableOpacity onPress={() => navigation.navigate('Details')} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Detail Screen</Text>
     </TouchableOpacity>
+    </>
   );
 }
 
-function DetailsScreen() {
+const DetailsScreen = () => {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Detail Screen</Text>
