@@ -2,9 +2,9 @@ import 'react-native-gesture-handler';
 import React, { Component } from 'react'
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import rootReducer from './modules';
+import rootReducer from './src/modules';
 import {NavigationContainer} from '@react-navigation/native';
-import InitNavi from './routers/navigations/InitNavi';
+import InitNavi from './src/routers/navigations/InitNavi';
 
 const store = createStore(rootReducer);
 const App = () =>{
