@@ -1,4 +1,6 @@
 
+
+
 //redux 예시
 const INCREASE = 'counter/INCREASE' as const;
 const DECREASE = 'counter/DECREASE' as const;
@@ -19,7 +21,7 @@ type CounterAction =
   type CounterState = {
     count: number;
   }
-
+  
   const initialState: CounterState = {
     count: 0
   };
@@ -36,5 +38,5 @@ type CounterAction =
         return state;
     }
   }
-
-  export default counter; 
+  
+  export default counter;
