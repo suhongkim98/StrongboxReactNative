@@ -25,15 +25,15 @@ export class StrongboxDatabase{
         let ciphertext = CryptoJS.AES.encrypt('my message', 'secret key 123').toString();
         return ciphertext;
     }
-    public testConnectDB = () =>{
+    public async testConnectDB() {
         const testSuccess = () =>{
             alert("success");
         }
         const testFail = () =>{
 
         }
-        let db = this.connectDatabase(testSuccess,testFail);
-
+        let db = await this.connectDatabase(testSuccess,testFail);
         db.close();
+        return true;
     }
 }
