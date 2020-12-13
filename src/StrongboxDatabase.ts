@@ -1,5 +1,6 @@
 import CryptoJS from "react-native-crypto-js";
 import SQLite from 'react-native-sqlite-storage';
+import { sha256 } from 'react-native-sha256';
 
 export class StrongboxDatabase{
     private static strongboxDatabase: StrongboxDatabase;
@@ -11,29 +12,45 @@ export class StrongboxDatabase{
         }
         return StrongboxDatabase.strongboxDatabase;
     }
-    public connectDatabase = (successToOpenDB:any, failToOpenDB:any) =>{
+    public connectDatabase = (failToOpenDB:any) =>{
         return SQLite.openDatabase({
       name:StrongboxDatabase.DB_PATH, // assets/www 안에 있음
       createFromLocation:1,
     },
-    successToOpenDB,
+    ()=>{},
     failToOpenDB,
     );
     }
-    public testCrypto = () =>{
-        // Encrypt
-        let ciphertext = CryptoJS.AES.encrypt('my message', 'secret key 123').toString();
-        return ciphertext;
-    }
-    public async testConnectDB() {
-        const testSuccess = () =>{
-            alert("success");
-        }
-        const testFail = () =>{
 
+    private executeQuery = (db:any, query:string, params = []) => { // 쿼리를 날리고 비동기로 받자
+        return new Promise((succ, fail) =>{
+            db.transaction((trans)=>{
+                 trans.executeSql(query,params,(trans,results)=>{
+                    succ(results);
+                },(error)=>{
+                    fail(error);
+                });
+            });
+        });
+    }
+    
+    public async createUser(password:string){ // 사용자 등록 함수
+        let db = null;
+        let key = null;
+        let encryptedPassword, salt;
+
+        const onFail = () =>{
+            
         }
-        let db = await this.connectDatabase(testSuccess,testFail);
-        db.close();
-        return true;
+
+        db = await this.connectDatabase(onFail);
+        await sha256((new Date()).toUTCString()).then(hash => salt = hash); // salt 구하기
+        await sha256(password+salt).then(hash => encryptedPassword = hash); // db에 저장할 키의 해시값
+        key = password + salt; // 실제로 데이터를 암복호화 할 키
+
+        const val = "('" + encryptedPassword + "', '" + salt + "')";
+        let singleInsert = await this.executeQuery(db, "INSERT INTO USERS_TB(PASSWORD, SALT) VALUES" + val);
+        console.log(singleInsert);
+        return key;
     }
 }

@@ -23,7 +23,6 @@ padding: 0 40px 0 40px;
 const PinView = styled.View`
 width:100%;
 height:140px;
-background-color:#E9E9EA;
 justify-content:space-evenly;
 align-items:center;
 
@@ -72,10 +71,15 @@ const SetPinScreen = ({ navigation }) =>{
         } else {
             if(pin.length >= PIN_LENGTH){
                 if(beforePin.current === pin){
-                    alert("맞음" + pin);
-                    //사용자 등록 후 스크린 이동 구현하기
-
-                    //
+                    //사용자 등록
+                    const database = StrongboxDatabase.getInstance();
+                    database.createUser(pin).then((result)=>{
+                        global.key = result; // 유저 등록 성공하면 키를 받아 글로벌 변수에 저장한다
+                    }).catch((error:any)=>{
+                        console.log(error);
+                    });
+                    //스크린 이동
+                    navigation.reset({routes: [{ name: "Main" }]});
                 }else{
                     Alert.alert("비밀번호가 일치하지 않습니다.","다시 입력해주세요",[{text: '확인', onPress:()=>{}}]);
                     setPin('');
@@ -91,7 +95,7 @@ const SetPinScreen = ({ navigation }) =>{
         <StyledText color="white" fontWeight="700" size="30px">Accong Box</StyledText>
         <PaddingView>
         <PinView>
-            {checkPin ? <StyledText color="darkred" fontWeight="700" size="30px">Pin 확인</StyledText> : <StyledText color="darkred" fontWeight="700" size="30px">Pin 설정</StyledText>} 
+            {checkPin ? <StyledText color="lightyellow" fontWeight="700" size="30px">Pin 확인</StyledText> : <StyledText color="lightyellow" fontWeight="700" size="30px">Pin 설정</StyledText>} 
             <PinBox val={pin} length={PIN_LENGTH}/>
         </PinView>
         </PaddingView>
