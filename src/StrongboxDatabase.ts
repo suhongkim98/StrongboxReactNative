@@ -33,17 +33,17 @@ export class StrongboxDatabase{
             });
         });
     }
+
+    private onFailConnectDB = () =>{
+
+    }
     
     public async createUser(password:string){ // 사용자 등록 함수
         let db = null;
         let key = null;
         let encryptedPassword, salt;
 
-        const onFail = () =>{
-            
-        }
-
-        db = await this.connectDatabase(onFail);
+        db = await this.connectDatabase(this.onFailConnectDB);
         await sha256((new Date()).toUTCString()).then(hash => salt = hash); // salt 구하기
         await sha256(password+salt).then(hash => encryptedPassword = hash); // db에 저장할 키의 해시값
         key = password + salt; // 실제로 데이터를 암복호화 할 키
@@ -52,5 +52,32 @@ export class StrongboxDatabase{
         let singleInsert = await this.executeQuery(db, "INSERT INTO USERS_TB(PASSWORD, SALT) VALUES" + val);
         console.log(singleInsert);
         return key;
+    }
+
+    public async checkUser(){
+        //사용자 있는지 여부 검사 후 true / false 반환
+        let db = null;
+        db = await this.connectDatabase(this.onFailConnectDB);
+        let selectQuery = await this.executeQuery(db, "SELECT * FROM USERS_TB");
+        const rows = selectQuery.rows;
+        if(rows.length <= 0) return false;
+        return true;
+    }
+
+    public async validUser(password:string){
+        let db = null;
+
+        db = await this.connectDatabase(this.onFailConnectDB);
+        let selectQuery = await this.executeQuery(db, "SELECT * FROM USERS_TB");
+        const rows = selectQuery.rows; // 무조건 첫번째 row를 대상으로 하자(앱은 싱글사용자모드니깐)
+        console.log(password);
+        if(rows.length <= 0) return false; // 사용자가 없다면 로그인 실패
+
+        const salt = rows.item(0).SALT;
+        let encryptedPassword;
+        await sha256(password+salt).then(hash => encryptedPassword = hash);
+
+        if(encryptedPassword !== rows.item(0).PASSWORD) return false; // 일치하지 않으면 로그인 실패
+        return password + salt; // 로그인 성공 시 key 반환
     }
 }
