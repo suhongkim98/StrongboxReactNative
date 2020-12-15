@@ -2,10 +2,10 @@ import 'react-native-gesture-handler';
 import React, {useEffect, useState} from 'react';
 import InitScreen from '../screens/InitScreen';
 import SetPinScreen from '../screens/SetPinScreen';
-import MainScreen from '../screens/MainScreen';
 import LoginScreen from '../screens/LoginScreen';
 import {StrongboxDatabase} from '../../StrongboxDatabase';
 import {createStackNavigator} from '@react-navigation/stack';
+import MainNavi from './MainNavi';
 
 const Stack = createStackNavigator();
 const InitNavi = () => {
@@ -33,7 +33,7 @@ const InitNavi = () => {
           </>
         )}
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Main" component={MainScreen} />
+        <Stack.Screen name="Main" component={MainNavi} />
       </Stack.Navigator>
     </>
   );
