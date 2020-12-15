@@ -3,9 +3,9 @@ import {View, Alert} from 'react-native';
 import styled from 'styled-components/native';
 import {StrongboxDatabase} from '../../StrongboxDatabase';
 import theme from '../../styles/theme';
-import CleanSVG from '../../images/CleanSVG';
 import PinBox from '../../components/PinBox';
 import StyledText from '../../components/StyledText';
+import InputNumberKeyboard from '../../components/InputNumberKeyboard';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -31,19 +31,6 @@ const PinView = styled.View`
 const InputView = styled.View`
   flex: 0.35;
   background-color: #e9e9ea;
-`;
-const InputRow = styled.View`
-  flex: 1;
-  flex-direction: row;
-`;
-const InputButton = styled.TouchableOpacity`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
-const ButtonText = styled.Text`
-  font-size: 25px;
-  font-weight: 700;
 `;
 
 const LoginScreen = ({navigation}) => {
@@ -96,81 +83,7 @@ const LoginScreen = ({navigation}) => {
         </View>
       </ViewBody>
       <InputView>
-        <InputRow>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '1');
-            }}>
-            <ButtonText>1</ButtonText>
-          </InputButton>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '2');
-            }}>
-            <ButtonText>2</ButtonText>
-          </InputButton>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '3');
-            }}>
-            <ButtonText>3</ButtonText>
-          </InputButton>
-        </InputRow>
-        <InputRow>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '4');
-            }}>
-            <ButtonText>4</ButtonText>
-          </InputButton>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '5');
-            }}>
-            <ButtonText>5</ButtonText>
-          </InputButton>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '6');
-            }}>
-            <ButtonText>6</ButtonText>
-          </InputButton>
-        </InputRow>
-        <InputRow>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '7');
-            }}>
-            <ButtonText>7</ButtonText>
-          </InputButton>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '8');
-            }}>
-            <ButtonText>8</ButtonText>
-          </InputButton>
-          <InputButton
-            onPress={() => {
-              setPin(pin + '9');
-            }}>
-            <ButtonText>9</ButtonText>
-          </InputButton>
-        </InputRow>
-        <InputRow>
-          <InputButton />
-          <InputButton
-            onPress={() => {
-              setPin(pin + '0');
-            }}>
-            <ButtonText>0</ButtonText>
-          </InputButton>
-          <InputButton
-            onPress={() => {
-              setPin('');
-            }}>
-            <CleanSVG width="25px" height="25px" color="black" />
-          </InputButton>
-        </InputRow>
+        <InputNumberKeyboard typingFunc={setPin} text={pin} />
       </InputView>
     </TotalWrapper>
   );
