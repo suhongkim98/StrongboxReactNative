@@ -1,7 +1,6 @@
-
 //redux
 
-import { combineReducers } from 'redux';
+import {combineReducers} from 'redux';
 import counter from './counter';
 import groupList from './groupList';
 import serviceList from './serviceList';
@@ -13,7 +12,7 @@ const rootReducer = combineReducers({
   groupList,
   serviceList,
   selectedService,
-  accountList
+  accountList,
 });
 
 export default rootReducer;

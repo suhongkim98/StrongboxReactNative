@@ -1,6 +1,6 @@
 export interface SVGDefaultProps {
-    width:string;
-    height:string;
-    color?:any;
-    style?:any;
+  width: string;
+  height: string;
+  color?: any;
+  style?: any;
 }

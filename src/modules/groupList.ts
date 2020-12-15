@@ -6,15 +6,15 @@ const DELETE = 'groupList/DELETE' as const;
 
 export const updateGroup = (newList: any) => ({
   type: UPDATE,
-  payload: newList
+  payload: newList,
 });
 export const addGroup = (item: any) => ({
   type: ADD,
-  payload: item
+  payload: item,
 });
 export const deleteGroup = (groupIDX: number) => ({
   type: DELETE,
-  payload: groupIDX
+  payload: groupIDX,
 });
 
 type groupListAction =
@@ -22,26 +22,31 @@ type groupListAction =
   | ReturnType<typeof addGroup>
   | ReturnType<typeof deleteGroup>;
 
-  type groupListState = {
-    list: any; // 
-  }
-  
-  const initialState: groupListState = {
-    list: []
-  };
+type groupListState = {
+  list: any; //
+};
 
-  const groupList = (state: groupListState = initialState, action: groupListAction) => {
-    switch (action.type) {
-      case UPDATE:
-        return { list: action.payload }; // 새로운 배열로 교체
-      case ADD:
-        return { list: [...state.list, action.payload]}; // 새로운 아이템 추가
-      case DELETE:
-        const newList = state.list.filter((row:any)=>{return row.GRP_IDX !== action.payload});
-        return { list: newList }; // 해당 IDX 삭제
-      default:
-        return state;
-    }
+const initialState: groupListState = {
+  list: [],
+};
+
+const groupList = (
+  state: groupListState = initialState,
+  action: groupListAction,
+) => {
+  switch (action.type) {
+    case UPDATE:
+      return {list: action.payload}; // 새로운 배열로 교체
+    case ADD:
+      return {list: [...state.list, action.payload]}; // 새로운 아이템 추가
+    case DELETE:
+      const newList = state.list.filter((row: any) => {
+        return row.GRP_IDX !== action.payload;
+      });
+      return {list: newList}; // 해당 IDX 삭제
+    default:
+      return state;
   }
-  
-  export default groupList;
+};
+
+export default groupList;
