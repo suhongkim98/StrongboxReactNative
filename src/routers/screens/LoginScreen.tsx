@@ -38,7 +38,7 @@ const LoginScreen = ({navigation}) => {
   const [pin, setPin] = useState('');
 
   useEffect(() => {
-    if (pin.length >= PIN_LENGTH) {
+    if (pin.length === PIN_LENGTH) {
       //로그인
       const database = StrongboxDatabase.getInstance();
       database
@@ -51,9 +51,13 @@ const LoginScreen = ({navigation}) => {
           } else {
             //로그인 실패 // 비밀번호 틀림
             Alert.alert('비밀번호가 일치하지 않습니다.', '다시 입력해주세요', [
-              {text: '확인', onPress: () => {}},
+              {
+                text: '확인',
+                onPress: () => {
+                  setPin('');
+                },
+              },
             ]);
-            setPin('');
           }
         })
         .catch((error: any) => {

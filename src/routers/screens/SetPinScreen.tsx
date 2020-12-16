@@ -48,7 +48,7 @@ const SetPinScreen = ({navigation}) => {
         beforePin.current = pin;
       }
     } else {
-      if (pin.length >= PIN_LENGTH) {
+      if (pin.length === PIN_LENGTH) {
         if (beforePin.current === pin) {
           //사용자 등록
           const database = StrongboxDatabase.getInstance();
@@ -64,11 +64,15 @@ const SetPinScreen = ({navigation}) => {
           navigation.reset({routes: [{name: 'Main'}]});
         } else {
           Alert.alert('비밀번호가 일치하지 않습니다.', '다시 입력해주세요', [
-            {text: '확인', onPress: () => {}},
+            {
+              text: '확인',
+              onPress: () => {
+                setPin('');
+                beforePin.current = '';
+                setCheckPin(false);
+              },
+            },
           ]);
-          setPin('');
-          beforePin.current = '';
-          setCheckPin(false);
         }
       }
     }

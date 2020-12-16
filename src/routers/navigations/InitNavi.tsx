@@ -6,10 +6,23 @@ import LoginScreen from '../screens/LoginScreen';
 import {StrongboxDatabase} from '../../StrongboxDatabase';
 import {createStackNavigator} from '@react-navigation/stack';
 import MainNavi from './MainNavi';
+import styled from 'styled-components/native';
+import theme from '../../styles/theme';
+import StyledText from '../../components/StyledText';
+import LoadingSVG from '../../images/LoadingSVG';
+
+const LoadingWrapper = styled.View`
+  flex: 1;
+  background-color: ${theme.colors.backgroundMainColor};
+  justify-content: center;
+  align-items: center;
+`;
 
 const Stack = createStackNavigator();
 const InitNavi = () => {
   const [isExistUser, setIsExistUser] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     // 사용자 여부 검사하기
     const database = StrongboxDatabase.getInstance();
@@ -17,11 +30,23 @@ const InitNavi = () => {
       .checkUser()
       .then((result) => {
         setIsExistUser(result);
+        setIsLoading(false);
       })
       .catch((error: any) => {
         console.log(error);
       });
   }, []);
+
+  if (isLoading) {
+    //로딩 중일 땐
+    return (
+      <LoadingWrapper>
+        <StyledText color="white" size="25px">
+          <LoadingSVG width="50px" height="50px" color="white" />
+        </StyledText>
+      </LoadingWrapper>
+    );
+  }
 
   return (
     <>
