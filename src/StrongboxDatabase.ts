@@ -11,14 +11,14 @@ export class StrongboxDatabase {
     }
     return StrongboxDatabase.strongboxDatabase;
   };
-  public connectDatabase = (failToOpenDB: any) => {
+  public connectDatabase = () => {
     return SQLite.openDatabase(
       {
         name: StrongboxDatabase.DB_PATH, // assets/www 안에 있음
         createFromLocation: 1,
       },
       () => {},
-      failToOpenDB,
+      this.onFailConnectDB,
     );
   };
 
@@ -48,7 +48,7 @@ export class StrongboxDatabase {
     let key = null;
     let encryptedPassword, salt;
 
-    db = await this.connectDatabase(this.onFailConnectDB);
+    db = await this.connectDatabase();
     await sha256(new Date().toUTCString()).then((hash) => (salt = hash)); // salt 구하기
     await sha256(password + salt).then((hash) => (encryptedPassword = hash)); // db에 저장할 키의 해시값
     key = password + salt; // 실제로 데이터를 암복호화 할 키
@@ -65,7 +65,7 @@ export class StrongboxDatabase {
   public async checkUser() {
     //사용자 있는지 여부 검사 후 true / false 반환
     let db = null;
-    db = await this.connectDatabase(this.onFailConnectDB);
+    db = await this.connectDatabase();
     let selectQuery = await this.executeQuery(db, 'SELECT * FROM USERS_TB');
     const rows = selectQuery.rows;
     if (rows.length <= 0) {
@@ -77,7 +77,7 @@ export class StrongboxDatabase {
   public async validUser(password: string) {
     let db = null;
 
-    db = await this.connectDatabase(this.onFailConnectDB);
+    db = await this.connectDatabase();
     let selectQuery = await this.executeQuery(db, 'SELECT * FROM USERS_TB');
     const rows = selectQuery.rows; // 무조건 첫번째 row를 대상으로 하자(앱은 싱글사용자모드니깐)
     if (rows.length <= 0) {
@@ -92,5 +92,16 @@ export class StrongboxDatabase {
       return false;
     } // 일치하지 않으면 로그인 실패
     return password + salt; // 로그인 성공 시 key 반환
+  }
+
+  public async addGroup(groupName: string) {
+    let db = null;
+    db = await this.connectDatabase();
+    let singleInsert = await this.executeQuery(
+      db,
+      'INSERT INTO GROUPS_TB(OWNER_IDX, GRP_NAME) VALUES(?, ?)',
+      [0, groupName],
+    );
+    return {rowid: singleInsert.insertId, groupName: groupName};
   }
 }
