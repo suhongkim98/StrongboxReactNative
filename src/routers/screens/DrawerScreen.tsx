@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
 import theme from '../../styles/theme';
 import StyledText from '../../components/StyledText';
 import {StrongboxDatabase} from '../../StrongboxDatabase';
-import Modal from 'react-native-modal';
 import GroupFolder from '../../components/GroupFolder';
+import ModalPopup from '../../components/ModalPopup';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -32,59 +32,51 @@ const AddFolderButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
 `;
-const AddGroupModalWrapper = styled.View`
-  flex: 1;
-`;
-const HideModalButton = styled.TouchableOpacity`
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
-`;
-const StyleModel = styled(Modal)`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
-const ModalContainer = styled.View`
-  width: 300px;
-  height: 200px;
-  background-color: white;
-  border-radius: 5px;
-`;
+const GroupTextInput = styled.TextInput``;
+
 const DrawerScreen = (props) => {
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
+  const addGroupTextValue = useRef('');
 
-  // const onPressAddFolder = () => {
-  //   const database = StrongboxDatabase.getInstance();
-  //   database
-  //     .addGroup('test')
-  //     .then((result) => {
-  //       console.log(result.rowid + '랑' + result.groupName); //get row id //addGroupList({GRP_IDX: result.rowid, GRP_NAME: result.groupName});
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+  const onAddFolder = () => {
+    const database = StrongboxDatabase.getInstance();
+    database
+      .addGroup(addGroupTextValue.current)
+      .then((result) => {
+        console.log(result.rowid + '랑' + result.groupName); //get row id //addGroupList({GRP_IDX: result.rowid, GRP_NAME: result.groupName});
+        setAddGroupModalVisible(false);
+        //redux 건들기
+        //알림Toast 추가하기
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <TotalWrapper>
-      <StyleModel
+      <ModalPopup
+        containerWidth="300px"
+        containerHeight="150px"
         isVisible={addGroupModalVisible}
-        onBackdropPress={() => {
+        headerTitle="폴더 추가"
+        onAgreeTitle="폴더 생성"
+        onDenyTitle="취소"
+        onAgree={onAddFolder}
+        onDeny={() => {
           setAddGroupModalVisible(false);
         }}
-        useNativeDriver={true}>
-        <ModalContainer>
-          <AddGroupModalWrapper>
-            <StyledText color="black">여기다가 그룹 이름 적기</StyledText>
-            <HideModalButton
-              onPress={() => {
-                setAddGroupModalVisible(false);
-              }}>
-              <StyledText color="black">모달 닫기</StyledText>
-            </HideModalButton>
-          </AddGroupModalWrapper>
-        </ModalContainer>
-      </StyleModel>
+        onBackdropPress={() => {
+          setAddGroupModalVisible(false);
+        }}>
+        <GroupTextInput
+          onChangeText={(text) => {
+            addGroupTextValue.current = text;
+            console.log(addGroupTextValue.current);
+          }}
+          placeholder="이름을 입력해주세요"
+        />
+      </ModalPopup>
       <HeaderWrapper>
         <StyledText color="white" size="20px">
           Accong Box
@@ -171,7 +163,7 @@ const DrawerScreen = (props) => {
             setAddGroupModalVisible(true);
           }}>
           <StyledText color="white" size="14px">
-            폴더 추가
+            폴더 추가하기
           </StyledText>
         </AddFolderButton>
       </FooterWrapper>

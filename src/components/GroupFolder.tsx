@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import PlusSVG from '../images/PlusSVG';
 import MinusSVG from '../images/MinusSVG';
@@ -35,13 +35,16 @@ const GroupFolder = ({groupName, children}: GroupFolderProps) => {
   const [isClose, setClose] = useState(false);
   const [innerBodyHeight, setInnerBodyHeight] = useState(0);
 
-  const toggleFolder = () => {
-    setClose(!isClose);
+  useEffect(() => {
     if (isClose) {
       setInnerBodyHeight(0);
     } else {
       setInnerBodyHeight(27 * children.length);
     }
+  }, [isClose, children.length]);
+
+  const toggleFolder = () => {
+    setClose(!isClose);
   };
 
   return (
@@ -52,9 +55,9 @@ const GroupFolder = ({groupName, children}: GroupFolderProps) => {
             {groupName}
           </StyledText>
           {isClose ? (
-            <MinusSVG width="20px" height="20px" color="gray" />
-          ) : (
             <PlusSVG width="20px" height="20px" color="gray" />
+          ) : (
+            <MinusSVG width="20px" height="20px" color="gray" />
           )}
         </HeaderWrapper>
       </TouchableOpacity>
