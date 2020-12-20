@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import styled from 'styled-components/native';
-import {Button} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import theme from '../../styles/theme';
 import StyledText from '../../components/StyledText';
 import {StrongboxDatabase} from '../../StrongboxDatabase';
 import Modal from 'react-native-modal';
+import GroupFolder from '../../components/GroupFolder';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -94,18 +95,74 @@ const DrawerScreen = (props) => {
       </HeaderWrapper>
       <BodyWrapper>
         <DrawerContentScrollView {...props}>
-          <Button
-            title="계정1"
-            onPress={() =>
-              props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 1})
-            } //기존화면으로 파라미터에 IDX를 넣고 이동
-          />
-          <Button
-            title="계정2"
-            onPress={() =>
-              props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 2})
-            }
-          />
+          <GroupFolder groupName="test">
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 1})
+              }>
+              <StyledText size="20px" color="white">
+                t1
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 2})
+              }>
+              <StyledText size="20px" color="white">
+                t2
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 3})
+              }>
+              <StyledText size="20px" color="white">
+                t2
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 4})
+              }>
+              <StyledText size="20px" color="white">
+                t2
+              </StyledText>
+            </TouchableOpacity>
+          </GroupFolder>
+          <GroupFolder groupName="test2">
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 5})
+              }>
+              <StyledText size="20px" color="white">
+                t1
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 6})
+              }>
+              <StyledText size="20px" color="white">
+                t2
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 7})
+              }>
+              <StyledText size="20px" color="white">
+                t2
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 8})
+              }>
+              <StyledText size="20px" color="white">
+                t2
+              </StyledText>
+            </TouchableOpacity>
+          </GroupFolder>
         </DrawerContentScrollView>
       </BodyWrapper>
       <FooterWrapper>
