@@ -104,4 +104,15 @@ export class StrongboxDatabase {
     );
     return {rowid: singleInsert.insertId, groupName: groupName};
   }
+
+  public async getGroup() {
+    let db = null;
+    db = await this.connectDatabase();
+    let selectQuery = await this.executeQuery(
+      db,
+      'SELECT IDX, GRP_NAME FROM GROUPS_TB',
+      [],
+    );
+    return selectQuery.rows;
+  }
 }

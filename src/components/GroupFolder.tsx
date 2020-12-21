@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Children} from 'react';
 import styled from 'styled-components';
 import PlusSVG from '../images/PlusSVG';
 import MinusSVG from '../images/MinusSVG';
@@ -39,9 +39,9 @@ const GroupFolder = ({groupName, children}: GroupFolderProps) => {
     if (isClose) {
       setInnerBodyHeight(0);
     } else {
-      setInnerBodyHeight(27 * children.length);
+      setInnerBodyHeight(27 * Children.count(children));
     }
-  }, [isClose, children.length]);
+  }, [isClose, children]);
 
   const toggleFolder = () => {
     setClose(!isClose);
