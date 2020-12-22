@@ -10,6 +10,7 @@ import ModalPopup from '../../components/ModalPopup';
 import {useSelector, useDispatch} from 'react-redux';
 import {addGroup} from '../../modules/groupList';
 import Toast from 'react-native-root-toast';
+import {updateSelectedItemIndex} from '../../modules/selectedService';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -114,9 +115,18 @@ const DrawerScreen = (props) => {
             return (
               <GroupFolder key={row.GRP_IDX} groupName={row.GRP_NAME}>
                 <TouchableOpacity
-                  onPress={() =>
-                    props.navigation.jumpTo('MainScreen', {SERVICE_IDX: 1})
-                  }>
+                  onPress={() => {
+                    dispatch(
+                      updateSelectedItemIndex({
+                        idx: 1,
+                        name: '서비스이름 넣기',
+                      }),
+                    );
+                    props.navigation.jumpTo('MainScreen', {
+                      SERVICE_IDX: 1,
+                      SERVICE_NAME: '서비스이름 넣기',
+                    });
+                  }}>
                   <StyledText size="20px" color="white">
                     test
                   </StyledText>
