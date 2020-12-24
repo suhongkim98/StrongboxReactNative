@@ -11,6 +11,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {addGroup} from '../../modules/groupList';
 import Toast from 'react-native-root-toast';
 import {updateSelectedItemIndex} from '../../modules/selectedService';
+import BottomSlide from '../../components/BottomSlide';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -37,6 +38,19 @@ const AddFolderButton = styled.TouchableOpacity`
   justify-content: center;
 `;
 const GroupTextInput = styled.TextInput``;
+const SlideItem = styled.TouchableOpacity`
+  width: 100%;
+  height: 40px;
+  justify-content: center;
+`;
+const SlideInnerWrapper = styled.View`
+  width: 100%;
+`;
+const Hr = styled.View`
+  width: 100%;
+  border-bottom-width: 1px;
+  border-color: gray;
+`;
 
 const DrawerScreen = (props) => {
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
@@ -45,6 +59,7 @@ const DrawerScreen = (props) => {
   const groupList = useSelector((state: RootState) => state.groupList.list);
   const [toastVisible, setToastVisible] = useState(false);
   const toastTimer = useRef<number>(-1);
+  const [bottomSlideVisible, setBottomSlideVisible] = useState(false);
 
   const onAddFolder = () => {
     const database = StrongboxDatabase.getInstance();
@@ -79,6 +94,30 @@ const DrawerScreen = (props) => {
         hideOnPress={true}>
         폴더를 추가했습니다.
       </Toast>
+      <BottomSlide
+        width="100%"
+        height="150px"
+        isVisible={bottomSlideVisible}
+        onClose={() => {
+          setBottomSlideVisible(false);
+        }}>
+        <SlideInnerWrapper>
+          <SlideItem
+            onPress={() => {
+              setBottomSlideVisible(false);
+              setAddGroupModalVisible(true);
+            }}>
+            <StyledText>폴더 추가</StyledText>
+          </SlideItem>
+          <SlideItem>
+            <StyledText>서비스 추가</StyledText>
+          </SlideItem>
+          <Hr />
+          <SlideItem>
+            <StyledText>편집</StyledText>
+          </SlideItem>
+        </SlideInnerWrapper>
+      </BottomSlide>
       <ModalPopup
         containerWidth="300px"
         containerHeight="150px"
@@ -139,10 +178,10 @@ const DrawerScreen = (props) => {
       <FooterWrapper>
         <AddFolderButton
           onPress={() => {
-            setAddGroupModalVisible(true);
+            setBottomSlideVisible(true);
           }}>
           <StyledText color="white" size="14px">
-            폴더 추가하기
+            수정하기
           </StyledText>
         </AddFolderButton>
       </FooterWrapper>
