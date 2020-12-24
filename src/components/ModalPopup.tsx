@@ -15,16 +15,17 @@ const StyleModal = styled(Modal)`
   align-items: center;
 `;
 const HeaderModal = styled.View`
-  flex: 0.3;
+  height: 40px;
   flex-direction: row;
   justify-content: center;
+  align-items: center;
 `;
 const BodyModal = styled.View`
-  flex: 0.4;
+  flex: 1;
   padding: 0 5px 0 5px;
 `;
 const FooterModal = styled.View`
-  flex: 0.3;
+  height: 40px;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
@@ -34,7 +35,9 @@ interface ModalContainerProps {
   height: string;
 }
 const ModalContainer = styled.View<ModalContainerProps>`
+  min-width: 100px;
   width: ${(props) => props.width};
+  min-height: 100px;
   height: ${(props) => props.height};
   background-color: white;
   border-radius: 5px;

@@ -15,7 +15,7 @@ const Item = styled.TouchableOpacity`
 const BodyWrapper = styled.View`
   width: 100%;
 `;
-const Hr = styled.View`
+const Divider = styled.View`
   width: 100%;
   border-bottom-width: 1px;
   border-color: gray;
@@ -35,7 +35,7 @@ const DrawerBottomSlide = ({isVisible, onClose}) => {
         <Item>
           <StyledText>서비스 추가</StyledText>
         </Item>
-        <Hr />
+        <Divider />
         <Item>
           <StyledText>편집</StyledText>
         </Item>

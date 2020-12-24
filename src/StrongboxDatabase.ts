@@ -115,4 +115,15 @@ export class StrongboxDatabase {
     );
     return selectQuery.rows;
   }
+
+  public async addService(groupIdx: number, name: string) {
+    let db = null;
+    db = await this.connectDatabase();
+    let singleInsert = await this.executeQuery(
+      db,
+      'INSERT INTO SERVICES_TB(GRP_IDX, SERVICE_NAME) VALUES(?,?)',
+      [groupIdx, name],
+    );
+    return {rowid: singleInsert.insertId, serviceName: name};
+  }
 }

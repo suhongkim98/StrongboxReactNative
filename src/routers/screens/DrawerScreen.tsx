@@ -4,14 +4,13 @@ import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
 import theme from '../../styles/theme';
 import StyledText from '../../components/StyledText';
-import {StrongboxDatabase} from '../../StrongboxDatabase';
 import GroupFolder from '../../components/GroupFolder';
-import ModalPopup from '../../components/ModalPopup';
 import {useSelector, useDispatch} from 'react-redux';
-import {addGroup} from '../../modules/groupList';
 import Toast from 'react-native-root-toast';
 import {updateSelectedItemIndex} from '../../modules/selectedService';
 import BottomSlide from '../../components/BottomSlide';
+import AddGroupModalPopup from '../../components/AddGroupModalPopup';
+import AddServiceModalPopup from '../../components/AddServiceModalPopup';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -37,7 +36,6 @@ const AddFolderButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
 `;
-const GroupTextInput = styled.TextInput``;
 const SlideItem = styled.TouchableOpacity`
   width: 100%;
   height: 40px;
@@ -54,34 +52,26 @@ const Hr = styled.View`
 
 const DrawerScreen = (props) => {
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
-  const addGroupTextValue = useRef('');
-  const dispatch = useDispatch();
+  const [addServiceModalVisible, setAddServiceModalVisible] = useState(false);
   const groupList = useSelector((state: RootState) => state.groupList.list);
+  const [bottomSlideVisible, setBottomSlideVisible] = useState(false);
+  const dispatch = useDispatch();
+
   const [toastVisible, setToastVisible] = useState(false);
   const toastTimer = useRef<number>(-1);
-  const [bottomSlideVisible, setBottomSlideVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
-  const onAddFolder = () => {
-    const database = StrongboxDatabase.getInstance();
-    database
-      .addGroup(addGroupTextValue.current)
-      .then((result) => {
-        setAddGroupModalVisible(false);
-        //redux 건들기
-        dispatch(addGroup({GRP_IDX: result.rowid, GRP_NAME: result.groupName}));
-        //알림Toast 추가하기
-        setToastVisible(true);
-        if (toastTimer.current !== -1) {
-          clearTimeout(toastTimer.current);
-          toastTimer.current = -1;
-        }
-        toastTimer.current = setTimeout(() => {
-          setToastVisible(false);
-        }, 2000);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const showToastMessage = (message: string) => {
+    // toast 보여주는 함수
+    setToastMessage(message);
+    setToastVisible(true);
+    if (toastTimer.current !== -1) {
+      clearTimeout(toastTimer.current);
+      toastTimer.current = -1;
+    }
+    toastTimer.current = setTimeout(() => {
+      setToastVisible(false);
+    }, 2000);
   };
 
   return (
@@ -92,7 +82,7 @@ const DrawerScreen = (props) => {
         shadow={true}
         animation={true}
         hideOnPress={true}>
-        폴더를 추가했습니다.
+        {toastMessage}
       </Toast>
       <BottomSlide
         width="100%"
@@ -109,7 +99,11 @@ const DrawerScreen = (props) => {
             }}>
             <StyledText>폴더 추가</StyledText>
           </SlideItem>
-          <SlideItem>
+          <SlideItem
+            onPress={() => {
+              setBottomSlideVisible(false);
+              setAddServiceModalVisible(true);
+            }}>
             <StyledText>서비스 추가</StyledText>
           </SlideItem>
           <Hr />
@@ -118,28 +112,16 @@ const DrawerScreen = (props) => {
           </SlideItem>
         </SlideInnerWrapper>
       </BottomSlide>
-      <ModalPopup
-        containerWidth="300px"
-        containerHeight="150px"
-        isVisible={addGroupModalVisible}
-        headerTitle="폴더 추가"
-        onAgreeTitle="폴더 생성"
-        onDenyTitle="취소"
-        onAgree={onAddFolder}
-        onDeny={() => {
-          setAddGroupModalVisible(false);
-        }}
-        onBackdropPress={() => {
-          setAddGroupModalVisible(false);
-        }}>
-        <GroupTextInput
-          onChangeText={(text) => {
-            addGroupTextValue.current = text;
-            console.log(addGroupTextValue.current);
-          }}
-          placeholder="이름을 입력해주세요"
-        />
-      </ModalPopup>
+      <AddGroupModalPopup
+        visible={addGroupModalVisible}
+        visibleFunc={setAddGroupModalVisible}
+        toastFunc={showToastMessage}
+      />
+      <AddServiceModalPopup
+        visible={addServiceModalVisible}
+        visibleFunc={setAddServiceModalVisible}
+        toastFunc={showToastMessage}
+      />
       <HeaderWrapper>
         <StyledText color="white" size="20px">
           Accong Box
