@@ -1,13 +1,11 @@
 import React, {useState, useRef} from 'react';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import styled from 'styled-components/native';
-import {TouchableOpacity} from 'react-native';
 import theme from '../../styles/theme';
 import StyledText from '../../components/StyledText';
 import GroupFolder from '../../components/GroupFolder';
-import {useSelector, useDispatch} from 'react-redux';
+import {useSelector} from 'react-redux';
 import Toast from 'react-native-root-toast';
-import {updateSelectedItemIndex} from '../../modules/selectedService';
 import BottomSlide from '../../components/BottomSlide';
 import AddGroupModalPopup from '../../components/AddGroupModalPopup';
 import AddServiceModalPopup from '../../components/AddServiceModalPopup';
@@ -55,7 +53,6 @@ const DrawerScreen = (props) => {
   const [addServiceModalVisible, setAddServiceModalVisible] = useState(false);
   const groupList = useSelector((state: RootState) => state.groupList.list);
   const [bottomSlideVisible, setBottomSlideVisible] = useState(false);
-  const dispatch = useDispatch();
 
   const [toastVisible, setToastVisible] = useState(false);
   const toastTimer = useRef<number>(-1);
@@ -134,25 +131,12 @@ const DrawerScreen = (props) => {
         <DrawerContentScrollView {...props}>
           {groupList.map((row: any) => {
             return (
-              <GroupFolder key={row.GRP_IDX} groupName={row.GRP_NAME}>
-                <TouchableOpacity
-                  onPress={() => {
-                    dispatch(
-                      updateSelectedItemIndex({
-                        idx: 1,
-                        name: '서비스이름 넣기',
-                      }),
-                    );
-                    props.navigation.jumpTo('MainScreen', {
-                      SERVICE_IDX: 1,
-                      SERVICE_NAME: '서비스이름 넣기',
-                    });
-                  }}>
-                  <StyledText size="20px" color="white">
-                    test
-                  </StyledText>
-                </TouchableOpacity>
-              </GroupFolder>
+              <GroupFolder
+                key={row.GRP_IDX}
+                groupName={row.GRP_NAME}
+                groupIdx={row.GRP_IDX}
+                navigation={props.navigation}
+              />
             );
           })}
         </DrawerContentScrollView>

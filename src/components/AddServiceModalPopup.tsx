@@ -62,9 +62,6 @@ const AddServiceModalPopup = ({
     database // grp-idx, service이름 매개변수로
       .addService(groupIdx, addServiceTextValue.current)
       .then((result) => {
-        console.log(
-          result.rowid + '랑 ' + result.serviceName + '그룹idx ' + groupIdx,
-        );
         visibleFunc(false);
         //redux 건들기
         dispatch(
@@ -94,9 +91,11 @@ const AddServiceModalPopup = ({
       onAgree={onAddService}
       onDeny={() => {
         visibleFunc(false);
+        initInputValue();
       }}
       onBackdropPress={() => {
         visibleFunc(false);
+        initInputValue();
       }}>
       <BodyWrapper>
         <View>

@@ -4,6 +4,7 @@ import StyledText from '../../components/StyledText';
 import {StrongboxDatabase} from '../../StrongboxDatabase.ts';
 import {useDispatch, useSelector} from 'react-redux';
 import {updateGroup} from '../../modules/groupList';
+import {updateService} from '../../modules/serviceList';
 import MenuSVG from '../../images/MenuSVG';
 import SettingSVG from '../../images/SettingSVG';
 const TotalWrapper = styled.View`
@@ -30,7 +31,7 @@ const BodyWrapper = styled.View`
 `;
 const AdvertisementView = styled.View``; // 추후 광고 추가 예정
 
-const MainScreen = ({route, navigation}) => {
+const MainScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const selectedService = useSelector(
     (state: RootState) => state.selectedService.itemIndex,
@@ -51,7 +52,26 @@ const MainScreen = ({route, navigation}) => {
       .catch((error) => {
         console.log(error);
       });
+
+    database
+      .getService()
+      .then((result) => {
+        const tmp = [];
+        for (let i = 0; i < result.length; i++) {
+          const row = result.item(i);
+          tmp.push({
+            GRP_IDX: row.GRP_IDX,
+            SERVICE_IDX: row.IDX,
+            SERVICE_NAME: row.SERVICE_NAME,
+          });
+        }
+        dispatch(updateService(tmp)); // 서비스 리스트 업데이트하자~~~~
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, [dispatch]);
+
   return (
     <TotalWrapper>
       <HeaderWrapper>
@@ -61,9 +81,9 @@ const MainScreen = ({route, navigation}) => {
           }}>
           <MenuSVG width="20px" height="20px" color="black" />
         </MenuButton>
-        {route.params && (
+        {selectedService.idx > 0 && (
           <StyledText size="20px" fontWeight="700">
-            {route.params.SERVICE_NAME}
+            {selectedService.name}
           </StyledText>
         )}
         <MenuButton onPress={() => {}}>

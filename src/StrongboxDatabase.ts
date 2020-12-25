@@ -126,4 +126,15 @@ export class StrongboxDatabase {
     );
     return {rowid: singleInsert.insertId, serviceName: name};
   }
+
+  public async getService() {
+    let db = null;
+    db = await this.connectDatabase();
+    let selectQuery = await this.executeQuery(
+      db,
+      'SELECT IDX, SERVICE_NAME, GRP_IDX FROM SERVICES_TB',
+      [],
+    );
+    return selectQuery.rows;
+  }
 }
