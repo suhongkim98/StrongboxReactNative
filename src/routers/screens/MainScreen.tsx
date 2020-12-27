@@ -7,6 +7,12 @@ import {updateGroup} from '../../modules/groupList';
 import {updateService} from '../../modules/serviceList';
 import MenuSVG from '../../images/MenuSVG';
 import SettingSVG from '../../images/SettingSVG';
+import ActionButton from 'react-native-action-button';
+import Icon from 'react-native-vector-icons/AntDesign';
+import {LogBox} from 'react-native';
+
+LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
+
 const TotalWrapper = styled.View`
   flex: 1;
   background-color: #f5f5f5;
@@ -30,6 +36,11 @@ const BodyWrapper = styled.View`
   align-items: center;
 `;
 const AdvertisementView = styled.View``; // 추후 광고 추가 예정
+const StyledIcon = styled(Icon)`
+  font-size: 20px;
+  height: 22px;
+  color: white;
+`;
 
 const MainScreen = ({navigation}) => {
   const dispatch = useDispatch();
@@ -100,6 +111,20 @@ const MainScreen = ({navigation}) => {
             </StyledText>
           )}
         </StyledText>
+        <ActionButton buttonColor="rgba(231,76,60,1)">
+          <ActionButton.Item
+            buttonColor="#9b59b6"
+            title="계정 추가"
+            onPress={() => {}}>
+            <StyledIcon name="pluscircleo" />
+          </ActionButton.Item>
+          <ActionButton.Item
+            buttonColor="#3498db"
+            title="계정 삭제"
+            onPress={() => {}}>
+            <StyledIcon name="delete" />
+          </ActionButton.Item>
+        </ActionButton>
       </BodyWrapper>
       <AdvertisementView />
     </TotalWrapper>
