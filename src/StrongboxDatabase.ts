@@ -1,6 +1,6 @@
 import SQLite from 'react-native-sqlite-storage';
 import {sha256} from 'react-native-sha256';
-
+import CryptoJS from 'react-native-crypto-js';
 export class StrongboxDatabase {
   private static strongboxDatabase: StrongboxDatabase;
   private static DB_PATH = 'test.db';
@@ -136,5 +136,105 @@ export class StrongboxDatabase {
       [],
     );
     return selectQuery.rows;
+  }
+
+  public async addAccount(
+    serviceIDX: number,
+    accountName: string,
+    account: {OAuthAccountIDX?: number; id?: string; password?: string},
+  ) {
+    //
+    let db = await this.connectDatabase();
+    let query = null;
+    let params = [];
+    if (account.OAuthAccountIDX) {
+      query =
+        'INSERT INTO ACCOUNTS_TB(ACCOUNT_NAME, SERVICE_IDX, OAUTH_LOGIN_IDX) VALUES(?,?,?)';
+      params = [accountName, serviceIDX, account.OAuthAccountIDX];
+    } else {
+      const key = global.key;
+      let ciphertext = CryptoJS.AES.encrypt(account.password, key).toString(); // AES암호화
+      query =
+        'INSERT INTO ACCOUNTS_TB(SERVICE_IDX,ACCOUNT_NAME,ID,PASSWORD) VALUES(?,?,?,?)';
+      params = [serviceIDX, accountName, account.id, ciphertext];
+    }
+
+    let singleQuery = await this.executeQuery(db, query, params);
+
+    const date = new Date();
+    const now =
+      date.getFullYear() +
+      '-' +
+      date.getMonth() +
+      '-' +
+      date.getDate() +
+      ' ' +
+      date.getHours() +
+      ':' +
+      date.getMinutes() +
+      ':' +
+      date.getSeconds();
+    const result = {
+      ROWID: singleQuery.insertId,
+      DATE: now,
+      NAME: accountName,
+      SERVICE_IDX: serviceIDX,
+      OAuthIDX: account.OAuthAccountIDX,
+      ID: account.id,
+      PASSWORD: account.password,
+    };
+    return result;
+  }
+  public async getAccount() {
+    let db = this.connectDatabase();
+    let query =
+      'SELECT ACCOUNTS_TB.IDX,SERVICE_IDX,ACCOUNT_NAME,DATE,OAUTH_LOGIN_IDX,ID,PASSWORD FROM ACCOUNTS_TB ' +
+      'JOIN SERVICES_TB ON ACCOUNTS_TB.SERVICE_IDX = SERVICES_TB.IDX ' +
+      'JOIN GROUPS_TB ON SERVICES_TB.GRP_IDX = GROUPS_TB.IDX ';
+    let allAccountSelectQuery = await this.executeQuery(db, query, []);
+    const allAccountRows = allAccountSelectQuery.rows;
+
+    const list = [];
+    for (let i = 0; i < allAccountRows.length; i++) {
+      if (allAccountRows.item(i).OAUTH_LOGIN_IDX) {
+        list.push(allAccountRows.item(i).OAUTH_LOGIN_IDX);
+      }
+    }
+
+    if (list.length > 0) {
+      let idx = '(';
+      for (let i = 0; i < list.length; i++) {
+        idx += list[i];
+        if (i !== list.length - 1) {
+          idx += ',';
+        } else {
+          idx += ')';
+        }
+      }
+      query =
+        'SELECT ATB.IDX,STB.SERVICE_NAME,ATB.ACCOUNT_NAME,ATB.ID,ATB.PASSWORD FROM ACCOUNTS_TB ATB,SERVICES_TB STB ' +
+        'WHERE ATB.IDX IN ' +
+        idx +
+        ' AND ATB.SERVICE_IDX = STB.IDX';
+      const oauthAccountSelectQuery = await this.executeQuery(db, query, []);
+      const oauthAccountRows = oauthAccountSelectQuery.rows;
+
+      for (let i = 0; i < allAccountRows.length; i++) {
+        for (let j = 0; j < oauthAccountRows.length; j++) {
+          // 나중에 SQL문으로 한번에 뽑아보자
+          if (
+            allAccountRows.item(i).OAUTH_LOGIN_IDX ===
+            oauthAccountRows.item(j).IDX
+          ) {
+            allAccountRows.item(i).OAUTH_SERVICE_NAME = oauthAccountRows.item(
+              j,
+            ).SERVICE_NAME;
+            allAccountRows.item(i).ID = oauthAccountRows.item(j).ID;
+            allAccountRows.item(i).PASSWORD = oauthAccountRows.item(j).PASSWORD;
+          }
+        }
+      }
+    }
+    return allAccountRows;
   }
 }

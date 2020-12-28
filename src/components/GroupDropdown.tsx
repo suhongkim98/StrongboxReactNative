@@ -3,42 +3,42 @@ import Dropdown from './Dropdown';
 import DropdownItem from './DropdownItem';
 import {useSelector} from 'react-redux';
 
-interface ServiceDropdownProps {
-  setServiceFunc: (idx: number) => any;
+interface GroupDropdownProps {
+  setGroupFunc: (idx: number) => any;
 }
 
-const ServiceDropdown = ({setServiceFunc}: ServiceDropdownProps) => {
-  const serviceList = useSelector((state: RootState) => state.serviceList.list);
+const GroupDropdown = ({setGroupFunc}: GroupDropdownProps) => {
+  const groupList = useSelector((state: RootState) => state.groupList.list);
   const [dropdownList, setDropdownList] = useState([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [serviceName, setServiceName] = useState('');
+  const [groupName, setGroupName] = useState('');
 
   useEffect(() => {
     const tmp = [];
-    serviceList.map((row) =>
+    groupList.map((row) =>
       tmp.push(
         <DropdownItem
-          key={row.SERVICE_IDX}
-          title={row.SERVICE_NAME}
+          key={row.GRP_IDX}
+          title={row.GRP_NAME}
           onPressItem={() => {
-            setServiceName(row.SERVICE_NAME);
-            setServiceFunc(row.SERVICE_IDX);
+            setGroupName(row.GRP_NAME);
+            setGroupFunc(row.GRP_IDX);
             setDropdownVisible(false);
           }}
         />,
       ),
     );
     setDropdownList(tmp);
-  }, [serviceList, setServiceFunc]);
+  }, [groupList, setGroupFunc]);
   return (
     <Dropdown
       width="100%"
       list={dropdownList}
-      selectedName={serviceName}
+      selectedName={groupName}
       visibleFunc={setDropdownVisible}
       visible={dropdownVisible}
     />
   );
 };
 
-export default ServiceDropdown;
+export default GroupDropdown;

@@ -5,7 +5,7 @@ import {StrongboxDatabase} from '../StrongboxDatabase';
 import styled from 'styled-components/native';
 import {addService} from '../modules/serviceList';
 import {useDispatch} from 'react-redux';
-import ServiceDropdown from './ServiceDropdown';
+import GroupDropdown from './GroupDropdown';
 import StyledText from './StyledText';
 
 interface AddServiceModalPopupProps {
@@ -100,7 +100,7 @@ const AddServiceModalPopup = ({
       <BodyWrapper>
         <View>
           <StyledText>그룹 선택</StyledText>
-          <ServiceDropdown setGroupFunc={setGroupIdx} />
+          <GroupDropdown setGroupFunc={setGroupIdx} />
         </View>
         <View>
           <StyledText>서비스 이름</StyledText>

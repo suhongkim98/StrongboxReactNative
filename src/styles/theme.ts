@@ -1,11 +1,11 @@
 const colors = {
-	white: '#ffffff',
-	black: '#000000',
-	backgroundMainColor: '#1A1A2E'
+  white: '#ffffff',
+  black: '#000000',
+  backgroundMainColor: '#1A1A2E',
 };
 
 const theme = {
-	colors
+  colors,
 };
 
 export default theme;
