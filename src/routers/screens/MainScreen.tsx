@@ -120,6 +120,26 @@ const MainScreen = ({navigation}) => {
       });
   }, [dispatch]);
 
+  const printAccountView = () => {
+    const list = accountList.filter((row) => {
+      return row.SERVICE_IDX === selectedService.idx;
+    });
+    if (list.length <= 0) {
+      return <StyledText fontWeight="700">계정을 추가해주세요.</StyledText>;
+    }
+    return list.map((row) => {
+      return (
+        <AccountView
+          name={row.ACCOUNT_NAME}
+          date={row.DATE}
+          id={row.ID}
+          password={row.PASSWORD}
+          oauthServiceName={row.OAUTH_SERVICE_NAME}
+        />
+      );
+    });
+  };
+
   return (
     <TotalWrapper>
       <AddAccountModalpopup
@@ -145,78 +165,8 @@ const MainScreen = ({navigation}) => {
       </HeaderWrapper>
       <ScrollView>
         <BodyWrapper>
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅎㅎ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-          />
-          <AccountView
-            name="ㅋㅋ"
-            date="2020-12-12"
-            id="abvc"
-            password="1232"
-            oauthServiceName="페잇으북"
-          />
           {selectedService.idx > 0 ? (
-            accountList.map((row) => {
-              if (row.SERVICE_IDX !== selectedService.idx) {
-                return null;
-              }
-              return (
-                <StyledText key={row.ACCOUNT_IDX} color="black">
-                  {row.ACCOUNT_NAME}
-                </StyledText>
-              );
-            })
+            printAccountView()
           ) : (
             <StyledText size="16px" fontWeight="700">
               선택한 서비스가 없습니다.

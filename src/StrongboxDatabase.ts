@@ -147,6 +147,7 @@ export class StrongboxDatabase {
     let db = await this.connectDatabase();
     let query = null;
     let params = [];
+    let [id, password] = [account.id, account.password];
     if (account.OAuthAccountIDX) {
       query =
         'INSERT INTO ACCOUNTS_TB(ACCOUNT_NAME, SERVICE_IDX, OAUTH_LOGIN_IDX) VALUES(?,?,?)';
@@ -160,6 +161,18 @@ export class StrongboxDatabase {
     }
 
     let singleQuery = await this.executeQuery(db, query, params);
+
+    let selectQuery;
+    if (account.OAuthAccountIDX) {
+      query =
+        'SELECT ID, PASSWORD FROM ACCOUNTS_TB WHERE IDX = ' +
+        account.OAuthAccountIDX;
+      selectQuery = await this.executeQuery(db, query, []);
+      [id, password] = [
+        selectQuery.rows.item(0).ID,
+        selectQuery.rows.item(0).PASSWORD,
+      ];
+    }
 
     const date = new Date();
     const now =
@@ -180,8 +193,8 @@ export class StrongboxDatabase {
       NAME: accountName,
       SERVICE_IDX: serviceIDX,
       OAuthIDX: account.OAuthAccountIDX,
-      ID: account.id,
-      PASSWORD: account.password,
+      ID: id,
+      PASSWORD: password,
     };
     return result;
   }

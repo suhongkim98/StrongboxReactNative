@@ -14,20 +14,17 @@ const GroupDropdown = ({setGroupFunc}: GroupDropdownProps) => {
   const [groupName, setGroupName] = useState('');
 
   useEffect(() => {
-    const tmp = [];
-    groupList.map((row) =>
-      tmp.push(
-        <DropdownItem
-          key={row.GRP_IDX}
-          title={row.GRP_NAME}
-          onPressItem={() => {
-            setGroupName(row.GRP_NAME);
-            setGroupFunc(row.GRP_IDX);
-            setDropdownVisible(false);
-          }}
-        />,
-      ),
-    );
+    const tmp = groupList.map((row) => (
+      <DropdownItem
+        key={row.GRP_IDX}
+        title={row.GRP_NAME}
+        onPressItem={() => {
+          setGroupName(row.GRP_NAME);
+          setGroupFunc(row.GRP_IDX);
+          setDropdownVisible(false);
+        }}
+      />
+    ));
     setDropdownList(tmp);
   }, [groupList, setGroupFunc]);
   return (

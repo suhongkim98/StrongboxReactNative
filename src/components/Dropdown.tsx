@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import StyledText from './StyledText';
-import {ScrollView} from 'react-native';
 
 interface DropdownProps {
   width: string;
@@ -27,17 +26,24 @@ const Clickable = styled.TouchableOpacity`
   align-items: center;
   padding: 0 10px 0 10px;
 `;
-const DropdownView = styled.View`
+interface DropdownViewProps {
+  height: string;
+}
+const DropdownView = styled.View<DropdownViewProps>`
   position: absolute;
   top: 35px;
   width: 100%;
-  height: 150px;
+  height: ${(props) => props.height};
   background-color: white;
   z-index: 2;
   border-width: 1px;
   border-color: gray;
   border-radius: 3px;
   padding: 0 10px 0 10px;
+  align-items: center;
+`;
+const DropdownScrollView = styled.ScrollView`
+  width: 100%;
 `;
 const Arrow = styled.View`
   width: 10px;
@@ -55,6 +61,19 @@ const Dropdown = ({
   visibleFunc,
   visible,
 }: DropdownProps) => {
+  const printDropdownItem = () => {
+    if (!visible) {
+      return null;
+    }
+    if (list.length <= 0) {
+      return null;
+    }
+    return (
+      <DropdownView height="120px">
+        <DropdownScrollView>{list}</DropdownScrollView>
+      </DropdownView>
+    );
+  };
   return (
     <TotalWrapper width={width}>
       <Clickable
@@ -68,11 +87,7 @@ const Dropdown = ({
         )}
         <Arrow />
       </Clickable>
-      {visible && (
-        <DropdownView>
-          <ScrollView>{list}</ScrollView>
-        </DropdownView>
-      )}
+      {printDropdownItem()}
     </TotalWrapper>
   );
 };

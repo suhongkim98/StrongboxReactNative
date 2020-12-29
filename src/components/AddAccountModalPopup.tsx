@@ -7,6 +7,8 @@ import {Alert, Switch, View} from 'react-native';
 import StyledText from './StyledText';
 import ServiceDropdown from './ServiceDropdown';
 import {addAccount} from '../modules/accountList';
+import AccountDropdown from './AccountDropdown';
+import CryptoJS from 'react-native-crypto-js';
 interface AddAccountModalPopupProps {
   visible: boolean;
   visibleFunc: (visible: boolean) => any;
@@ -18,6 +20,7 @@ const AddTextInput = styled.TextInput`
   padding: 0 10px 0 10px;
   border-color: gray;
   border-radius: 3px;
+  background-color: #f3f3f3;
 `;
 const BodyWrapper = styled.View`
   width: 100%;
@@ -30,7 +33,7 @@ const OauthView = styled.View`
   align-items: center;
   border-bottom-width: 1px;
 `;
-const TitleView = styled.View`
+const OauthWrapper = styled.View`
   margin-bottom: 30px;
 `;
 
@@ -44,6 +47,9 @@ const AddAccountModalPopup = ({
   const passwordValue = useRef('');
   const [isOauthMode, setOauthMode] = useState(false);
   const [selectedDropboxService, setSelectedDropboxService] = useState(-1);
+  const [selectedDropboxServiceName, setSelectedDropboxServiceName] = useState(
+    '',
+  );
   const [selectedAccount, setSelectedAccount] = useState(-1);
 
   const dispatch = useDispatch();
@@ -88,18 +94,23 @@ const AddAccountModalPopup = ({
           OAuthAccountIDX: selectedAccount,
         })
         .then((result) => {
+          if (result.OAuthIDX) {
+            let bytes = CryptoJS.AES.decrypt(result.PASSWORD, global.key);
+            let decrypted = bytes.toString(CryptoJS.enc.Utf8);
+            result.PASSWORD = decrypted;
+          }
           dispatch(
             addAccount({
               ACCOUNT_IDX: result.ROWID,
               SERVICE_IDX: result.SERVICE_IDX,
               ACCOUNT_NAME: result.NAME,
               DATE: result.DATE,
+              OAUTH_LOGIN_IDX: result.OAuthIDX,
+              OAUTH_SERVICE_NAME: selectedDropboxServiceName,
               ID: result.ID,
               PASSWORD: result.PASSWORD,
             }),
-          ).catch((error) => {
-            console.log(error);
-          });
+          );
         });
     } else {
       database
@@ -114,12 +125,12 @@ const AddAccountModalPopup = ({
               SERVICE_IDX: result.SERVICE_IDX,
               ACCOUNT_NAME: result.NAME,
               DATE: result.DATE,
-              OAUTH_LOGIN_IDX: result.OAuthIDX,
-              OAUTH_SERVICE_NAME: '서비스이름지정좀;',
               ID: result.ID,
               PASSWORD: result.PASSWORD,
             }),
-          );
+          ).catch((error) => {
+            console.log(error);
+          });
         })
         .catch((error) => {
           console.log(error);
@@ -132,12 +143,13 @@ const AddAccountModalPopup = ({
     passwordValue.current = '';
     setSelectedDropboxService(-1);
     setSelectedAccount(-1);
+    setSelectedDropboxServiceName('');
   };
 
   return (
     <ModalPopup
       containerWidth="300px"
-      containerHeight="300px"
+      containerHeight="350px"
       isVisible={visible}
       headerTitle="계정 추가"
       onAgreeTitle="생성"
@@ -152,16 +164,7 @@ const AddAccountModalPopup = ({
         setOauthMode(false);
       }}>
       <BodyWrapper>
-        <TitleView>
-          <StyledText fontWeight="700">타이틀 입력</StyledText>
-          <AddTextInput
-            onChangeText={(text) => {
-              titleValue.current = text;
-            }}
-            placeholder="입력"
-          />
-        </TitleView>
-        <View>
+        <OauthWrapper>
           <OauthView>
             <StyledText>SNS 연동 로그인 등록하기</StyledText>
             <Switch
@@ -177,10 +180,17 @@ const AddAccountModalPopup = ({
             <View>
               <View>
                 <StyledText fontWeight="700">서비스 선택</StyledText>
-                <ServiceDropdown setServiceFunc={setSelectedDropboxService} />
+                <ServiceDropdown
+                  setServiceFunc={setSelectedDropboxService}
+                  setServiceNameFunc={setSelectedDropboxServiceName}
+                />
               </View>
               <View>
-                <StyledText fontWeight="700">계정 선택 드롭박스</StyledText>
+                <StyledText fontWeight="700">계정 선택</StyledText>
+                <AccountDropdown
+                  setAccountFunc={setSelectedAccount}
+                  serviceIdx={selectedDropboxService}
+                />
               </View>
             </View>
           ) : (
@@ -205,6 +215,15 @@ const AddAccountModalPopup = ({
               </View>
             </View>
           )}
+        </OauthWrapper>
+        <View>
+          <StyledText fontWeight="700">계정 이름 입력</StyledText>
+          <AddTextInput
+            onChangeText={(text) => {
+              titleValue.current = text;
+            }}
+            placeholder="입력"
+          />
         </View>
       </BodyWrapper>
     </ModalPopup>

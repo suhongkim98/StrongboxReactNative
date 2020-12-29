@@ -34,6 +34,7 @@ const BodyWrapper = styled.View<BodyProps>`
 const BodyInnerWrapper = styled.View`
   overflow: visible;
 `;
+const IconView = styled.View``;
 
 const GroupFolder = ({groupName, groupIdx, navigation}: GroupFolderProps) => {
   const [isClose, setClose] = useState(false);
@@ -64,6 +65,16 @@ const GroupFolder = ({groupName, groupIdx, navigation}: GroupFolderProps) => {
     setClose(!isClose);
   };
 
+  const printIcon = () => {
+    if (groupItems.length <= 0) {
+      return null;
+    }
+    if (isClose) {
+      return <PlusSVG width="20px" height="20px" color="gray" />;
+    }
+    return <MinusSVG width="20px" height="20px" color="gray" />;
+  };
+
   return (
     <TotalWrapper>
       <TouchableOpacity onPress={() => toggleFolder()}>
@@ -71,11 +82,7 @@ const GroupFolder = ({groupName, groupIdx, navigation}: GroupFolderProps) => {
           <StyledText size="20px" color="gray">
             {groupName}
           </StyledText>
-          {isClose ? (
-            <PlusSVG width="20px" height="20px" color="gray" />
-          ) : (
-            <MinusSVG width="20px" height="20px" color="gray" />
-          )}
+          <IconView>{printIcon()}</IconView>
         </HeaderWrapper>
       </TouchableOpacity>
       <BodyWrapper height={innerBodyHeight} isClose={isClose}>

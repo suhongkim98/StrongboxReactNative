@@ -56,7 +56,7 @@ const AccountView = ({
         <StyledText fontWeight="700" size="20px">
           {name}
         </StyledText>
-        <StyledText>수정일: {date}</StyledText>
+        <StyledText size="12px">수정일: {date}</StyledText>
       </HeaderWrapper>
       <BodyWrapper>
         <OauthArea>
@@ -67,12 +67,16 @@ const AccountView = ({
           )}
         </OauthArea>
         <BodyItem>
-          <StyledText fontWeight="700">아이디</StyledText>
-          <StyledText>{id}</StyledText>
+          <StyledText fontWeight="700" size="16px">
+            아이디
+          </StyledText>
+          <StyledText size="16px">{id}</StyledText>
         </BodyItem>
         <BodyItem>
-          <StyledText fontWeight="700">패스워드</StyledText>
-          <StyledText>{password}</StyledText>
+          <StyledText fontWeight="700" size="16px">
+            패스워드
+          </StyledText>
+          <StyledText size="16px">{password}</StyledText>
         </BodyItem>
       </BodyWrapper>
     </TotalWrapper>
