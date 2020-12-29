@@ -31,7 +31,7 @@ const DropdownView = styled.View`
   position: absolute;
   top: 35px;
   width: 100%;
-  height: 100px;
+  height: 150px;
   background-color: white;
   z-index: 2;
   border-width: 1px;

@@ -9,10 +9,11 @@ import MenuSVG from '../../images/MenuSVG';
 import SettingSVG from '../../images/SettingSVG';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {LogBox} from 'react-native';
+import {LogBox, ScrollView} from 'react-native';
 import AddAccountModalpopup from '../../components/AddAccountModalPopup';
 import {updateAccount} from '../../modules/accountList';
 import CryptoJS from 'react-native-crypto-js';
+import AccountView from '../../components/AccountView';
 
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
@@ -34,9 +35,9 @@ const HeaderWrapper = styled.View`
 const MenuButton = styled.TouchableOpacity``;
 const BodyWrapper = styled.View`
   flex: 1;
-  padding: 30px 20px 0 20px;
   flex-direction: column;
   align-items: center;
+  padding: 30px 20px 0 20px;
 `;
 const AdvertisementView = styled.View``; // 추후 광고 추가 예정
 const StyledIcon = styled(Icon)`
@@ -142,44 +143,105 @@ const MainScreen = ({navigation}) => {
           <SettingSVG width="20px" height="20px" color="black" />
         </MenuButton>
       </HeaderWrapper>
-      <BodyWrapper>
-        <StyledText color="black">
+      <ScrollView>
+        <BodyWrapper>
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅎㅎ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+          />
+          <AccountView
+            name="ㅋㅋ"
+            date="2020-12-12"
+            id="abvc"
+            password="1232"
+            oauthServiceName="페잇으북"
+          />
           {selectedService.idx > 0 ? (
             accountList.map((row) => {
               if (row.SERVICE_IDX !== selectedService.idx) {
                 return null;
               }
               return (
-                <StyledText key={row.ACCOUNT_IDX}>
+                <StyledText key={row.ACCOUNT_IDX} color="black">
                   {row.ACCOUNT_NAME}
                 </StyledText>
               );
             })
           ) : (
             <StyledText size="16px" fontWeight="700">
-              선택한 계정이 없습니다.
+              선택한 서비스가 없습니다.
             </StyledText>
           )}
-        </StyledText>
-        {selectedService.idx > 0 && (
-          <ActionButton buttonColor="rgba(231,76,60,1)">
-            <ActionButton.Item
-              buttonColor="#9b59b6"
-              title="계정 추가"
-              onPress={() => {
-                setVisibleAddAccountModal(true);
-              }}>
-              <StyledIcon name="pluscircleo" />
-            </ActionButton.Item>
-            <ActionButton.Item
-              buttonColor="#3498db"
-              title="계정 삭제"
-              onPress={() => {}}>
-              <StyledIcon name="delete" />
-            </ActionButton.Item>
-          </ActionButton>
-        )}
-      </BodyWrapper>
+        </BodyWrapper>
+      </ScrollView>
+      {selectedService.idx > 0 && (
+        <ActionButton buttonColor="rgba(231,76,60,1)">
+          <ActionButton.Item
+            buttonColor="#9b59b6"
+            title="계정 추가"
+            onPress={() => {
+              setVisibleAddAccountModal(true);
+            }}>
+            <StyledIcon name="pluscircleo" />
+          </ActionButton.Item>
+          <ActionButton.Item
+            buttonColor="#3498db"
+            title="계정 삭제"
+            onPress={() => {}}>
+            <StyledIcon name="delete" />
+          </ActionButton.Item>
+        </ActionButton>
+      )}
       <AdvertisementView />
     </TotalWrapper>
   );
