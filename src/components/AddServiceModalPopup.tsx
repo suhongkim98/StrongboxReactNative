@@ -69,6 +69,7 @@ const AddServiceModalPopup = ({
             GRP_IDX: groupIdx,
             SERVICE_IDX: result.rowid,
             SERVICE_NAME: result.serviceName,
+            ORDER: result.sortOrder,
           }),
         );
         //알림Toast 추가하기

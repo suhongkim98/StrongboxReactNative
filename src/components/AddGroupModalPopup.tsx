@@ -34,9 +34,16 @@ const AddGroupModalPopup = ({
     database
       .addGroup(addGroupTextValue.current)
       .then((result) => {
+        console.log(result);
         visibleFunc(false);
         //redux 건들기
-        dispatch(addGroup({GRP_IDX: result.rowid, GRP_NAME: result.groupName}));
+        dispatch(
+          addGroup({
+            GRP_IDX: result.rowid,
+            GRP_NAME: result.groupName,
+            ORDER: result.sortOrder,
+          }),
+        );
         //알림Toast 추가하기
         toastFunc('폴더를 추가했습니다.');
         addGroupTextValue.current = '';

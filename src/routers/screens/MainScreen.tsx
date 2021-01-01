@@ -62,7 +62,11 @@ const MainScreen = ({navigation}) => {
         const tmp = [];
         for (let i = 0; i < result.length; i++) {
           const row = result.item(i);
-          tmp.push({GRP_IDX: row.IDX, GRP_NAME: row.GRP_NAME});
+          tmp.push({
+            GRP_IDX: row.IDX,
+            GRP_NAME: row.GRP_NAME,
+            ORDER: row.SORT_ORDER,
+          });
         }
         dispatch(updateGroup(tmp)); // 업데이트하자~~~~
       })
@@ -80,6 +84,7 @@ const MainScreen = ({navigation}) => {
             GRP_IDX: row.GRP_IDX,
             SERVICE_IDX: row.IDX,
             SERVICE_NAME: row.SERVICE_NAME,
+            ORDER: row.SORT_ORDER,
           });
         }
         dispatch(updateService(tmp)); // 서비스 리스트 업데이트하자~~~~
@@ -104,6 +109,7 @@ const MainScreen = ({navigation}) => {
             OAUTH_SERVICE_NAME: item.OAUTH_SERVICE_NAME,
             ID: item.ID,
             PASSWORD: item.PASSWORD,
+            ORDER: item.ACCOUNT_ORDER,
           }; // 기본항목
           if (item.PASSWORD) {
             //패스워드가 존재하면 복호화

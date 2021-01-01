@@ -22,6 +22,24 @@ export class StrongboxDatabase {
     );
   };
 
+  private getColumnCount = (db, column: string, table: string) => {
+    let query = 'SELECT MAX(' + column + ') AS COUNT FROM ' + table;
+    return new Promise((succ, fail) => {
+      db.transaction((trans) => {
+        trans.executeSql(
+          query,
+          [],
+          (tx, results) => {
+            succ(results);
+          },
+          (error) => {
+            fail(error);
+          },
+        );
+      });
+    });
+  };
+
   private executeQuery = (db: any, query: string, params = []) => {
     // 쿼리를 날리고 비동기로 받자
     return new Promise((succ, fail) => {
@@ -99,10 +117,16 @@ export class StrongboxDatabase {
     db = await this.connectDatabase();
     let singleInsert = await this.executeQuery(
       db,
-      'INSERT INTO GROUPS_TB(OWNER_IDX, GRP_NAME) VALUES(?, ?)',
+      'INSERT INTO GROUPS_TB(OWNER_IDX, GRP_NAME, SORT_ORDER) VALUES(?, ?, (SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM GROUPS_TB))',
       [0, groupName],
     );
-    return {rowid: singleInsert.insertId, groupName: groupName};
+    let countSelect = await this.getColumnCount(db, 'SORT_ORDER', 'GROUPS_TB');
+    const count = countSelect.rows.item(0).COUNT;
+    return {
+      rowid: singleInsert.insertId,
+      groupName: groupName,
+      sortOrder: count,
+    };
   }
 
   public async getGroup() {
@@ -110,7 +134,7 @@ export class StrongboxDatabase {
     db = await this.connectDatabase();
     let selectQuery = await this.executeQuery(
       db,
-      'SELECT IDX, GRP_NAME FROM GROUPS_TB',
+      'SELECT IDX, GRP_NAME, SORT_ORDER FROM GROUPS_TB ORDER BY SORT_ORDER ASC',
       [],
     );
     return selectQuery.rows;
@@ -121,10 +145,20 @@ export class StrongboxDatabase {
     db = await this.connectDatabase();
     let singleInsert = await this.executeQuery(
       db,
-      'INSERT INTO SERVICES_TB(GRP_IDX, SERVICE_NAME) VALUES(?,?)',
+      'INSERT INTO SERVICES_TB(GRP_IDX, SERVICE_NAME, SORT_ORDER) VALUES(?,?,(SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM SERVICES_TB))',
       [groupIdx, name],
     );
-    return {rowid: singleInsert.insertId, serviceName: name};
+    let countSelect = await this.getColumnCount(
+      db,
+      'SORT_ORDER',
+      'SERVICES_TB',
+    );
+    const count = countSelect.rows.item(0).COUNT;
+    return {
+      rowid: singleInsert.insertId,
+      serviceName: name,
+      sortOrder: count,
+    };
   }
 
   public async getService() {
@@ -132,7 +166,7 @@ export class StrongboxDatabase {
     db = await this.connectDatabase();
     let selectQuery = await this.executeQuery(
       db,
-      'SELECT IDX, SERVICE_NAME, GRP_IDX FROM SERVICES_TB',
+      'SELECT IDX, SERVICE_NAME, GRP_IDX, SORT_ORDER FROM SERVICES_TB ORDER BY SORT_ORDER ASC',
       [],
     );
     return selectQuery.rows;
@@ -150,13 +184,13 @@ export class StrongboxDatabase {
     let [id, password] = [account.id, account.password];
     if (account.OAuthAccountIDX) {
       query =
-        'INSERT INTO ACCOUNTS_TB(ACCOUNT_NAME, SERVICE_IDX, OAUTH_LOGIN_IDX) VALUES(?,?,?)';
+        'INSERT INTO ACCOUNTS_TB(ACCOUNT_NAME, SERVICE_IDX, OAUTH_LOGIN_IDX, SORT_ORDER) VALUES(?,?,?,(SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM ACCOUNTS_TB))';
       params = [accountName, serviceIDX, account.OAuthAccountIDX];
     } else {
       const key = global.key;
       let ciphertext = CryptoJS.AES.encrypt(account.password, key).toString(); // AES암호화
       query =
-        'INSERT INTO ACCOUNTS_TB(SERVICE_IDX,ACCOUNT_NAME,ID,PASSWORD) VALUES(?,?,?,?)';
+        'INSERT INTO ACCOUNTS_TB(SERVICE_IDX,ACCOUNT_NAME,ID,PASSWORD, SORT_ORDER) VALUES(?,?,?,?,(SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM ACCOUNTS_TB))';
       params = [serviceIDX, accountName, account.id, ciphertext];
     }
 
@@ -173,6 +207,13 @@ export class StrongboxDatabase {
         selectQuery.rows.item(0).PASSWORD,
       ];
     }
+    //출력 순서를 위한 정렬 순서 뽑기
+    const countSelect = await this.getColumnCount(
+      db,
+      'SORT_ORDER',
+      'ACCOUNTS_TB',
+    );
+    const count = countSelect.rows.item(0).COUNT;
 
     const date = new Date();
     const now =
@@ -195,19 +236,21 @@ export class StrongboxDatabase {
       OAuthIDX: account.OAuthAccountIDX,
       ID: id,
       PASSWORD: password,
+      ORDER: count,
     };
     return result;
   }
   public async getAccount() {
     let db = this.connectDatabase();
     let query =
-      'SELECT ACCOUNTS_TB.IDX,SERVICE_IDX,ACCOUNT_NAME,DATE,OAUTH_LOGIN_IDX,ID,PASSWORD FROM ACCOUNTS_TB ' +
+      'SELECT ACCOUNTS_TB.IDX,SERVICE_IDX,ACCOUNT_NAME,DATE,OAUTH_LOGIN_IDX,ID,PASSWORD,ACCOUNTS_TB.SORT_ORDER AS ACCOUNT_ORDER FROM ACCOUNTS_TB ' +
       'JOIN SERVICES_TB ON ACCOUNTS_TB.SERVICE_IDX = SERVICES_TB.IDX ' +
-      'JOIN GROUPS_TB ON SERVICES_TB.GRP_IDX = GROUPS_TB.IDX ';
+      'JOIN GROUPS_TB ON SERVICES_TB.GRP_IDX = GROUPS_TB.IDX ' +
+      'ORDER BY ACCOUNTS_TB.SORT_ORDER ASC';
     let allAccountSelectQuery = await this.executeQuery(db, query, []);
     const allAccountRows = allAccountSelectQuery.rows;
 
-    const list = [];
+    const list = []; // OAUTH 계정만 뽑아내기
     for (let i = 0; i < allAccountRows.length; i++) {
       if (allAccountRows.item(i).OAUTH_LOGIN_IDX) {
         list.push(allAccountRows.item(i).OAUTH_LOGIN_IDX);

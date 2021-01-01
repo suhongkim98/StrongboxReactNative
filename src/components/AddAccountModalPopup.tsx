@@ -109,6 +109,7 @@ const AddAccountModalPopup = ({
               OAUTH_SERVICE_NAME: selectedDropboxServiceName,
               ID: result.ID,
               PASSWORD: result.PASSWORD,
+              ORDER: result.ORDER,
             }),
           );
         });
