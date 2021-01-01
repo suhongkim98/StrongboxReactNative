@@ -8,7 +8,7 @@ const TotalWrapper = styled.View`
   flex: 1;
   justify-content: space-evenly;
   align-items: center;
-  background-color: ${theme.colors.backgroundMainColor};
+  background-color: ${theme.colors.mainColor};
 
   padding: 0 40px 0 40px;
 `;

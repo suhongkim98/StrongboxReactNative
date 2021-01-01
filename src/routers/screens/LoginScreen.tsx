@@ -9,7 +9,7 @@ import InputNumberKeyboard from '../../components/InputNumberKeyboard';
 
 const TotalWrapper = styled.View`
   flex: 1;
-  background-color: ${theme.colors.backgroundMainColor};
+  background-color: ${theme.colors.mainColor};
 `;
 const ViewBody = styled.View`
   flex: 0.65;

@@ -13,7 +13,7 @@ import LoadingSVG from '../../images/LoadingSVG';
 
 const LoadingWrapper = styled.View`
   flex: 1;
-  background-color: ${theme.colors.backgroundMainColor};
+  background-color: ${theme.colors.mainColor};
   justify-content: center;
   align-items: center;
 `;

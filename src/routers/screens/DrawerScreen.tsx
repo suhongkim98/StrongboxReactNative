@@ -12,7 +12,7 @@ import AddServiceModalPopup from '../../components/AddServiceModalPopup';
 
 const TotalWrapper = styled.View`
   flex: 1;
-  background-color: ${theme.colors.backgroundMainColor};
+  background-color: ${theme.colors.mainColor};
   padding: 20px;
 `;
 const HeaderWrapper = styled.View`
@@ -104,7 +104,11 @@ const DrawerScreen = (props) => {
             <StyledText>서비스 추가</StyledText>
           </SlideItem>
           <Hr />
-          <SlideItem>
+          <SlideItem
+            onPress={() => {
+              setBottomSlideVisible(false);
+              props.navigation.navigate('EditScreen');
+            }}>
             <StyledText>편집</StyledText>
           </SlideItem>
         </SlideInnerWrapper>

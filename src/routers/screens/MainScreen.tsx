@@ -14,12 +14,13 @@ import AddAccountModalpopup from '../../components/AddAccountModalPopup';
 import {updateAccount} from '../../modules/accountList';
 import CryptoJS from 'react-native-crypto-js';
 import AccountView from '../../components/AccountView';
+import theme from '../../styles/theme';
 
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
 const TotalWrapper = styled.View`
   flex: 1;
-  background-color: #f5f5f5;
+  background-color: ${theme.colors.backgroundMainColor};
 `;
 const HeaderWrapper = styled.View`
   padding: 0 20px 0 20px;
@@ -192,8 +193,10 @@ const MainScreen = ({navigation}) => {
           </ActionButton.Item>
           <ActionButton.Item
             buttonColor="#3498db"
-            title="계정 삭제"
-            onPress={() => {}}>
+            title="편집"
+            onPress={() => {
+              navigation.navigate('EditScreen');
+            }}>
             <StyledIcon name="delete" />
           </ActionButton.Item>
         </ActionButton>
