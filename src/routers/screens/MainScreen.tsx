@@ -15,6 +15,7 @@ import {updateAccount} from '../../modules/accountList';
 import CryptoJS from 'react-native-crypto-js';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
+import {EditCode} from '../../modules/enumList';
 
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
@@ -195,7 +196,7 @@ const MainScreen = ({navigation}) => {
             buttonColor="#3498db"
             title="편집"
             onPress={() => {
-              navigation.navigate('EditScreen');
+              navigation.navigate('EditScreen', {editType: EditCode.account});
             }}>
             <StyledIcon name="delete" />
           </ActionButton.Item>
