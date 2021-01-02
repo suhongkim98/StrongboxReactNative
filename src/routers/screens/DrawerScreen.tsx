@@ -9,7 +9,6 @@ import Toast from 'react-native-root-toast';
 import BottomSlide from '../../components/BottomSlide';
 import AddGroupModalPopup from '../../components/AddGroupModalPopup';
 import AddServiceModalPopup from '../../components/AddServiceModalPopup';
-import {EditCode} from '../../modules/enumList';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -108,9 +107,7 @@ const DrawerScreen = (props) => {
           <SlideItem
             onPress={() => {
               setBottomSlideVisible(false);
-              props.navigation.navigate('EditScreen', {
-                editType: EditCode.drawer,
-              });
+              props.navigation.navigate('EditDrawerScreen');
             }}>
             <StyledText>편집</StyledText>
           </SlideItem>
