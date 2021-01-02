@@ -128,10 +128,9 @@ const AddAccountModalPopup = ({
               DATE: result.DATE,
               ID: result.ID,
               PASSWORD: result.PASSWORD,
+              ORDER: result.ORDER,
             }),
-          ).catch((error) => {
-            console.log(error);
-          });
+          );
         })
         .catch((error) => {
           console.log(error);

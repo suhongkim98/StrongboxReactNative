@@ -137,6 +137,7 @@ const MainScreen = ({navigation}) => {
     return list.map((row) => {
       return (
         <AccountView
+          key={row.ACCOUNT_IDX}
           name={row.ACCOUNT_NAME}
           date={row.DATE}
           id={row.ID}
@@ -195,7 +196,9 @@ const MainScreen = ({navigation}) => {
             buttonColor="#3498db"
             title="편집"
             onPress={() => {
-              navigation.navigate('EditAccountScreen');
+              navigation.navigate('EditAccountScreen', {
+                serviceIdx: selectedService.idx,
+              });
             }}>
             <StyledIcon name="delete" />
           </ActionButton.Item>

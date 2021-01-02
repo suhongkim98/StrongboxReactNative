@@ -60,6 +60,14 @@ export class StrongboxDatabase {
 
   private onFailConnectDB = () => {};
 
+  public updateSortOrder = (table: string, idx: number, order: number) => {
+    //해당 idx의 order을 바꾼다. 동기식으로 할 필요 없으니 비동기 방법으로 ㄱㄱ
+    let db = this.connectDatabase();
+    const query =
+      'UPDATE ' + table + ' SET SORT_ORDER = ' + order + ' WHERE IDX = ' + idx;
+    this.executeQuery(db, query, []);
+  };
+
   public async createUser(password: string) {
     // 사용자 등록 함수
     let db = null;
@@ -293,4 +301,10 @@ export class StrongboxDatabase {
     }
     return allAccountRows;
   }
+  public deleteAccount = (idx: number) => {
+    //비동기식으로 삭제하자
+    const db = this.connectDatabase();
+    const query = 'DELETE FROM ACCOUNTS_TB WHERE IDX = ' + idx;
+    this.executeQuery(db, query, []);
+  };
 }

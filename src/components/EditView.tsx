@@ -53,15 +53,15 @@ const DeleteButton = styled.TouchableOpacity<DeleteButtonProps>`
 const AdvertisementView = styled.View``;
 interface EditViewProps {
   onPressBackButton: () => any;
-  onPressApplyButton: () => any;
   onPressDeleteButton: () => any;
   children?: any;
+  isSelected: boolean;
 }
 const EditView = ({
   onPressBackButton,
-  onPressApplyButton,
   onPressDeleteButton,
   children,
+  isSelected,
 }: EditViewProps) => {
   return (
     <TotalWrapper>
@@ -72,15 +72,17 @@ const EditView = ({
         <StyledText fontWeight="700" size="16px">
           편집
         </StyledText>
-        <HeaderItemButton onPress={onPressApplyButton}>
-          <StyledText color="darkred" fontWeight="700" size="16px">
-            적용
-          </StyledText>
+        <HeaderItemButton>
+          <StyledText color="darkred" fontWeight="700" size="16px" />
         </HeaderItemButton>
       </HeaderWrapper>
       <BodyWrapper>{children}</BodyWrapper>
       <FooterWrapper>
-        <DeleteButton onPress={onPressDeleteButton} isSelected={true}>
+        <DeleteButton
+          onPress={() => {
+            isSelected && onPressDeleteButton();
+          }}
+          isSelected={isSelected}>
           <StyledText color="white" fontWeight="700">
             삭제
           </StyledText>
