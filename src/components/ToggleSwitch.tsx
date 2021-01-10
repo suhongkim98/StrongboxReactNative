@@ -37,7 +37,7 @@ const ToggleSwitch = ({onTrue, onFalse, navigation}: ToggleSwitchProps) => {
   }, [navigation]);
   return (
     <TotalWrapper
-      onPress={() => {
+      onPressIn={() => {
         if (toggle) {
           //기존에 TRUE였다면
           onFalse();

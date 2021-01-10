@@ -25,19 +25,19 @@ const InputNumberKeyboard = ({typingFunc, text}: InputNumberKeyboardProps) => {
     <>
       <InputRow>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '1');
           }}>
           <ButtonText>1</ButtonText>
         </InputButton>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '2');
           }}>
           <ButtonText>2</ButtonText>
         </InputButton>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '3');
           }}>
           <ButtonText>3</ButtonText>
@@ -45,19 +45,19 @@ const InputNumberKeyboard = ({typingFunc, text}: InputNumberKeyboardProps) => {
       </InputRow>
       <InputRow>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '4');
           }}>
           <ButtonText>4</ButtonText>
         </InputButton>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '5');
           }}>
           <ButtonText>5</ButtonText>
         </InputButton>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '6');
           }}>
           <ButtonText>6</ButtonText>
@@ -65,19 +65,19 @@ const InputNumberKeyboard = ({typingFunc, text}: InputNumberKeyboardProps) => {
       </InputRow>
       <InputRow>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '7');
           }}>
           <ButtonText>7</ButtonText>
         </InputButton>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '8');
           }}>
           <ButtonText>8</ButtonText>
         </InputButton>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '9');
           }}>
           <ButtonText>9</ButtonText>
@@ -86,13 +86,13 @@ const InputNumberKeyboard = ({typingFunc, text}: InputNumberKeyboardProps) => {
       <InputRow>
         <InputButton />
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc(text + '0');
           }}>
           <ButtonText>0</ButtonText>
         </InputButton>
         <InputButton
-          onPress={() => {
+          onPressIn={() => {
             typingFunc('');
           }}>
           <CleanSVG width="25px" height="25px" color="black" />

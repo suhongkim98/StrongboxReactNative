@@ -307,4 +307,16 @@ export class StrongboxDatabase {
     const query = 'DELETE FROM ACCOUNTS_TB WHERE IDX = ' + idx;
     this.executeQuery(db, query, []);
   };
+  public deleteGroup = (idx: number) => {
+    //비동기식으로 삭제하자
+    const db = this.connectDatabase();
+    const query = 'DELETE FROM GROUPS_TB WHERE IDX = ' + idx;
+    this.executeQuery(db, query, []);
+  };
+  public deleteService = (idx: number) => {
+    //비동기식으로 삭제하자
+    const db = this.connectDatabase();
+    const query = 'DELETE FROM SERVICES_TB WHERE IDX = ' + idx;
+    this.executeQuery(db, query, []);
+  };
 }
