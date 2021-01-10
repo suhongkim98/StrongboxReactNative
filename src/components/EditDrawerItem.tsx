@@ -1,11 +1,15 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {TouchableOpacity} from 'react-native';
 import StyledText from '../components/StyledText';
 import ToggleSwitch from '../components/ToggleSwitch';
 import {pushGroup, popGroup} from '../modules/editDrawerRedux.ts';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import DraggableFlatList from 'react-native-draggable-flatlist';
+import {StrongboxDatabase} from '../StrongboxDatabase.ts';
+import {updateServiceByIdx} from '../modules/serviceList.ts';
+import {pushService, popService} from '../modules/editDrawerRedux.ts';
 const StyledIcon = styled(Icon)`
   font-size: 30px;
   height: 22px;
@@ -17,8 +21,7 @@ const FolderIcon = styled(Icon)`
   color: black;
 `;
 const TotalWrapper = styled.View`
-  flex-direction: row;
-  height: 100px;
+  flex-direction: column;
   border: solid gray 1px;
   background-color: white;
 `;
@@ -29,11 +32,19 @@ const HeaderWrapper = styled.View`
   align-items: center;
   height: 30px;
 `;
-const HeaderItem = styled.View`
+const RowItem = styled.View`
   flex-direction: row;
 `;
-const BodyWrapper = styled.View``;
-
+const BodyWrapper = styled.View`
+  width: 100%;
+  padding: 20px 0 0 20px;
+`;
+const BodyItem = styled.View`
+  height: 30px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
 interface EditDrawerItemProps {
   onLongPress: () => any;
   name: string;
@@ -47,16 +58,87 @@ const EditDrawerItem = ({
   groupIdx,
 }: EditDrawerItemProps) => {
   const dispatch = useDispatch();
-  const onFalseCalled = () => {
+  const [rerenderDraggable, setRerenderDraggable] = useState(false); // DraggableFlatList에 버그가 있는 듯 하다 일단 임시로 이렇게 해결
+  const [targetList, setTargetList] = useState([]);
+  const [orderList, setOrderList] = useState([]);
+  const serviceList = useSelector((state: RootState) => state.serviceList.list);
+  const [isGroupSelected, setIsGroupSelected] = useState(false);
+
+  useEffect(() => {
+    console.log('진입s');
+    setRerenderDraggable(true);
+
+    const unsubscribe = navigation.addListener('blur', () => {
+      //화면 이탈 시 발생 이벤트 초기화하자
+      console.log('이탈s');
+      setRerenderDraggable(false);
+      setIsGroupSelected(false);
+    });
+
+    return unsubscribe;
+  }, [dispatch, navigation]);
+
+  useEffect(() => {
+    const services = serviceList.filter((row) => {
+      return row.GRP_IDX === groupIdx;
+    });
+    const tmp = [];
+    for (let i = 0; i < services.length; i++) {
+      tmp.push(services[i].ORDER);
+    }
+    setOrderList(tmp);
+    setTargetList(services);
+  }, [serviceList, groupIdx]);
+
+  const onFalseGroupToggle = () => {
     dispatch(popGroup(groupIdx));
   };
-  const onTrueCalled = () => {
+  const onTrueGroupToggle = () => {
     dispatch(pushGroup(groupIdx));
+  };
+  const renderItem = ({item, drag}) => {
+    return (
+      <BodyItem>
+        <RowItem>
+          <TouchableOpacity onLongPress={drag}>
+            <StyledIcon name="drag-handle" />
+          </TouchableOpacity>
+          <StyledText>{item.SERVICE_NAME}</StyledText>
+        </RowItem>
+        <ToggleSwitch
+          navigation={navigation}
+          disabled={isGroupSelected}
+          onFalse={() => {
+            dispatch(popService(item.SERVICE_IDX));
+          }}
+          onTrue={() => {
+            dispatch(pushService(item.SERVICE_IDX));
+          }}
+        />
+      </BodyItem>
+    );
+  };
+  const onDragEnd = (newData) => {
+    //리스트 변화 시
+    for (let i = 0; i < newData.length; i++) {
+      newData[i].ORDER = orderList[i]; //순서 변경
+    }
+    //DB업데이트
+    const database = StrongboxDatabase.getInstance();
+    for (let i = 0; i < newData.length; i++) {
+      database.updateSortOrder(
+        'SERVICES_TB',
+        newData[i].SERVICE_IDX,
+        newData[i].ORDER,
+      );
+    }
+    // service list redux업데이트
+    dispatch(updateServiceByIdx(newData));
   };
   return (
     <TotalWrapper>
       <HeaderWrapper>
-        <HeaderItem>
+        <RowItem>
           <TouchableOpacity onLongPress={onLongPress}>
             <StyledIcon name="drag-handle" />
           </TouchableOpacity>
@@ -64,14 +146,26 @@ const EditDrawerItem = ({
           <StyledText size="18px" fontWeight="700">
             {name}
           </StyledText>
-        </HeaderItem>
+        </RowItem>
         <ToggleSwitch
           navigation={navigation}
-          onFalse={onFalseCalled}
-          onTrue={onTrueCalled}
+          onFalse={onFalseGroupToggle}
+          onTrue={onTrueGroupToggle}
+          getToggleState={setIsGroupSelected}
         />
       </HeaderWrapper>
-      <BodyWrapper />
+      <BodyWrapper>
+        {rerenderDraggable && (
+          <DraggableFlatList
+            data={targetList}
+            renderItem={renderItem}
+            onDragEnd={({data}) => onDragEnd(data)}
+            keyExtractor={(item) =>
+              `draggable-service-item-${item.SERVICE_IDX}`
+            }
+          />
+        )}
+      </BodyWrapper>
     </TotalWrapper>
   );
 };

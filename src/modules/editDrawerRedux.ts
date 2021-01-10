@@ -21,14 +21,14 @@ export const popService = (idx: number) => ({
   type: POP_SERVICE,
   payload: idx,
 });
-export const initRedux = () => ({type: INIT});
+export const initEditDrawerRedux = () => ({type: INIT});
 
 type EditDrawerReduxAction =
   | ReturnType<typeof pushGroup>
   | ReturnType<typeof popGroup>
   | ReturnType<typeof pushService>
   | ReturnType<typeof popService>
-  | ReturnType<typeof initRedux>;
+  | ReturnType<typeof initEditDrawerRedux>;
 
 type EditDrawerReduxState = {
   count: number;
@@ -42,36 +42,46 @@ const initialState: EditDrawerReduxState = {
   selectedService: [],
 };
 
-function counter(
+const editDrawerRedux = (
   state: EditDrawerReduxState = initialState,
   action: EditDrawerReduxAction,
-) {
+) => {
   switch (action.type) {
     case PUSH_GROUP:
       return {
         selectedGroup: [...state.selectedGroup, action.payload],
         count: state.count + 1,
+        selectedService: [...state.selectedService],
       };
     case POP_GROUP:
       const groupNewList = state.selectedGroup.filter((idx) => {
         return idx !== action.payload;
       });
-      return {selectedGroup: groupNewList, count: state.count - 1};
+      return {
+        selectedGroup: groupNewList,
+        count: state.count - 1,
+        selectedService: [...state.selectedService],
+      };
     case PUSH_SERVICE:
       return {
         selectedService: [...state.selectedService, action.payload],
         count: state.count + 1,
+        selectedGroup: [...state.selectedGroup],
       };
     case POP_SERVICE:
       const serviceNewList = state.selectedService.filter((idx) => {
         return idx !== action.payload;
       });
-      return {selectedService: serviceNewList, count: state.count - 1};
+      return {
+        selectedService: serviceNewList,
+        count: state.count - 1,
+        selectedGroup: [...state.selectedGroup],
+      };
     case INIT:
       return {selectedService: [], selectedGroup: [], count: 0};
     default:
       return state;
   }
-}
+};
 
-export default counter;
+export default editDrawerRedux;

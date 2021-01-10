@@ -3,6 +3,7 @@
 const UPDATE = 'serviceList/UPDATE' as const;
 const ADD = 'serviceList/ADD' as const;
 const DELETE = 'serviceList/DELETE' as const;
+const DELETE_ARRAY = 'serviceList/DELETE_ARRAY' as const;
 const UPDATE_SERVICE = 'serviceList/UPDATE_SERVICE' as const;
 
 export const updateService = (newList: any) => ({
@@ -17,16 +18,21 @@ export const deleteService = (item: any) => ({
   type: DELETE,
   payload: item,
 });
-export const updateServiceByIdx = (itemList: any) => ({
+export const updateServiceByIdx = (newList: any) => ({
   type: UPDATE_SERVICE,
-  payload: itemList,
+  payload: newList,
+});
+export const deleteServiceByIdx = (idx: number[]) => ({
+  type: DELETE_ARRAY,
+  payload: idx,
 });
 
 type serviceListAction =
   | ReturnType<typeof updateService>
   | ReturnType<typeof addService>
   | ReturnType<typeof deleteService>
-  | ReturnType<typeof updateServiceByIdx>;
+  | ReturnType<typeof updateServiceByIdx>
+  | ReturnType<typeof deleteServiceByIdx>;
 
 type serviceListState = {
   list: any;
@@ -50,6 +56,22 @@ const serviceList = (
         return row.SERVICE_IDX !== action.payload;
       });
       return {list: newList};
+    case DELETE_ARRAY: {
+      const deleteList = action.payload;
+
+      for (let i = 0; i < state.list.length; i++) {
+        for (let j = 0; j < deleteList.length; j++) {
+          if (state.list[i].SERVICE_IDX === deleteList[j]) {
+            delete state.list[i];
+            break;
+          }
+        }
+      }
+      const after = state.list.filter((row) => {
+        return row !== null;
+      });
+      return {list: after};
+    }
     case UPDATE_SERVICE:
       //배열 삭제 후 다시 추가하는 방법으로 업데이트
       const [before, target] = [state.list, action.payload];

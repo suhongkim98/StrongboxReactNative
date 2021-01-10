@@ -307,16 +307,35 @@ export class StrongboxDatabase {
     const query = 'DELETE FROM ACCOUNTS_TB WHERE IDX = ' + idx;
     this.executeQuery(db, query, []);
   };
-  public deleteGroup = (idx: number) => {
+  public deleteGroup = (idx: number[]) => {
     //비동기식으로 삭제하자
+    let value = '(';
+    for (let i = 0; i < idx.length; i++) {
+      const element = idx[i];
+      value += element;
+      if (i + 1 < idx.length) {
+        value += ',';
+      }
+    }
+    value += ')';
     const db = this.connectDatabase();
-    const query = 'DELETE FROM GROUPS_TB WHERE IDX = ' + idx;
+    const query = 'DELETE FROM GROUPS_TB WHERE IDX IN ' + value;
     this.executeQuery(db, query, []);
   };
-  public deleteService = (idx: number) => {
+  public deleteService = (idx: number[]) => {
     //비동기식으로 삭제하자
+    let value = '(';
+    for (let i = 0; i < idx.length; i++) {
+      const element = idx[i];
+      value += element;
+      if (i + 1 < idx.length) {
+        value += ',';
+      }
+    }
+    value += ')';
+    console.log(value);
     const db = this.connectDatabase();
-    const query = 'DELETE FROM SERVICES_TB WHERE IDX = ' + idx;
+    const query = 'DELETE FROM SERVICES_TB WHERE IDX IN ' + value;
     this.executeQuery(db, query, []);
   };
 }

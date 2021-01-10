@@ -4,6 +4,7 @@ import theme from '../styles/theme';
 
 interface ToggleBoxProps {
   isSelected: boolean;
+  disabled?: boolean;
 }
 const TotalWrapper = styled.TouchableOpacity`
   width: 30px;
@@ -17,14 +18,22 @@ const ToggleBox = styled.View<ToggleBoxProps>`
   border-radius: 7px;
   border-width: 1px;
   background-color: ${(props) =>
-    props.isSelected ? theme.colors.mainColor : 'white'};
+    props.isSelected || props.disabled ? theme.colors.mainColor : 'white'};
 `;
 interface ToggleSwitchProps {
   onTrue: () => any;
   onFalse: () => any;
   navigation: any;
+  disabled?: boolean;
+  getToggleState?: (bool) => boolean;
 }
-const ToggleSwitch = ({onTrue, onFalse, navigation}: ToggleSwitchProps) => {
+const ToggleSwitch = ({
+  onTrue,
+  onFalse,
+  navigation,
+  disabled,
+  getToggleState,
+}: ToggleSwitchProps) => {
   const [toggle, setToggle] = useState(false);
 
   useEffect(() => {
@@ -38,15 +47,20 @@ const ToggleSwitch = ({onTrue, onFalse, navigation}: ToggleSwitchProps) => {
   return (
     <TotalWrapper
       onPressIn={() => {
-        if (toggle) {
-          //기존에 TRUE였다면
-          onFalse();
-        } else {
-          onTrue();
+        if (!disabled) {
+          if (toggle) {
+            //기존에 TRUE였다면
+            onFalse();
+          } else {
+            onTrue();
+          }
+          if (getToggleState !== undefined) {
+            getToggleState(!toggle);
+          }
+          setToggle(!toggle);
         }
-        setToggle(!toggle);
       }}>
-      <ToggleBox isSelected={toggle} />
+      <ToggleBox isSelected={toggle} disabled={disabled} />
     </TotalWrapper>
   );
 };

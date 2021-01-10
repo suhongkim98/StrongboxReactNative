@@ -6,7 +6,9 @@ import {Alert} from 'react-native';
 import {updateGroup} from '../../modules/groupList';
 import EditDrawerItem from '../../components/EditDrawerItem';
 import {StrongboxDatabase} from '../../StrongboxDatabase.ts';
-import {initRedux} from '../../modules/editDrawerRedux.ts';
+import {initEditDrawerRedux} from '../../modules/editDrawerRedux.ts';
+import {deleteGroupByIdx} from '../../modules/groupList.ts';
+import {deleteServiceByIdx} from '../../modules/serviceList.ts';
 
 const EditDrawerScreen = ({navigation}) => {
   const [rerenderDraggable, setRerenderDraggable] = useState(false); // DraggableFlatList에 버그가 있는 듯 하다 일단 임시로 이렇게 해결
@@ -14,6 +16,12 @@ const EditDrawerScreen = ({navigation}) => {
   const [orderList, setOrderList] = useState([]);
   const groupList = useSelector((state: RootState) => state.groupList.list);
   const count = useSelector((state: RootState) => state.editDrawerRedux.count);
+  const selectedServiceIdx = useSelector(
+    (state: RootState) => state.editDrawerRedux.selectedService,
+  );
+  const selectedGroupIdx = useSelector(
+    (state: RootState) => state.editDrawerRedux.selectedGroup,
+  );
   useEffect(() => {
     const subscribe = navigation.addListener('focus', () => {
       //화면 진입 시 발생 이벤트 초기화하자
@@ -29,7 +37,7 @@ const EditDrawerScreen = ({navigation}) => {
       //화면 이탈 시 발생 이벤트 초기화하자
       console.log('이탈');
       setRerenderDraggable(false);
-      dispatch(initRedux()); // 초기화
+      dispatch(initEditDrawerRedux()); // 초기화
     });
 
     return unsubscribe;
@@ -72,8 +80,15 @@ const EditDrawerScreen = ({navigation}) => {
   };
 
   const onAgree = () => {
-    // 삭제 쿼리
-    //
+    const database = StrongboxDatabase.getInstance();
+    if (selectedServiceIdx.length > 0) {
+      database.deleteService(selectedServiceIdx);
+      dispatch(deleteServiceByIdx(selectedServiceIdx));
+    }
+    if (selectedGroupIdx > 0) {
+      database.deleteGroup(selectedGroupIdx);
+      dispatch(deleteGroupByIdx(selectedGroupIdx));
+    }
     navigation.goBack();
   };
   return (
@@ -104,7 +119,7 @@ const EditDrawerScreen = ({navigation}) => {
           data={groupList}
           renderItem={renderItem}
           onDragEnd={({data}) => onDragEnd(data)}
-          keyExtractor={(item) => `draggable-item-${item.GRP_IDX}`}
+          keyExtractor={(item) => `draggable-group-item-${item.GRP_IDX}`}
         />
       )}
     </EditView>

@@ -23,13 +23,12 @@ const HeaderWrapper = styled.View`
   justify-content: space-between;
 `;
 interface BodyProps {
-  height: string;
   isClose: boolean;
 }
 const BodyWrapper = styled.View<BodyProps>`
   padding-left: 15px;
   overflow: hidden;
-  height: ${(props) => props.height + 'px'};
+  ${({isClose}) => isClose && 'height: 0px;'};
 `;
 const BodyInnerWrapper = styled.View`
   overflow: visible;
@@ -38,18 +37,9 @@ const IconView = styled.View``;
 
 const GroupFolder = ({groupName, groupIdx, navigation}: GroupFolderProps) => {
   const [isClose, setClose] = useState(false);
-  const [innerBodyHeight, setInnerBodyHeight] = useState(0);
   const dispatch = useDispatch();
   const serviceList = useSelector((state: RootState) => state.serviceList.list);
   const [groupItems, setGroupItems] = useState([]);
-
-  useEffect(() => {
-    if (isClose) {
-      setInnerBodyHeight(0);
-    } else {
-      setInnerBodyHeight(27 * groupItems.length);
-    }
-  }, [groupItems.length, isClose]);
 
   useEffect(() => {
     const tmp = [];
@@ -85,7 +75,7 @@ const GroupFolder = ({groupName, groupIdx, navigation}: GroupFolderProps) => {
           <IconView>{printIcon()}</IconView>
         </HeaderWrapper>
       </TouchableOpacity>
-      <BodyWrapper height={innerBodyHeight} isClose={isClose}>
+      <BodyWrapper isClose={isClose}>
         <BodyInnerWrapper>
           {groupItems.map((row) => {
             return (
