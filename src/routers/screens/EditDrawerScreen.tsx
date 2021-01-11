@@ -11,7 +11,6 @@ import {deleteGroupByIdx} from '../../modules/groupList.ts';
 import {deleteServiceByIdx} from '../../modules/serviceList.ts';
 
 const EditDrawerScreen = ({navigation}) => {
-  const [rerenderDraggable, setRerenderDraggable] = useState(false); // DraggableFlatList에 버그가 있는 듯 하다 일단 임시로 이렇게 해결
   const dispatch = useDispatch();
   const [orderList, setOrderList] = useState([]);
   const groupList = useSelector((state: RootState) => state.groupList.list);
@@ -22,22 +21,13 @@ const EditDrawerScreen = ({navigation}) => {
   const selectedGroupIdx = useSelector(
     (state: RootState) => state.editDrawerRedux.selectedGroup,
   );
-  useEffect(() => {
-    const subscribe = navigation.addListener('focus', () => {
-      //화면 진입 시 발생 이벤트 초기화하자
-      console.log('진입');
-      setRerenderDraggable(true);
-    });
-
-    return subscribe;
-  }, [navigation]);
 
   useEffect(() => {
+    console.log('진입');
     const unsubscribe = navigation.addListener('blur', () => {
       //화면 이탈 시 발생 이벤트 초기화하자
       console.log('이탈');
-      setRerenderDraggable(false);
-      dispatch(initEditDrawerRedux()); // 초기화
+      dispatch(initEditDrawerRedux()); // redux 초기화
     });
 
     return unsubscribe;
@@ -114,14 +104,12 @@ const EditDrawerScreen = ({navigation}) => {
           {cancelable: true},
         );
       }}>
-      {rerenderDraggable && (
-        <DraggableFlatList
-          data={groupList}
-          renderItem={renderItem}
-          onDragEnd={({data}) => onDragEnd(data)}
-          keyExtractor={(item) => `draggable-group-item-${item.GRP_IDX}`}
-        />
-      )}
+      <DraggableFlatList
+        data={groupList}
+        renderItem={renderItem}
+        onDragEnd={({data}) => onDragEnd(data)}
+        keyExtractor={(item) => `draggable-group-item-${item.GRP_IDX}`}
+      />
     </EditView>
   );
 };

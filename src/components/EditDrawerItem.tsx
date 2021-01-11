@@ -58,25 +58,10 @@ const EditDrawerItem = ({
   groupIdx,
 }: EditDrawerItemProps) => {
   const dispatch = useDispatch();
-  const [rerenderDraggable, setRerenderDraggable] = useState(false); // DraggableFlatList에 버그가 있는 듯 하다 일단 임시로 이렇게 해결
   const [targetList, setTargetList] = useState([]);
   const [orderList, setOrderList] = useState([]);
   const serviceList = useSelector((state: RootState) => state.serviceList.list);
   const [isGroupSelected, setIsGroupSelected] = useState(false);
-
-  useEffect(() => {
-    console.log('진입s');
-    setRerenderDraggable(true);
-
-    const unsubscribe = navigation.addListener('blur', () => {
-      //화면 이탈 시 발생 이벤트 초기화하자
-      console.log('이탈s');
-      setRerenderDraggable(false);
-      setIsGroupSelected(false);
-    });
-
-    return unsubscribe;
-  }, [dispatch, navigation]);
 
   useEffect(() => {
     const services = serviceList.filter((row) => {
@@ -155,16 +140,12 @@ const EditDrawerItem = ({
         />
       </HeaderWrapper>
       <BodyWrapper>
-        {rerenderDraggable && (
-          <DraggableFlatList
-            data={targetList}
-            renderItem={renderItem}
-            onDragEnd={({data}) => onDragEnd(data)}
-            keyExtractor={(item) =>
-              `draggable-service-item-${item.SERVICE_IDX}`
-            }
-          />
-        )}
+        <DraggableFlatList
+          data={targetList}
+          renderItem={renderItem}
+          onDragEnd={({data}) => onDragEnd(data)}
+          keyExtractor={(item) => `draggable-service-item-${item.SERVICE_IDX}`}
+        />
       </BodyWrapper>
     </TotalWrapper>
   );

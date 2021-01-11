@@ -10,6 +10,8 @@ import styled from 'styled-components/native';
 import theme from '../../styles/theme';
 import StyledText from '../../components/StyledText';
 import LoadingSVG from '../../images/LoadingSVG';
+import EditDrawerScreen from '../screens/EditDrawerScreen';
+import EditAccountScreen from '../screens/EditAccountScreen';
 
 const LoadingWrapper = styled.View`
   flex: 1;
@@ -59,6 +61,8 @@ const InitNavi = () => {
         )}
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Main" component={MainNavi} />
+        <Stack.Screen name="EditDrawerScreen" component={EditDrawerScreen} />
+        <Stack.Screen name="EditAccountScreen" component={EditAccountScreen} />
       </Stack.Navigator>
     </>
   );

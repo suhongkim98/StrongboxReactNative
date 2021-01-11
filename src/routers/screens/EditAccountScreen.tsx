@@ -46,7 +46,6 @@ const EditAccountScreen = ({navigation, route}) => {
   const [orderList, setOrderList] = useState([]);
   const [count, setCount] = useState(0);
   const deleteAccountList = useRef([]);
-  const [rerenderDraggable, setRerenderDraggable] = useState(false); // DraggableFlatList에 버그가 있는 듯 하다 일단 임시로 이렇게 해결
   /*
   1 데이터가 들어오면, 삭제 되면 데이터들의 sort order부터 뽑아내 따로 저장
   2 리스트에 변화가 발생하면 위에서부터 순서대로 sort order 업데이트
@@ -64,28 +63,6 @@ const EditAccountScreen = ({navigation, route}) => {
     setOrderList(tmp);
     setTargetList(accounts);
   }, [accountList, serviceIdx]);
-
-  useEffect(() => {
-    const subscribe = navigation.addListener('focus', () => {
-      //화면 진입 시 발생 이벤트 초기화하자
-      console.log('진입');
-      setRerenderDraggable(true);
-    });
-
-    return subscribe;
-  }, [navigation]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      //화면 이탈 시 발생 이벤트 초기화하자
-      console.log('이탈');
-      setCount(0);
-      deleteAccountList.current = [];
-      setRerenderDraggable(false);
-    });
-
-    return unsubscribe;
-  }, [navigation]);
 
   const renderItem = ({item, drag}) => {
     return (
@@ -167,14 +144,12 @@ const EditAccountScreen = ({navigation, route}) => {
           {cancelable: true},
         );
       }}>
-      {rerenderDraggable && (
-        <DraggableFlatList
-          data={targetList}
-          renderItem={renderItem}
-          onDragEnd={({data}) => onDragEnd(data)}
-          keyExtractor={(item) => `draggable-item-${item.ACCOUNT_IDX}`}
-        />
-      )}
+      <DraggableFlatList
+        data={targetList}
+        renderItem={renderItem}
+        onDragEnd={({data}) => onDragEnd(data)}
+        keyExtractor={(item) => `draggable-item-${item.ACCOUNT_IDX}`}
+      />
     </EditView>
   );
 };
