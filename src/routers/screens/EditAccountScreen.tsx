@@ -99,25 +99,14 @@ const EditAccountScreen = ({navigation, route}) => {
       newData[i].ORDER = orderList[i]; //순서 변경
     }
     //DB업데이트
-    const database = StrongboxDatabase.getInstance();
-    for (let i = 0; i < newData.length; i++) {
-      database.updateSortOrder(
-        'ACCOUNTS_TB',
-        newData[i].ACCOUNT_IDX,
-        newData[i].ORDER,
-      );
-    }
+
     //redux업데이트
     dispatch(updateAccountByIdx(newData));
   };
 
   const onAgree = () => {
     const database = StrongboxDatabase.getInstance();
-    for (let i = 0; i < deleteAccountList.current.length; i++) {
-      const accountIdx = deleteAccountList.current[i];
-      database.deleteAccount(accountIdx);
-      dispatch(deleteAccount(accountIdx));
-    }
+    //deleteAccountList 해당 계정 삭제
 
     navigation.goBack();
   };

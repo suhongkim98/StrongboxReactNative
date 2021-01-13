@@ -2,13 +2,10 @@ import React, {useRef, useState} from 'react';
 import ModalPopup from './ModalPopup';
 import {StrongboxDatabase} from '../StrongboxDatabase';
 import styled from 'styled-components/native';
-import {useDispatch} from 'react-redux';
 import {Alert, Switch, View} from 'react-native';
 import StyledText from './StyledText';
 import ServiceDropdown from './ServiceDropdown';
-import {addAccount} from '../modules/accountList';
 import AccountDropdown from './AccountDropdown';
-import CryptoJS from 'react-native-crypto-js';
 interface AddAccountModalPopupProps {
   visible: boolean;
   visibleFunc: (visible: boolean) => any;
@@ -47,12 +44,7 @@ const AddAccountModalPopup = ({
   const passwordValue = useRef('');
   const [isOauthMode, setOauthMode] = useState(false);
   const [selectedDropboxService, setSelectedDropboxService] = useState(-1);
-  const [selectedDropboxServiceName, setSelectedDropboxServiceName] = useState(
-    '',
-  );
   const [selectedAccount, setSelectedAccount] = useState(-1);
-
-  const dispatch = useDispatch();
 
   const onAgreeAddAccount = () => {
     if (titleValue.current === '') {
@@ -90,52 +82,35 @@ const AddAccountModalPopup = ({
     const database = StrongboxDatabase.getInstance();
     if (isOauthMode) {
       database
-        .addAccount(selectedServiceIDX, titleValue.current, {
+        .addAccount({
+          accountName: titleValue.current,
+          serviceIDX: selectedServiceIDX,
           OAuthAccountIDX: selectedAccount,
         })
-        .then((result) => {
-          if (result.OAuthIDX) {
-            let bytes = CryptoJS.AES.decrypt(result.PASSWORD, global.key);
-            let decrypted = bytes.toString(CryptoJS.enc.Utf8);
-            result.PASSWORD = decrypted;
-          }
-          dispatch(
-            addAccount({
-              ACCOUNT_IDX: result.ROWID,
-              SERVICE_IDX: result.SERVICE_IDX,
-              ACCOUNT_NAME: result.NAME,
-              DATE: result.DATE,
-              OAUTH_LOGIN_IDX: result.OAuthIDX,
-              OAUTH_SERVICE_NAME: selectedDropboxServiceName,
-              ID: result.ID,
-              PASSWORD: result.PASSWORD,
-              ORDER: result.ORDER,
-            }),
-          );
+        .then(() => {
+          //메인스크린 계정 업데이트 함수 redux 건들기
+          //
+        })
+        .catch((error) => {
+          console.log(error);
         });
     } else {
       database
-        .addAccount(selectedServiceIDX, titleValue.current, {
+        .addAccount({
+          accountName: titleValue.current,
+          serviceIDX: selectedServiceIDX,
           id: accountValue.current,
           password: passwordValue.current,
         })
-        .then((result) => {
-          dispatch(
-            addAccount({
-              ACCOUNT_IDX: result.ROWID,
-              SERVICE_IDX: result.SERVICE_IDX,
-              ACCOUNT_NAME: result.NAME,
-              DATE: result.DATE,
-              ID: result.ID,
-              PASSWORD: result.PASSWORD,
-              ORDER: result.ORDER,
-            }),
-          );
+        .then(() => {
+          //메인스크린 계정 업데이트 함수 redux 건들기
+          //
         })
         .catch((error) => {
           console.log(error);
         });
     }
+
     visibleFunc(false);
   };
   const initInputData = () => {
@@ -143,7 +118,6 @@ const AddAccountModalPopup = ({
     passwordValue.current = '';
     setSelectedDropboxService(-1);
     setSelectedAccount(-1);
-    setSelectedDropboxServiceName('');
   };
 
   return (
@@ -180,10 +154,7 @@ const AddAccountModalPopup = ({
             <View>
               <View>
                 <StyledText fontWeight="700">서비스 선택</StyledText>
-                <ServiceDropdown
-                  setServiceFunc={setSelectedDropboxService}
-                  setServiceNameFunc={setSelectedDropboxServiceName}
-                />
+                <ServiceDropdown setServiceFunc={setSelectedDropboxService} />
               </View>
               <View>
                 <StyledText fontWeight="700">계정 선택</StyledText>

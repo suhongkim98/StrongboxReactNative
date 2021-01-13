@@ -11,7 +11,6 @@ import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {LogBox, ScrollView} from 'react-native';
 import AddAccountModalpopup from '../../components/AddAccountModalPopup';
-import {updateAccount} from '../../modules/accountList';
 import CryptoJS from 'react-native-crypto-js';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
@@ -53,7 +52,7 @@ const MainScreen = ({navigation}) => {
   const selectedService = useSelector(
     (state: RootState) => state.selectedService.itemIndex,
   );
-  const accountList = useSelector((state: RootState) => state.accountList.list);
+  const [accountList, setAccountList] = useState([]);
 
   useEffect(() => {
     const database = StrongboxDatabase.getInstance();
@@ -81,6 +80,7 @@ const MainScreen = ({navigation}) => {
         const tmp = [];
         for (let i = 0; i < result.length; i++) {
           const row = result.item(i);
+          console.log(row);
           tmp.push({
             GRP_IDX: row.GRP_IDX,
             SERVICE_IDX: row.IDX,
@@ -93,51 +93,38 @@ const MainScreen = ({navigation}) => {
       .catch((error) => {
         console.log(error);
       });
-
-    database
-      .getAccount()
-      .then((result) => {
-        // 계정리스트 업데이트 하자
-        const tmp = [];
-        for (let i = 0; i < result.length; i++) {
-          const item = result.item(i);
-          const json = {
-            ACCOUNT_IDX: item.IDX,
-            SERVICE_IDX: item.SERVICE_IDX,
-            ACCOUNT_NAME: item.ACCOUNT_NAME,
-            DATE: item.DATE,
-            OAUTH_LOGIN_IDX: item.OAUTH_LOGIN_IDX,
-            OAUTH_SERVICE_NAME: item.OAUTH_SERVICE_NAME,
-            ID: item.ID,
-            PASSWORD: item.PASSWORD,
-            ORDER: item.ACCOUNT_ORDER,
-          }; // 기본항목
-          if (item.PASSWORD) {
-            //패스워드가 존재하면 복호화
-            let bytes = CryptoJS.AES.decrypt(item.PASSWORD, global.key);
-            let decrypted = bytes.toString(CryptoJS.enc.Utf8);
-            json.PASSWORD = decrypted;
-          }
-          tmp.push(json);
-        }
-        dispatch(updateAccount(tmp));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }, [dispatch]);
 
+  useEffect(() => {
+    // 이부분을 나중에 redux에 집어넣고 redux에 변화가 발생할 경우 데이터를 뽑아 메인에 출력한다
+    if (selectedService.idx > 0) {
+      const database = StrongboxDatabase.getInstance();
+      database
+        .getAccount(selectedService.idx)
+        .then((result) => {
+          for (let i = 0; i < result.length; i++) {
+            //복호화
+            let bytes = CryptoJS.AES.decrypt(result[i].PASSWORD, global.key);
+            let decrypted = bytes.toString(CryptoJS.enc.Utf8);
+            result[i].PASSWORD = decrypted;
+          }
+          setAccountList(result);
+          console.log(result);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [selectedService.idx]);
+
   const printAccountView = () => {
-    const list = accountList.filter((row) => {
-      return row.SERVICE_IDX === selectedService.idx;
-    });
-    if (list.length <= 0) {
+    if (accountList.length <= 0) {
       return <StyledText fontWeight="700">계정을 추가해주세요.</StyledText>;
     }
-    return list.map((row) => {
+    return accountList.map((row) => {
       return (
         <AccountView
-          key={row.ACCOUNT_IDX}
+          key={row.SORT_ORDER}
           name={row.ACCOUNT_NAME}
           date={row.DATE}
           id={row.ID}

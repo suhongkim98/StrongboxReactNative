@@ -3,7 +3,7 @@ import {sha256} from 'react-native-sha256';
 import CryptoJS from 'react-native-crypto-js';
 export class StrongboxDatabase {
   private static strongboxDatabase: StrongboxDatabase;
-  private static DB_PATH = 'test.db';
+  private static DB_PATH = 'accong.db';
 
   public static getInstance = () => {
     if (!StrongboxDatabase.strongboxDatabase) {
@@ -12,7 +12,7 @@ export class StrongboxDatabase {
     return StrongboxDatabase.strongboxDatabase;
   };
   public connectDatabase = () => {
-    return SQLite.openDatabase(
+    const db = SQLite.openDatabase(
       {
         name: StrongboxDatabase.DB_PATH, // assets/www 안에 있음
         createFromLocation: 1,
@@ -20,6 +20,17 @@ export class StrongboxDatabase {
       () => {},
       this.onFailConnectDB,
     );
+    db.executeSql(
+      'PRAGMA foreign_keys = ON;', //foreign key 사용 하기 위해 PRAGRA
+      [],
+      (_, {rows: {_array}}) => {
+        console.log(`Enable foreign keys result: ${JSON.stringify(_array)}`);
+      },
+      ({}, error) => {
+        console.log(`Enable foreign keys error: ${error}`);
+      },
+    );
+    return db;
   };
 
   private getColumnCount = (db, column: string, table: string) => {
@@ -30,6 +41,9 @@ export class StrongboxDatabase {
           query,
           [],
           (tx, results) => {
+            if (results.rows.item(0).COUNT === null) {
+              results.rows.item(0).COUNT = 0;
+            }
             succ(results);
           },
           (error) => {
@@ -125,8 +139,8 @@ export class StrongboxDatabase {
     db = await this.connectDatabase();
     let singleInsert = await this.executeQuery(
       db,
-      'INSERT INTO GROUPS_TB(OWNER_IDX, GRP_NAME, SORT_ORDER) VALUES(?, ?, (SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM GROUPS_TB))',
-      [0, groupName],
+      'INSERT INTO GROUPS_TB(GRP_NAME, SORT_ORDER) VALUES(?, (SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM GROUPS_TB))',
+      [groupName],
     );
     let countSelect = await this.getColumnCount(db, 'SORT_ORDER', 'GROUPS_TB');
     const count = countSelect.rows.item(0).COUNT;
@@ -180,126 +194,116 @@ export class StrongboxDatabase {
     return selectQuery.rows;
   }
 
-  public async addAccount(
-    serviceIDX: number,
-    accountName: string,
-    account: {OAuthAccountIDX?: number; id?: string; password?: string},
-  ) {
-    //
-    let db = await this.connectDatabase();
+  public async addAccount(account: {
+    accountName: string;
+    serviceIDX: number;
+    OAuthAccountIDX?: number;
+    id?: string;
+    password?: string;
+  }) {
+    //db에 계정 추가만 한다, 출력은 mainScreen에서 계속 db에서 데이터를 뽑아 출력하는 것으로 바꿀 것이기 때문에
+    const db = await this.connectDatabase();
     let query = null;
     let params = [];
-    let [id, password] = [account.id, account.password];
-    if (account.OAuthAccountIDX) {
-      query =
-        'INSERT INTO ACCOUNTS_TB(ACCOUNT_NAME, SERVICE_IDX, OAUTH_LOGIN_IDX, SORT_ORDER) VALUES(?,?,?,(SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM ACCOUNTS_TB))';
-      params = [accountName, serviceIDX, account.OAuthAccountIDX];
-    } else {
-      const key = global.key;
-      let ciphertext = CryptoJS.AES.encrypt(account.password, key).toString(); // AES암호화
-      query =
-        'INSERT INTO ACCOUNTS_TB(SERVICE_IDX,ACCOUNT_NAME,ID,PASSWORD, SORT_ORDER) VALUES(?,?,?,?,(SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM ACCOUNTS_TB))';
-      params = [serviceIDX, accountName, account.id, ciphertext];
-    }
-
-    let singleQuery = await this.executeQuery(db, query, params);
-
-    let selectQuery;
-    if (account.OAuthAccountIDX) {
-      query =
-        'SELECT ID, PASSWORD FROM ACCOUNTS_TB WHERE IDX = ' +
-        account.OAuthAccountIDX;
-      selectQuery = await this.executeQuery(db, query, []);
-      [id, password] = [
-        selectQuery.rows.item(0).ID,
-        selectQuery.rows.item(0).PASSWORD,
-      ];
-    }
-    //출력 순서를 위한 정렬 순서 뽑기
-    const countSelect = await this.getColumnCount(
+    let accountCount = await this.getColumnCount(
       db,
       'SORT_ORDER',
       'ACCOUNTS_TB',
     );
-    const count = countSelect.rows.item(0).COUNT;
+    let OauthAccountCount = await this.getColumnCount(
+      db,
+      'SORT_ORDER',
+      'OAUTH_ACCOUNTS_TB',
+    );
+    let count = //sort order count
+      accountCount.rows.item(0).COUNT +
+      OauthAccountCount.rows.item(0).COUNT +
+      1;
 
-    const date = new Date();
-    const now =
-      date.getFullYear() +
-      '-' +
-      date.getMonth() +
-      '-' +
-      date.getDate() +
-      ' ' +
-      date.getHours() +
-      ':' +
-      date.getMinutes() +
-      ':' +
-      date.getSeconds();
-    const result = {
-      ROWID: singleQuery.insertId,
-      DATE: now,
-      NAME: accountName,
-      SERVICE_IDX: serviceIDX,
-      OAuthIDX: account.OAuthAccountIDX,
-      ID: id,
-      PASSWORD: password,
-      ORDER: count,
-    };
-    return result;
-  }
-  public async getAccount() {
-    let db = this.connectDatabase();
-    let query =
-      'SELECT ACCOUNTS_TB.IDX,SERVICE_IDX,ACCOUNT_NAME,DATE,OAUTH_LOGIN_IDX,ID,PASSWORD,ACCOUNTS_TB.SORT_ORDER AS ACCOUNT_ORDER FROM ACCOUNTS_TB ' +
-      'JOIN SERVICES_TB ON ACCOUNTS_TB.SERVICE_IDX = SERVICES_TB.IDX ' +
-      'JOIN GROUPS_TB ON SERVICES_TB.GRP_IDX = GROUPS_TB.IDX ' +
-      'ORDER BY ACCOUNTS_TB.SORT_ORDER ASC';
-    let allAccountSelectQuery = await this.executeQuery(db, query, []);
-    const allAccountRows = allAccountSelectQuery.rows;
-
-    const list = []; // OAUTH 계정만 뽑아내기
-    for (let i = 0; i < allAccountRows.length; i++) {
-      if (allAccountRows.item(i).OAUTH_LOGIN_IDX) {
-        list.push(allAccountRows.item(i).OAUTH_LOGIN_IDX);
-      }
-    }
-
-    if (list.length > 0) {
-      let idx = '(';
-      for (let i = 0; i < list.length; i++) {
-        idx += list[i];
-        if (i !== list.length - 1) {
-          idx += ',';
-        } else {
-          idx += ')';
-        }
-      }
+    if (account.OAuthAccountIDX) {
+      // oauth 계정 추가
       query =
-        'SELECT ATB.IDX,STB.SERVICE_NAME,ATB.ACCOUNT_NAME,ATB.ID,ATB.PASSWORD FROM ACCOUNTS_TB ATB,SERVICES_TB STB ' +
-        'WHERE ATB.IDX IN ' +
-        idx +
-        ' AND ATB.SERVICE_IDX = STB.IDX';
-      const oauthAccountSelectQuery = await this.executeQuery(db, query, []);
-      const oauthAccountRows = oauthAccountSelectQuery.rows;
+        'INSERT INTO OAUTH_ACCOUNTS_TB(ACCOUNT_IDX, ACCOUNT_NAME, SERVICE_IDX, SORT_ORDER, DATE) ' +
+        "VALUES(?,?,?,?,datetime('now', 'localtime'))";
+      params = [
+        account.OAuthAccountIDX,
+        account.accountName,
+        account.serviceIDX,
+        count,
+      ];
+    } else {
+      // 일반 계정 추가
+      const key = global.key;
+      let ciphertext = CryptoJS.AES.encrypt(account.password, key).toString(); // AES암호화
+      query =
+        'INSERT INTO ACCOUNTS_TB(SERVICE_IDX,ACCOUNT_NAME,ID,PASSWORD, SORT_ORDER, DATE) ' +
+        "VALUES(?,?,?,?,?,datetime('now', 'localtime'))";
+      params = [
+        account.serviceIDX,
+        account.accountName,
+        account.id,
+        ciphertext,
+        count,
+      ];
+    }
+    let singleQuery = await this.executeQuery(db, query, params);
+    return singleQuery;
+  }
 
-      for (let i = 0; i < allAccountRows.length; i++) {
-        for (let j = 0; j < oauthAccountRows.length; j++) {
-          // 나중에 SQL문으로 한번에 뽑아보자
-          if (
-            allAccountRows.item(i).OAUTH_LOGIN_IDX ===
-            oauthAccountRows.item(j).IDX
-          ) {
-            allAccountRows.item(i).OAUTH_SERVICE_NAME = oauthAccountRows.item(
-              j,
-            ).SERVICE_NAME;
-            allAccountRows.item(i).ID = oauthAccountRows.item(j).ID;
-            allAccountRows.item(i).PASSWORD = oauthAccountRows.item(j).PASSWORD;
-          }
-        }
+  public async getAccount(serviceIdx: number) {
+    //일반계정tb, oauth계정tb에서 모든 데이터를 뽑아온다.
+    //oauth계정은 accounttb, servicetb와 join을 해서 뽑는다.
+    //sort order순으로 나열한다.
+    const db = await this.connectDatabase();
+    let query =
+      'SELECT * FROM ACCOUNTS_TB WHERE SERVICE_IDX = ' +
+      serviceIdx +
+      ' ORDER BY SORT_ORDER ASC';
+    const accountQuery = await this.executeQuery(db, query, []); // 일반계정 뽑아내기, 복호화는 메인화면에서 하자
+    const accountRows = accountQuery.rows;
+
+    //oauth의 account idx를 이용해 뽑아야할 것은 id, pw, oauth service idx -> oauth service name
+    query =
+      'SELECT OTB.IDX, OTB.ACCOUNT_NAME, OTB.SORT_ORDER AS SORT_ORDER, OTB.DATE, STB.SERVICE_NAME AS OAUTH_SERVICE_NAME, ATB.ID, ATB.PASSWORD ' +
+      'FROM OAUTH_ACCOUNTS_TB OTB ' +
+      'JOIN ACCOUNTS_TB ATB ON OTB.ACCOUNT_IDX = ATB.IDX ' +
+      'JOIN SERVICES_TB STB ON ATB.SERVICE_IDX = STB.IDX ' +
+      'WHERE OTB.SERVICE_IDX = ' +
+      serviceIdx +
+      ' ORDER BY OTB.SORT_ORDER ASC';
+
+    const oauthQuery = await this.executeQuery(db, query, []);
+    const oauthRows = oauthQuery.rows;
+
+    //account, oauth 모두 오름차순으로 뽑았기 때문에 번갈아가며 둘을 합쳐 sort order하자
+    const result = [];
+    for (
+      let i = 0, j = 0;
+      accountRows.length > i || oauthRows.length > j;
+      i++, j++
+    ) {
+      const accountElement = accountRows.item(i);
+      const oauthAccountElement = oauthRows.item(j);
+
+      if (!accountElement && oauthAccountElement) {
+        // account 길이가 끝나서 검출이 안될 때
+        result.push(oauthAccountElement);
+        continue;
+      }
+      if (!oauthAccountElement && accountElement) {
+        // oauth 길이가 끝나서 검출이 안될 때
+        result.push(accountElement);
+        continue;
+      }
+
+      if (accountElement.SORT_ORDER > oauthAccountElement.SORT_ORDER) {
+        result.push(oauthAccountElement);
+      } else {
+        result.push(accountElement);
       }
     }
-    return allAccountRows;
+    //
+    return result;
   }
   public deleteAccount = (idx: number) => {
     //비동기식으로 삭제하자

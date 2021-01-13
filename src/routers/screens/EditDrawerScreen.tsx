@@ -9,17 +9,20 @@ import {StrongboxDatabase} from '../../StrongboxDatabase.ts';
 import {initEditDrawerRedux} from '../../modules/editDrawerRedux.ts';
 import {deleteGroupByIdx} from '../../modules/groupList.ts';
 import {deleteServiceByIdx} from '../../modules/serviceList.ts';
-
+import {updateSelectedItemIndex} from '../../modules/selectedService.ts';
 const EditDrawerScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const [orderList, setOrderList] = useState([]);
   const groupList = useSelector((state: RootState) => state.groupList.list);
   const count = useSelector((state: RootState) => state.editDrawerRedux.count);
-  const selectedServiceIdx = useSelector(
+  const targetServiceList = useSelector(
     (state: RootState) => state.editDrawerRedux.selectedService,
   );
-  const selectedGroupIdx = useSelector(
+  const targetGroupList = useSelector(
     (state: RootState) => state.editDrawerRedux.selectedGroup,
+  );
+  const selectedService = useSelector(
+    (state: RootState) => state.selectedService.itemIndex,
   );
 
   useEffect(() => {
@@ -71,13 +74,19 @@ const EditDrawerScreen = ({navigation}) => {
 
   const onAgree = () => {
     const database = StrongboxDatabase.getInstance();
-    if (selectedServiceIdx.length > 0) {
-      database.deleteService(selectedServiceIdx);
-      dispatch(deleteServiceByIdx(selectedServiceIdx));
+    if (targetServiceList.length > 0) {
+      database.deleteService(targetServiceList);
+      dispatch(deleteServiceByIdx(targetServiceList));
+
+      for (let i = 0; i < targetServiceList.length; i++) {
+        if (selectedService === targetServiceList[i]) {
+          dispatch(updateSelectedItemIndex({idx: -1, name: 'no-name'})); // 선택서비스 초기화
+        }
+      }
     }
-    if (selectedGroupIdx > 0) {
-      database.deleteGroup(selectedGroupIdx);
-      dispatch(deleteGroupByIdx(selectedGroupIdx));
+    if (targetGroupList.length > 0) {
+      database.deleteGroup(targetGroupList);
+      dispatch(deleteGroupByIdx(targetGroupList));
     }
     navigation.goBack();
   };
