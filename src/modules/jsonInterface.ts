@@ -1,4 +1,5 @@
 export interface AccontType {
+  IDX: number;
   ACCOUNT_NAME: string;
   DATE: string;
   ID: string;

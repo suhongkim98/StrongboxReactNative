@@ -314,12 +314,22 @@ export class StrongboxDatabase {
     //
     return result;
   }
-  public deleteAccount = (idx: number) => {
-    //비동기식으로 삭제하자
-    const db = this.connectDatabase();
-    const query = 'DELETE FROM ACCOUNTS_TB WHERE IDX = ' + idx;
-    this.executeQuery(db, query, []);
-  };
+  public async deleteAccount(table: string, idx: number[]) {
+    //배열로 받아 동기식으로 처리
+    let value = '(';
+    for (let i = 0; i < idx.length; i++) {
+      const element = idx[i];
+      value += element;
+      if (i + 1 < idx.length) {
+        value += ',';
+      }
+    }
+    value += ')';
+    const db = await this.connectDatabase();
+    const query = 'DELETE FROM ' + table + ' WHERE IDX IN ' + value;
+    const result = await this.executeQuery(db, query, []);
+    return result;
+  }
   public deleteGroup = (idx: number[]) => {
     //비동기식으로 삭제하자
     let value = '(';

@@ -6,6 +6,8 @@ import {Alert, Switch, View} from 'react-native';
 import StyledText from './StyledText';
 import ServiceDropdown from './ServiceDropdown';
 import AccountDropdown from './AccountDropdown';
+import {updateAccountAsync} from '../modules/accountList.ts';
+import {useDispatch} from 'react-redux';
 interface AddAccountModalPopupProps {
   visible: boolean;
   visibleFunc: (visible: boolean) => any;
@@ -45,6 +47,7 @@ const AddAccountModalPopup = ({
   const [isOauthMode, setOauthMode] = useState(false);
   const [selectedDropboxService, setSelectedDropboxService] = useState(-1);
   const [selectedAccount, setSelectedAccount] = useState(-1);
+  const dispatch = useDispatch();
 
   const onAgreeAddAccount = () => {
     if (titleValue.current === '') {
@@ -89,7 +92,7 @@ const AddAccountModalPopup = ({
         })
         .then(() => {
           //메인스크린 계정 업데이트 함수 redux 건들기
-          //
+          dispatch(updateAccountAsync(selectedServiceIDX));
         })
         .catch((error) => {
           console.log(error);
@@ -104,7 +107,7 @@ const AddAccountModalPopup = ({
         })
         .then(() => {
           //메인스크린 계정 업데이트 함수 redux 건들기
-          //
+          dispatch(updateAccountAsync(selectedServiceIDX));
         })
         .catch((error) => {
           console.log(error);

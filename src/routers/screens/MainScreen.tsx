@@ -14,8 +14,7 @@ import AddAccountModalpopup from '../../components/AddAccountModalPopup';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
 import {ServiceType, GroupType} from '../../modules/jsonInterface.ts';
-import {updateAccount} from '../../modules/accountList.ts';
-import CryptoJS from 'react-native-crypto-js';
+import {updateAccountAsync} from '../../modules/accountList.ts';
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
 const TotalWrapper = styled.View`
@@ -98,22 +97,7 @@ const MainScreen = ({navigation}) => {
   }, [dispatch]);
 
   useEffect(() => {
-    const database = StrongboxDatabase.getInstance();
-    database
-      .getAccount(selectedService.idx)
-      .then((result) => {
-        for (let i = 0; i < result.length; i++) {
-          //복호화
-          let bytes = CryptoJS.AES.decrypt(result[i].PASSWORD, global.key);
-          let decrypted = bytes.toString(CryptoJS.enc.Utf8);
-          result[i].PASSWORD = decrypted;
-        }
-        //result반환
-        dispatch(updateAccount(result));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    dispatch(updateAccountAsync(selectedService.idx)); //selectedService가 바뀔 때마다 리덕스 업데이트
   }, [dispatch, selectedService.idx]);
 
   const printAccountView = () => {
