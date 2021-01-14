@@ -41,7 +41,7 @@ const EditDrawerScreen = ({navigation}) => {
     const tmp = [];
     for (let i = 0; i < groupList.length; i++) {
       const element = groupList[i];
-      tmp.push(element.ORDER);
+      tmp.push(element.SORT_ORDER);
     }
     setOrderList(tmp);
   }, [groupList]);
@@ -57,18 +57,19 @@ const EditDrawerScreen = ({navigation}) => {
     );
   };
   const onDragEnd = (newData) => {
+    const grpIdx = [];
     //순서 변경 작업
     for (let i = 0; i < newData.length; i++) {
-      newData[i].ORDER = orderList[i]; //순서 변경
+      grpIdx.push(newData[i].GRP_IDX);
+      newData[i].SORT_ORDER = orderList[i]; //순서 변경
     }
     const database = StrongboxDatabase.getInstance();
-    for (let i = 0; i < newData.length; i++) {
-      database.updateSortOrder(
-        'GROUPS_TB',
-        newData[i].GRP_IDX,
-        newData[i].ORDER,
-      );
-    }
+    database
+      .updateSortOrder('GROUPS_TB', grpIdx, orderList)
+      .then(() => {})
+      .catch((error) => {
+        console.log(error);
+      });
     dispatch(updateGroup(newData));
   };
 

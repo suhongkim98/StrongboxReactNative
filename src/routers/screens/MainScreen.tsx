@@ -11,10 +11,11 @@ import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {LogBox, ScrollView} from 'react-native';
 import AddAccountModalpopup from '../../components/AddAccountModalPopup';
-import CryptoJS from 'react-native-crypto-js';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
-
+import {ServiceType, GroupType} from '../../modules/jsonInterface.ts';
+import {updateAccount} from '../../modules/accountList.ts';
+import CryptoJS from 'react-native-crypto-js';
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
 const TotalWrapper = styled.View`
@@ -52,7 +53,7 @@ const MainScreen = ({navigation}) => {
   const selectedService = useSelector(
     (state: RootState) => state.selectedService.itemIndex,
   );
-  const [accountList, setAccountList] = useState([]);
+  const accountList = useSelector((state: RootState) => state.accountList.list);
 
   useEffect(() => {
     const database = StrongboxDatabase.getInstance();
@@ -62,11 +63,12 @@ const MainScreen = ({navigation}) => {
         const tmp = [];
         for (let i = 0; i < result.length; i++) {
           const row = result.item(i);
-          tmp.push({
+          const group: GroupType = {
             GRP_IDX: row.IDX,
             GRP_NAME: row.GRP_NAME,
-            ORDER: row.SORT_ORDER,
-          });
+            SORT_ORDER: row.SORT_ORDER,
+          };
+          tmp.push(group);
         }
         dispatch(updateGroup(tmp)); // 업데이트하자~~~~
       })
@@ -80,13 +82,13 @@ const MainScreen = ({navigation}) => {
         const tmp = [];
         for (let i = 0; i < result.length; i++) {
           const row = result.item(i);
-          console.log(row);
-          tmp.push({
+          const service: ServiceType = {
             GRP_IDX: row.GRP_IDX,
             SERVICE_IDX: row.IDX,
             SERVICE_NAME: row.SERVICE_NAME,
-            ORDER: row.SORT_ORDER,
-          });
+            SORT_ORDER: row.SORT_ORDER,
+          };
+          tmp.push(service);
         }
         dispatch(updateService(tmp)); // 서비스 리스트 업데이트하자~~~~
       })
@@ -96,28 +98,26 @@ const MainScreen = ({navigation}) => {
   }, [dispatch]);
 
   useEffect(() => {
-    // 이부분을 나중에 redux에 집어넣고 redux에 변화가 발생할 경우 데이터를 뽑아 메인에 출력한다
-    if (selectedService.idx > 0) {
-      const database = StrongboxDatabase.getInstance();
-      database
-        .getAccount(selectedService.idx)
-        .then((result) => {
-          for (let i = 0; i < result.length; i++) {
-            //복호화
-            let bytes = CryptoJS.AES.decrypt(result[i].PASSWORD, global.key);
-            let decrypted = bytes.toString(CryptoJS.enc.Utf8);
-            result[i].PASSWORD = decrypted;
-          }
-          setAccountList(result);
-          console.log(result);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }, [selectedService.idx]);
+    const database = StrongboxDatabase.getInstance();
+    database
+      .getAccount(selectedService.idx)
+      .then((result) => {
+        for (let i = 0; i < result.length; i++) {
+          //복호화
+          let bytes = CryptoJS.AES.decrypt(result[i].PASSWORD, global.key);
+          let decrypted = bytes.toString(CryptoJS.enc.Utf8);
+          result[i].PASSWORD = decrypted;
+        }
+        //result반환
+        dispatch(updateAccount(result));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [dispatch, selectedService.idx]);
 
   const printAccountView = () => {
+    console.log(accountList);
     if (accountList.length <= 0) {
       return <StyledText fontWeight="700">계정을 추가해주세요.</StyledText>;
     }

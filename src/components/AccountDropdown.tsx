@@ -23,7 +23,7 @@ const AccountDropdown = ({
       .then((result) => {
         const list = result.filter((row) => {
           //Oauth계정 선택 못하게하기
-          return row.OAUTH_SERVICE_NAME !== null;
+          return row.OAUTH_SERVICE_NAME === undefined;
         });
         const tmp = list.map((row) => (
           <DropdownItem

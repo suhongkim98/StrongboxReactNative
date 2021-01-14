@@ -33,7 +33,7 @@ export class StrongboxDatabase {
     return db;
   };
 
-  private getColumnCount = (db, column: string, table: string) => {
+  private getColumnMaxValue = (db, column: string, table: string) => {
     let query = 'SELECT MAX(' + column + ') AS COUNT FROM ' + table;
     return new Promise((succ, fail) => {
       db.transaction((trans) => {
@@ -74,13 +74,22 @@ export class StrongboxDatabase {
 
   private onFailConnectDB = () => {};
 
-  public updateSortOrder = (table: string, idx: number, order: number) => {
-    //해당 idx의 order을 바꾼다. 동기식으로 할 필요 없으니 비동기 방법으로 ㄱㄱ
-    let db = this.connectDatabase();
-    const query =
-      'UPDATE ' + table + ' SET SORT_ORDER = ' + order + ' WHERE IDX = ' + idx;
-    this.executeQuery(db, query, []);
-  };
+  public async updateSortOrder(table: string, idx: any, order: any) {
+    //idx, order은 배열로 받고 그만큼 반복하며 update
+    let db = await this.connectDatabase();
+    let query;
+    for (let i = 0; i < idx.length; i++) {
+      query =
+        'UPDATE ' +
+        table +
+        ' SET SORT_ORDER = ' +
+        order[i] +
+        ' WHERE IDX = ' +
+        idx[i];
+      await this.executeQuery(db, query, []);
+    }
+    return true;
+  }
 
   public async createUser(password: string) {
     // 사용자 등록 함수
@@ -142,7 +151,11 @@ export class StrongboxDatabase {
       'INSERT INTO GROUPS_TB(GRP_NAME, SORT_ORDER) VALUES(?, (SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM GROUPS_TB))',
       [groupName],
     );
-    let countSelect = await this.getColumnCount(db, 'SORT_ORDER', 'GROUPS_TB');
+    let countSelect = await this.getColumnMaxValue(
+      db,
+      'SORT_ORDER',
+      'GROUPS_TB',
+    );
     const count = countSelect.rows.item(0).COUNT;
     return {
       rowid: singleInsert.insertId,
@@ -170,7 +183,7 @@ export class StrongboxDatabase {
       'INSERT INTO SERVICES_TB(GRP_IDX, SERVICE_NAME, SORT_ORDER) VALUES(?,?,(SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM SERVICES_TB))',
       [groupIdx, name],
     );
-    let countSelect = await this.getColumnCount(
+    let countSelect = await this.getColumnMaxValue(
       db,
       'SORT_ORDER',
       'SERVICES_TB',
@@ -205,20 +218,21 @@ export class StrongboxDatabase {
     const db = await this.connectDatabase();
     let query = null;
     let params = [];
-    let accountCount = await this.getColumnCount(
+    let accountCount = await this.getColumnMaxValue(
       db,
       'SORT_ORDER',
       'ACCOUNTS_TB',
     );
-    let OauthAccountCount = await this.getColumnCount(
+    let OauthAccountCount = await this.getColumnMaxValue(
       db,
       'SORT_ORDER',
       'OAUTH_ACCOUNTS_TB',
     );
-    let count = //sort order count
-      accountCount.rows.item(0).COUNT +
-      OauthAccountCount.rows.item(0).COUNT +
-      1;
+    //sort order count
+    let count =
+      accountCount.rows.item(0).COUNT >= OauthAccountCount.rows.item(0).COUNT
+        ? accountCount.rows.item(0).COUNT + 1
+        : OauthAccountCount.rows.item(0).COUNT + 1;
 
     if (account.OAuthAccountIDX) {
       // oauth 계정 추가
@@ -264,7 +278,7 @@ export class StrongboxDatabase {
 
     //oauth의 account idx를 이용해 뽑아야할 것은 id, pw, oauth service idx -> oauth service name
     query =
-      'SELECT OTB.IDX, OTB.ACCOUNT_NAME, OTB.SORT_ORDER AS SORT_ORDER, OTB.DATE, STB.SERVICE_NAME AS OAUTH_SERVICE_NAME, ATB.ID, ATB.PASSWORD ' +
+      'SELECT OTB.IDX, OTB.ACCOUNT_NAME, OTB.SORT_ORDER, OTB.DATE, STB.SERVICE_NAME AS OAUTH_SERVICE_NAME, ATB.ID, ATB.PASSWORD ' +
       'FROM OAUTH_ACCOUNTS_TB OTB ' +
       'JOIN ACCOUNTS_TB ATB ON OTB.ACCOUNT_IDX = ATB.IDX ' +
       'JOIN SERVICES_TB STB ON ATB.SERVICE_IDX = STB.IDX ' +
@@ -275,32 +289,27 @@ export class StrongboxDatabase {
     const oauthQuery = await this.executeQuery(db, query, []);
     const oauthRows = oauthQuery.rows;
 
-    //account, oauth 모두 오름차순으로 뽑았기 때문에 번갈아가며 둘을 합쳐 sort order하자
+    //account, oauth 모두 오름차순으로 뽑았기 때문에 번갈아가며 둘을 합쳐 sort하자
     const result = [];
-    for (
-      let i = 0, j = 0;
-      accountRows.length > i || oauthRows.length > j;
-      i++, j++
-    ) {
+    let [i, j] = [0, 0];
+    while (accountRows.length > i && oauthRows.length > j) {
       const accountElement = accountRows.item(i);
       const oauthAccountElement = oauthRows.item(j);
-
-      if (!accountElement && oauthAccountElement) {
-        // account 길이가 끝나서 검출이 안될 때
-        result.push(oauthAccountElement);
-        continue;
-      }
-      if (!oauthAccountElement && accountElement) {
-        // oauth 길이가 끝나서 검출이 안될 때
-        result.push(accountElement);
-        continue;
-      }
-
       if (accountElement.SORT_ORDER > oauthAccountElement.SORT_ORDER) {
         result.push(oauthAccountElement);
+        j++;
       } else {
         result.push(accountElement);
+        i++;
       }
+    }
+    while (accountRows.length > i) {
+      result.push(accountRows.item(i));
+      i++;
+    }
+    while (oauthRows.length > j) {
+      result.push(oauthRows.item(j));
+      j++;
     }
     //
     return result;

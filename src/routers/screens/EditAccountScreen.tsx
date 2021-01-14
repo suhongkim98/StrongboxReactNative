@@ -3,11 +3,9 @@ import {Alert} from 'react-native';
 import EditView from '../../components/EditView';
 import StyledText from '../../components/StyledText';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import {useSelector, useDispatch} from 'react-redux';
 import styled from 'styled-components';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import theme from '../../styles/theme';
-import {updateAccountByIdx, deleteAccount} from '../../modules/accountList';
 import {StrongboxDatabase} from '../../StrongboxDatabase';
 import ToggleSwitch from '../../components/ToggleSwitch';
 
@@ -40,8 +38,6 @@ const ItemView = styled.View`
 
 const EditAccountScreen = ({navigation, route}) => {
   const {serviceIdx} = route.params;
-  const accountList = useSelector((state: RootState) => state.accountList.list);
-  const dispatch = useDispatch();
   const [targetList, setTargetList] = useState([]);
   const [orderList, setOrderList] = useState([]);
   const [count, setCount] = useState(0);
@@ -50,19 +46,6 @@ const EditAccountScreen = ({navigation, route}) => {
   1 데이터가 들어오면, 삭제 되면 데이터들의 sort order부터 뽑아내 따로 저장
   2 리스트에 변화가 발생하면 위에서부터 순서대로 sort order 업데이트
   */
-  useEffect(() => {
-    //account리스트 redux에 변화가 있을 때마다 호출
-    const accounts = accountList.filter((row) => {
-      return row.SERVICE_IDX === serviceIdx;
-    });
-    const tmp = [];
-    for (let i = 0; i < accounts.length; i++) {
-      tmp.push(accounts[i].ORDER);
-    }
-    console.log('업데이트');
-    setOrderList(tmp);
-    setTargetList(accounts);
-  }, [accountList, serviceIdx]);
 
   const renderItem = ({item, drag}) => {
     return (
@@ -96,12 +79,10 @@ const EditAccountScreen = ({navigation, route}) => {
   const onDragEnd = (newData) => {
     //리스트 변화 시
     for (let i = 0; i < newData.length; i++) {
-      newData[i].ORDER = orderList[i]; //순서 변경
+      newData[i].SORT_ORDER = orderList[i]; //순서 변경
     }
     //DB업데이트
-
-    //redux업데이트
-    dispatch(updateAccountByIdx(newData));
+    //account, ouath에 따라
   };
 
   const onAgree = () => {

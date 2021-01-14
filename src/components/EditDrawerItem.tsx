@@ -69,7 +69,7 @@ const EditDrawerItem = ({
     });
     const tmp = [];
     for (let i = 0; i < services.length; i++) {
-      tmp.push(services[i].ORDER);
+      tmp.push(services[i].SORT_ORDER);
     }
     setOrderList(tmp);
     setTargetList(services);
@@ -104,20 +104,15 @@ const EditDrawerItem = ({
     );
   };
   const onDragEnd = (newData) => {
+    const serviceIdx = [];
     //리스트 변화 시
     for (let i = 0; i < newData.length; i++) {
-      newData[i].ORDER = orderList[i]; //순서 변경
+      serviceIdx.push(newData[i].SERVICE_IDX);
+      newData[i].SORT_ORDER = orderList[i]; //순서 변경
     }
     //DB업데이트
     const database = StrongboxDatabase.getInstance();
-    for (let i = 0; i < newData.length; i++) {
-      database.updateSortOrder(
-        'SERVICES_TB',
-        newData[i].SERVICE_IDX,
-        newData[i].ORDER,
-      );
-    }
-    // service list redux업데이트
+    database.updateSortOrder('SERVICES_TB', serviceIdx, orderList);
     dispatch(updateServiceByIdx(newData));
   };
   return (

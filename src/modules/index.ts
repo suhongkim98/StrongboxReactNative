@@ -5,16 +5,16 @@ import counter from './counter';
 import groupList from './groupList';
 import serviceList from './serviceList';
 import selectedService from './selectedService';
-import accountList from './accountList';
 import editDrawerRedux from './editDrawerRedux';
+import accountList from './accountList';
 
 const rootReducer = combineReducers({
   counter,
   groupList,
   serviceList,
   selectedService,
-  accountList,
   editDrawerRedux,
+  accountList,
 });
 
 export default rootReducer;
