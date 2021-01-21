@@ -8,7 +8,7 @@ import {pushGroup, popGroup} from '../modules/editDrawerRedux.ts';
 import {useDispatch, useSelector} from 'react-redux';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import {StrongboxDatabase} from '../StrongboxDatabase.ts';
-import {updateServiceByIdx} from '../modules/serviceList.ts';
+import {updateServiceAsync} from '../modules/serviceList.ts';
 import {pushService, popService} from '../modules/editDrawerRedux.ts';
 const StyledIcon = styled(Icon)`
   font-size: 30px;
@@ -62,7 +62,19 @@ const EditDrawerItem = ({
   const [orderList, setOrderList] = useState([]);
   const serviceList = useSelector((state: RootState) => state.serviceList.list);
   const [isGroupSelected, setIsGroupSelected] = useState(false);
-
+  useEffect(() => {
+    console.log('진입');
+    const unsubscribe = navigation.addListener('blur', () => {
+      //화면 이탈 시 발생 이벤트 초기화하자
+      console.log('이탈');
+    });
+    const services = serviceList.filter((row) => {
+      return row.GRP_IDX === groupIdx;
+    });
+    setTargetList(services);
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, navigation]);
   useEffect(() => {
     const services = serviceList.filter((row) => {
       return row.GRP_IDX === groupIdx;
@@ -72,7 +84,6 @@ const EditDrawerItem = ({
       tmp.push(services[i].SORT_ORDER);
     }
     setOrderList(tmp);
-    setTargetList(services);
   }, [serviceList, groupIdx]);
 
   const onFalseGroupToggle = () => {
@@ -110,10 +121,17 @@ const EditDrawerItem = ({
       serviceIdx.push(newData[i].SERVICE_IDX);
       newData[i].SORT_ORDER = orderList[i]; //순서 변경
     }
+    setTargetList(newData);
     //DB업데이트
     const database = StrongboxDatabase.getInstance();
-    database.updateSortOrder('SERVICES_TB', serviceIdx, orderList);
-    dispatch(updateServiceByIdx(newData));
+    database
+      .updateSortOrder('SERVICES_TB', serviceIdx, orderList)
+      .then(() => {
+        dispatch(updateServiceAsync());
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   return (
     <TotalWrapper>

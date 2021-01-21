@@ -330,8 +330,7 @@ export class StrongboxDatabase {
     const result = await this.executeQuery(db, query, []);
     return result;
   }
-  public deleteGroup = (idx: number[]) => {
-    //비동기식으로 삭제하자
+  public async deleteGroup(idx: number[]) {
     let value = '(';
     for (let i = 0; i < idx.length; i++) {
       const element = idx[i];
@@ -341,12 +340,12 @@ export class StrongboxDatabase {
       }
     }
     value += ')';
-    const db = this.connectDatabase();
+    const db = await this.connectDatabase();
     const query = 'DELETE FROM GROUPS_TB WHERE IDX IN ' + value;
-    this.executeQuery(db, query, []);
-  };
-  public deleteService = (idx: number[]) => {
-    //비동기식으로 삭제하자
+    const result = await this.executeQuery(db, query, []);
+    return result;
+  }
+  public async deleteService(idx: number[]) {
     let value = '(';
     for (let i = 0; i < idx.length; i++) {
       const element = idx[i];
@@ -357,8 +356,9 @@ export class StrongboxDatabase {
     }
     value += ')';
     console.log(value);
-    const db = this.connectDatabase();
+    const db = await this.connectDatabase();
     const query = 'DELETE FROM SERVICES_TB WHERE IDX IN ' + value;
-    this.executeQuery(db, query, []);
-  };
+    const result = await this.executeQuery(db, query, []);
+    return result;
+  }
 }

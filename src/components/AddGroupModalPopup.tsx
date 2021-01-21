@@ -2,10 +2,9 @@ import React, {useRef} from 'react';
 import ModalPopup from './ModalPopup';
 import {StrongboxDatabase} from '../StrongboxDatabase';
 import styled from 'styled-components/native';
-import {addGroup} from '../modules/groupList';
+import {updateGroupAsync} from '../modules/groupList';
 import {useDispatch} from 'react-redux';
 import {Alert} from 'react-native';
-import {GroupType} from '../modules/jsonInterface.ts';
 interface AddGroupModalPopupProps {
   visible: boolean;
   visibleFunc: (visible: boolean) => any;
@@ -34,16 +33,10 @@ const AddGroupModalPopup = ({
     const database = StrongboxDatabase.getInstance();
     database
       .addGroup(addGroupTextValue.current)
-      .then((result) => {
-        console.log(result);
+      .then(() => {
         visibleFunc(false);
         //redux 건들기
-        const group: GroupType = {
-          GRP_IDX: result.rowid,
-          GRP_NAME: result.groupName,
-          SORT_ORDER: result.sortOrder,
-        };
-        dispatch(addGroup(group));
+        dispatch(updateGroupAsync());
         //알림Toast 추가하기
         toastFunc('폴더를 추가했습니다.');
         addGroupTextValue.current = '';

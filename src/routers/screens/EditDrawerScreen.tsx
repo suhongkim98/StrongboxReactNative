@@ -3,16 +3,16 @@ import EditView from '../../components/EditView';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import {useSelector, useDispatch} from 'react-redux';
 import {Alert} from 'react-native';
-import {updateGroup} from '../../modules/groupList';
 import EditDrawerItem from '../../components/EditDrawerItem';
 import {StrongboxDatabase} from '../../StrongboxDatabase.ts';
 import {initEditDrawerRedux} from '../../modules/editDrawerRedux.ts';
-import {deleteGroupByIdx} from '../../modules/groupList.ts';
-import {deleteServiceByIdx} from '../../modules/serviceList.ts';
+import {updateGroupAsync} from '../../modules/groupList.ts';
+import {updateServiceAsync} from '../../modules/serviceList.ts';
 import {updateSelectedItemIndex} from '../../modules/selectedService.ts';
 const EditDrawerScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const [orderList, setOrderList] = useState([]);
+  const [targetList, setTargetList] = useState([]);
   const groupList = useSelector((state: RootState) => state.groupList.list);
   const count = useSelector((state: RootState) => state.editDrawerRedux.count);
   const targetServiceList = useSelector(
@@ -32,8 +32,9 @@ const EditDrawerScreen = ({navigation}) => {
       console.log('이탈');
       dispatch(initEditDrawerRedux()); // redux 초기화
     });
-
+    setTargetList(groupList);
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, navigation]);
 
   useEffect(() => {
@@ -63,31 +64,45 @@ const EditDrawerScreen = ({navigation}) => {
       grpIdx.push(newData[i].GRP_IDX);
       newData[i].SORT_ORDER = orderList[i]; //순서 변경
     }
+    setTargetList(newData);
     const database = StrongboxDatabase.getInstance();
     database
       .updateSortOrder('GROUPS_TB', grpIdx, orderList)
-      .then(() => {})
+      .then(() => {
+        dispatch(updateGroupAsync());
+      })
       .catch((error) => {
         console.log(error);
       });
-    dispatch(updateGroup(newData));
   };
 
   const onAgree = () => {
     const database = StrongboxDatabase.getInstance();
     if (targetServiceList.length > 0) {
-      database.deleteService(targetServiceList);
-      dispatch(deleteServiceByIdx(targetServiceList));
-
       for (let i = 0; i < targetServiceList.length; i++) {
         if (selectedService === targetServiceList[i]) {
           dispatch(updateSelectedItemIndex({idx: -1, name: 'no-name'})); // 선택서비스 초기화
         }
       }
+
+      database
+        .deleteService(targetServiceList)
+        .then(() => {
+          dispatch(updateServiceAsync());
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
     if (targetGroupList.length > 0) {
-      database.deleteGroup(targetGroupList);
-      dispatch(deleteGroupByIdx(targetGroupList));
+      database
+        .deleteGroup(targetGroupList)
+        .then(() => {
+          dispatch(updateGroupAsync());
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
     navigation.goBack();
   };
@@ -115,7 +130,7 @@ const EditDrawerScreen = ({navigation}) => {
         );
       }}>
       <DraggableFlatList
-        data={groupList}
+        data={targetList}
         renderItem={renderItem}
         onDragEnd={({data}) => onDragEnd(data)}
         keyExtractor={(item) => `draggable-group-item-${item.GRP_IDX}`}

@@ -3,11 +3,10 @@ import {Alert, View} from 'react-native';
 import ModalPopup from './ModalPopup';
 import {StrongboxDatabase} from '../StrongboxDatabase';
 import styled from 'styled-components/native';
-import {addService} from '../modules/serviceList';
+import {updateServiceAsync} from '../modules/serviceList';
 import {useDispatch} from 'react-redux';
 import GroupDropdown from './GroupDropdown';
 import StyledText from './StyledText';
-import {ServiceType} from '../modules/jsonInterface.ts';
 interface AddServiceModalPopupProps {
   visible: boolean;
   visibleFunc: (visible: boolean) => any;
@@ -61,16 +60,10 @@ const AddServiceModalPopup = ({
     const database = StrongboxDatabase.getInstance();
     database // grp-idx, service이름 매개변수로
       .addService(groupIdx, addServiceTextValue.current)
-      .then((result) => {
+      .then(() => {
         visibleFunc(false);
         //redux 건들기
-        const service: ServiceType = {
-          GRP_IDX: groupIdx,
-          SERVICE_IDX: result.rowid,
-          SERVICE_NAME: result.serviceName,
-          SORT_ORDER: result.sortOrder,
-        };
-        dispatch(addService(service));
+        dispatch(updateServiceAsync());
         //알림Toast 추가하기
         toastFunc('서비스를 추가했습니다.');
         initInputValue();

@@ -52,13 +52,23 @@ const EditAccountScreen = ({navigation, route}) => {
   2 리스트에 변화가 발생하면 위에서부터 순서대로 sort order 업데이트
   */
   useEffect(() => {
+    console.log('진입');
+    const unsubscribe = navigation.addListener('blur', () => {
+      //화면 이탈 시 발생 이벤트 초기화하자
+      console.log('이탈');
+    });
+    setTargetList(accountList);
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, navigation]);
+
+  useEffect(() => {
     const tmp = [];
     for (let i = 0; i < accountList.length; i++) {
       const element = accountList[i];
       tmp.push(element.SORT_ORDER);
     }
     setOrderList(tmp);
-    setTargetList(accountList);
   }, [accountList]);
   const renderItem = ({item, drag}) => {
     return (
@@ -120,6 +130,7 @@ const EditAccountScreen = ({navigation, route}) => {
         accountOrder.push(orderList[i]);
       }
     }
+    setTargetList(newData);
     //DB업데이트 account, ouath에 따라 sort order 변경
     const database = StrongboxDatabase.getInstance();
     database

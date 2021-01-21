@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import StyledText from '../../components/StyledText';
-import {StrongboxDatabase} from '../../StrongboxDatabase.ts';
 import {useDispatch, useSelector} from 'react-redux';
-import {updateGroup} from '../../modules/groupList';
-import {updateService} from '../../modules/serviceList';
+import {updateGroupAsync} from '../../modules/groupList';
+import {updateServiceAsync} from '../../modules/serviceList';
 import MenuSVG from '../../images/MenuSVG';
 import SettingSVG from '../../images/SettingSVG';
 import ActionButton from 'react-native-action-button';
@@ -13,7 +12,6 @@ import {LogBox, ScrollView} from 'react-native';
 import AddAccountModalpopup from '../../components/AddAccountModalPopup';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
-import {ServiceType, GroupType} from '../../modules/jsonInterface.ts';
 import {updateAccountAsync} from '../../modules/accountList.ts';
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
@@ -55,45 +53,8 @@ const MainScreen = ({navigation}) => {
   const accountList = useSelector((state: RootState) => state.accountList.list);
 
   useEffect(() => {
-    const database = StrongboxDatabase.getInstance();
-    database
-      .getGroup() // group redux 업데이트
-      .then((result) => {
-        const tmp = [];
-        for (let i = 0; i < result.length; i++) {
-          const row = result.item(i);
-          const group: GroupType = {
-            GRP_IDX: row.IDX,
-            GRP_NAME: row.GRP_NAME,
-            SORT_ORDER: row.SORT_ORDER,
-          };
-          tmp.push(group);
-        }
-        dispatch(updateGroup(tmp)); // 업데이트하자~~~~
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    database
-      .getService()
-      .then((result) => {
-        const tmp = [];
-        for (let i = 0; i < result.length; i++) {
-          const row = result.item(i);
-          const service: ServiceType = {
-            GRP_IDX: row.GRP_IDX,
-            SERVICE_IDX: row.IDX,
-            SERVICE_NAME: row.SERVICE_NAME,
-            SORT_ORDER: row.SORT_ORDER,
-          };
-          tmp.push(service);
-        }
-        dispatch(updateService(tmp)); // 서비스 리스트 업데이트하자~~~~
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    dispatch(updateGroupAsync());
+    dispatch(updateServiceAsync());
   }, [dispatch]);
 
   useEffect(() => {
