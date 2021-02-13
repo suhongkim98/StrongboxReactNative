@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import styled from 'styled-components/native';
 import StyledText from '../../components/StyledText';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,6 +13,7 @@ import AddAccountModalpopup from '../../components/AddAccountModalPopup';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
 import {updateAccountAsync} from '../../modules/accountList.ts';
+import Toast from 'react-native-root-toast';
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
 const TotalWrapper = styled.View`
@@ -52,6 +53,23 @@ const MainScreen = ({navigation}) => {
   );
   const accountList = useSelector((state: RootState) => state.accountList.list);
 
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimer = useRef<number>(-1);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const showToastMessage = (message: string) => {
+    // toast 보여주는 함수
+    setToastMessage(message);
+    setToastVisible(true);
+    if (toastTimer.current !== -1) {
+      clearTimeout(toastTimer.current);
+      toastTimer.current = -1;
+    }
+    toastTimer.current = setTimeout(() => {
+      setToastVisible(false);
+    }, 2000);
+  };
+
   useEffect(() => {
     dispatch(updateGroupAsync());
     dispatch(updateServiceAsync());
@@ -82,10 +100,19 @@ const MainScreen = ({navigation}) => {
 
   return (
     <TotalWrapper>
+      <Toast
+        visible={toastVisible}
+        position={Toast.positions.BOTTOM}
+        shadow={true}
+        animation={true}
+        hideOnPress={true}>
+        {toastMessage}
+      </Toast>
       <AddAccountModalpopup
         visible={visibleAddAccountModal}
         visibleFunc={setVisibleAddAccountModal}
         selectedServiceIDX={selectedService.idx}
+        toastFunc={showToastMessage}
       />
       <HeaderWrapper>
         <MenuButton

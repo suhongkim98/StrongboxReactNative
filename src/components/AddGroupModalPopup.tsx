@@ -32,14 +32,27 @@ const AddGroupModalPopup = ({
     }
     const database = StrongboxDatabase.getInstance();
     database
-      .addGroup(addGroupTextValue.current)
-      .then(() => {
-        visibleFunc(false);
-        //redux 건들기
-        dispatch(updateGroupAsync());
-        //알림Toast 추가하기
-        toastFunc('폴더를 추가했습니다.');
-        addGroupTextValue.current = '';
+      .isExistGroupName(addGroupTextValue.current)
+      .then((result) => {
+        if (result) {
+          visibleFunc(false);
+          toastFunc('이미 존재하는 그룹입니다.');
+          addGroupTextValue.current = '';
+        } else {
+          database
+            .addGroup(addGroupTextValue.current)
+            .then(() => {
+              visibleFunc(false);
+              //redux 건들기
+              dispatch(updateGroupAsync());
+              //알림Toast 추가하기
+              toastFunc('폴더를 추가했습니다.');
+              addGroupTextValue.current = '';
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
       })
       .catch((error) => {
         console.log(error);

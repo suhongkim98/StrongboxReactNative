@@ -361,4 +361,42 @@ export class StrongboxDatabase {
     const result = await this.executeQuery(db, query, []);
     return result;
   }
+  public async isExistGroupName(grpName: string) {
+    const query = "SELECT * FROM GROUPS_TB WHERE GRP_NAME = '" + grpName + "'";
+
+    const db = await this.connectDatabase();
+    const result = await this.executeQuery(db, query, []);
+    const rows = result.rows;
+    return rows.length > 0;
+  }
+  public async isExistServiceName(serviceName: string, groupIndex: number) {
+    const query =
+      'SELECT * FROM SERVICES_TB STB ' +
+      'JOIN GROUPS_TB GTB ON STB.GRP_IDX = GTB.IDX ' +
+      'WHERE GTB.IDX = ' +
+      groupIndex +
+      " AND STB.SERVICE_NAME = '" +
+      serviceName +
+      "'";
+
+    const db = await this.connectDatabase();
+    const result = await this.executeQuery(db, query, []);
+    const rows = result.rows;
+    return rows.length > 0;
+  }
+  public async isExistAccountName(accountName: string, serviceIndex: number) {
+    const query =
+      'SELECT * FROM ACCOUNTS_TB ATB ' +
+      'JOIN SERVICES_TB STB ON STB.IDX = ATB.SERVICE_IDX ' +
+      'WHERE STB.IDX = ' +
+      serviceIndex +
+      " AND ATB.ACCOUNT_NAME = '" +
+      accountName +
+      "'";
+
+    const db = await this.connectDatabase();
+    const result = await this.executeQuery(db, query, []);
+    const rows = result.rows;
+    return rows.length > 0;
+  }
 }

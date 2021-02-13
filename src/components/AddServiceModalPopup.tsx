@@ -58,15 +58,29 @@ const AddServiceModalPopup = ({
       return;
     }
     const database = StrongboxDatabase.getInstance();
-    database // grp-idx, service이름 매개변수로
-      .addService(groupIdx, addServiceTextValue.current)
-      .then(() => {
-        visibleFunc(false);
-        //redux 건들기
-        dispatch(updateServiceAsync());
-        //알림Toast 추가하기
-        toastFunc('서비스를 추가했습니다.');
-        initInputValue();
+    database
+      .isExistServiceName(addServiceTextValue.current, groupIdx)
+      .then((result) => {
+        if (result) {
+          visibleFunc(false);
+          //알림Toast 추가하기
+          toastFunc('이미 존재하는 서비스 이름입니다.');
+          initInputValue();
+        } else {
+          database // grp-idx, service이름 매개변수로
+            .addService(groupIdx, addServiceTextValue.current)
+            .then(() => {
+              visibleFunc(false);
+              //redux 건들기
+              dispatch(updateServiceAsync());
+              //알림Toast 추가하기
+              toastFunc('서비스를 추가했습니다.');
+              initInputValue();
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
       })
       .catch((error) => {
         console.log(error);

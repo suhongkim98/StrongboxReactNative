@@ -12,6 +12,7 @@ interface AddAccountModalPopupProps {
   visible: boolean;
   visibleFunc: (visible: boolean) => any;
   selectedServiceIDX: number;
+  toastFunc: (message: string) => any;
 }
 const AddTextInput = styled.TextInput`
   border-width: 1px;
@@ -40,6 +41,7 @@ const AddAccountModalPopup = ({
   visible,
   visibleFunc,
   selectedServiceIDX,
+  toastFunc,
 }: AddAccountModalPopupProps) => {
   const titleValue = useRef('');
   const accountValue = useRef('');
@@ -93,27 +95,39 @@ const AddAccountModalPopup = ({
         .then(() => {
           //메인스크린 계정 업데이트 함수 redux 건들기
           dispatch(updateAccountAsync(selectedServiceIDX));
+          toastFunc('계정을 추가했습니다');
         })
         .catch((error) => {
           console.log(error);
         });
     } else {
       database
-        .addAccount({
-          accountName: titleValue.current,
-          serviceIDX: selectedServiceIDX,
-          id: accountValue.current,
-          password: passwordValue.current,
-        })
-        .then(() => {
-          //메인스크린 계정 업데이트 함수 redux 건들기
-          dispatch(updateAccountAsync(selectedServiceIDX));
+        .isExistAccountName(titleValue.current, selectedServiceIDX)
+        .then((result) => {
+          if (result) {
+            toastFunc('이미 존재하는 계정입니다.');
+          } else {
+            database
+              .addAccount({
+                accountName: titleValue.current,
+                serviceIDX: selectedServiceIDX,
+                id: accountValue.current,
+                password: passwordValue.current,
+              })
+              .then(() => {
+                //메인스크린 계정 업데이트 함수 redux 건들기
+                dispatch(updateAccountAsync(selectedServiceIDX));
+                toastFunc('계정을 추가했습니다');
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
         })
         .catch((error) => {
           console.log(error);
         });
     }
-
     visibleFunc(false);
   };
   const initInputData = () => {
