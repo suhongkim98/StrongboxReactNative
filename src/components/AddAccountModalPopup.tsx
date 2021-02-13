@@ -87,15 +87,26 @@ const AddAccountModalPopup = ({
     const database = StrongboxDatabase.getInstance();
     if (isOauthMode) {
       database
-        .addAccount({
-          accountName: titleValue.current,
-          serviceIDX: selectedServiceIDX,
-          OAuthAccountIDX: selectedAccount,
-        })
-        .then(() => {
-          //메인스크린 계정 업데이트 함수 redux 건들기
-          dispatch(updateAccountAsync(selectedServiceIDX));
-          toastFunc('계정을 추가했습니다');
+        .isExistOauthAccountName(titleValue.current, selectedServiceIDX)
+        .then((result) => {
+          if (result) {
+            toastFunc('이미 존재하는 계정입니다.');
+          } else {
+            database
+              .addAccount({
+                accountName: titleValue.current,
+                serviceIDX: selectedServiceIDX,
+                OAuthAccountIDX: selectedAccount,
+              })
+              .then(() => {
+                //메인스크린 계정 업데이트 함수 redux 건들기
+                dispatch(updateAccountAsync(selectedServiceIDX));
+                toastFunc('계정을 추가했습니다');
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
         })
         .catch((error) => {
           console.log(error);

@@ -399,4 +399,22 @@ export class StrongboxDatabase {
     const rows = result.rows;
     return rows.length > 0;
   }
+  public async isExistOauthAccountName(
+    oauthAccountName: string,
+    serviceIndex: number,
+  ) {
+    const query =
+      'SELECT * FROM OAUTH_ACCOUNTS_TB OTB ' +
+      'JOIN SERVICES_TB STB ON STB.IDX = OTB.SERVICE_IDX ' +
+      'WHERE STB.IDX = ' +
+      serviceIndex +
+      " AND OTB.ACCOUNT_NAME = '" +
+      oauthAccountName +
+      "'";
+
+    const db = await this.connectDatabase();
+    const result = await this.executeQuery(db, query, []);
+    const rows = result.rows;
+    return rows.length > 0;
+  }
 }
