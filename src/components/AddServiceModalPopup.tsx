@@ -61,7 +61,7 @@ const AddServiceModalPopup = ({
     database
       .isExistServiceName(addServiceTextValue.current, groupIdx)
       .then((result) => {
-        if (result) {
+        if (result > 0) {
           visibleFunc(false);
           //알림Toast 추가하기
           toastFunc('이미 존재하는 서비스 이름입니다.');

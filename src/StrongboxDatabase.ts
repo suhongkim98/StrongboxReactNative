@@ -367,7 +367,10 @@ export class StrongboxDatabase {
     const db = await this.connectDatabase();
     const result = await this.executeQuery(db, query, []);
     const rows = result.rows;
-    return rows.length > 0;
+    if (rows.length > 0) {
+      return rows.item(0).IDX;
+    }
+    return -1;
   }
   public async isExistServiceName(serviceName: string, groupIndex: number) {
     const query =
@@ -382,7 +385,10 @@ export class StrongboxDatabase {
     const db = await this.connectDatabase();
     const result = await this.executeQuery(db, query, []);
     const rows = result.rows;
-    return rows.length > 0;
+    if (rows.length > 0) {
+      return rows.item(0).IDX;
+    }
+    return -1;
   }
   public async isExistAccountName(accountName: string, serviceIndex: number) {
     const query =
@@ -397,7 +403,10 @@ export class StrongboxDatabase {
     const db = await this.connectDatabase();
     const result = await this.executeQuery(db, query, []);
     const rows = result.rows;
-    return rows.length > 0;
+    if (rows.length > 0) {
+      return rows.item(0).IDX;
+    }
+    return -1;
   }
   public async isExistOauthAccountName(
     oauthAccountName: string,
@@ -415,6 +424,9 @@ export class StrongboxDatabase {
     const db = await this.connectDatabase();
     const result = await this.executeQuery(db, query, []);
     const rows = result.rows;
-    return rows.length > 0;
+    if (rows.length > 0) {
+      return rows.item(0).IDX;
+    }
+    return -1;
   }
 }

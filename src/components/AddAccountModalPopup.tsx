@@ -89,7 +89,7 @@ const AddAccountModalPopup = ({
       database
         .isExistOauthAccountName(titleValue.current, selectedServiceIDX)
         .then((result) => {
-          if (result) {
+          if (result > 0) {
             toastFunc('이미 존재하는 계정입니다.');
           } else {
             database
@@ -115,7 +115,7 @@ const AddAccountModalPopup = ({
       database
         .isExistAccountName(titleValue.current, selectedServiceIDX)
         .then((result) => {
-          if (result) {
+          if (result > 0) {
             toastFunc('이미 존재하는 계정입니다.');
           } else {
             database

@@ -34,7 +34,7 @@ const AddGroupModalPopup = ({
     database
       .isExistGroupName(addGroupTextValue.current)
       .then((result) => {
-        if (result) {
+        if (result > 0) {
           visibleFunc(false);
           toastFunc('이미 존재하는 그룹입니다.');
           addGroupTextValue.current = '';
