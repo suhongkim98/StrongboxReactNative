@@ -87,7 +87,11 @@ const AddAccountModalPopup = ({
     const database = StrongboxDatabase.getInstance();
     if (isOauthMode) {
       database
-        .isExistOauthAccountName(titleValue.current, selectedServiceIDX)
+        .isExistOauthAccountName(
+          titleValue.current,
+          selectedServiceIDX,
+          selectedAccount,
+        )
         .then((result) => {
           if (result > 0) {
             toastFunc('이미 존재하는 계정입니다.');

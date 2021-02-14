@@ -411,6 +411,7 @@ export class StrongboxDatabase {
   public async isExistOauthAccountName(
     oauthAccountName: string,
     serviceIndex: number,
+    accountIndex: number,
   ) {
     const query =
       'SELECT * FROM OAUTH_ACCOUNTS_TB OTB ' +
@@ -419,7 +420,8 @@ export class StrongboxDatabase {
       serviceIndex +
       " AND OTB.ACCOUNT_NAME = '" +
       oauthAccountName +
-      "'";
+      "' AND OTB.ACCOUNT_IDX = " +
+      accountIndex;
 
     const db = await this.connectDatabase();
     const result = await this.executeQuery(db, query, []);
