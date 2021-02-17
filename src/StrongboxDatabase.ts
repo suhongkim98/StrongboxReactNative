@@ -3,7 +3,7 @@ import {sha256} from 'react-native-sha256';
 import CryptoJS from 'react-native-crypto-js';
 export class StrongboxDatabase {
   private static strongboxDatabase: StrongboxDatabase;
-  private static DB_PATH = 'accong.db';
+  private static DB_NAME = 'accong.db';
 
   public static getInstance = () => {
     if (!StrongboxDatabase.strongboxDatabase) {
@@ -11,21 +11,12 @@ export class StrongboxDatabase {
     }
     return StrongboxDatabase.strongboxDatabase;
   };
-  // public connectDatabase = () => {
-  //   const db = SQLite.openDatabase(
-  //     {
-  //       name: StrongboxDatabase.DB_PATH, // assets/www 안에 있음
-  //       createFromLocation: 1,
-  //     },
-  //     () => {},
-  //     this.onFailConnectDB,
-  //   );
   public connectDatabase = () => {
     const db = SQLite.openDatabase(
       {
         name: 'a', // assets/www 안에 있음
         location: 'Library',
-        createFromLocation: '~www/accong.db',
+        createFromLocation: '~www/' + StrongboxDatabase.DB_NAME,
       },
       () => {},
       this.onFailConnectDB,
