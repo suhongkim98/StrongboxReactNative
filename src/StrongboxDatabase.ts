@@ -11,25 +11,25 @@ export class StrongboxDatabase {
     }
     return StrongboxDatabase.strongboxDatabase;
   };
-  public connectDatabase = () => {
-    const db = SQLite.openDatabase(
-      {
-        name: StrongboxDatabase.DB_PATH, // assets/www 안에 있음
-        createFromLocation: 1,
-      },
-      () => {},
-      this.onFailConnectDB,
-    );
   // public connectDatabase = () => {
   //   const db = SQLite.openDatabase(
   //     {
   //       name: StrongboxDatabase.DB_PATH, // assets/www 안에 있음
-  //       location: 'default',
-  //       createFromLocation: '~www/accong.db',
+  //       createFromLocation: 1,
   //     },
   //     () => {},
   //     this.onFailConnectDB,
   //   );
+  public connectDatabase = () => {
+    const db = SQLite.openDatabase(
+      {
+        name: 'a', // assets/www 안에 있음
+        location: 'Library',
+        createFromLocation: '~www/accong.db',
+      },
+      () => {},
+      this.onFailConnectDB,
+    );
     db.executeSql(
       'PRAGMA foreign_keys = ON;', //foreign key 사용 하기 위해 PRAGRA
       [],

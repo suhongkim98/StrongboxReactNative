@@ -8,6 +8,12 @@ import InitNavi from './src/routers/navigations/InitNavi';
 import {RootSiblingParent} from 'react-native-root-siblings';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
+import AntIcon from 'react-native-vector-icons/AntDesign';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+
+//폰트 로드
+AntIcon.loadFont();
+MaterialIcon.loadFont();
 
 const store = createStore(
   rootReducer,
