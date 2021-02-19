@@ -10,10 +10,15 @@ import {composeWithDevTools} from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import styled from 'styled-components/native';
 
 //폰트 로드
 AntIcon.loadFont();
 MaterialIcon.loadFont();
+
+const SafeView = styled.SafeAreaView`
+  flex: 1;
+`;
 
 const store = createStore(
   rootReducer,
@@ -25,9 +30,11 @@ const App = () => {
     <>
       <Provider store={store}>
         <RootSiblingParent>
-          <NavigationContainer>
-            <InitNavi />
-          </NavigationContainer>
+          <SafeView>
+            <NavigationContainer>
+              <InitNavi />
+            </NavigationContainer>
+          </SafeView>
         </RootSiblingParent>
       </Provider>
     </>
