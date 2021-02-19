@@ -1,6 +1,6 @@
 //그룹 리스트 상태관리 redux
 import {StrongboxDatabase} from '../StrongboxDatabase';
-import {ServiceType} from '../../modules/jsonInterface.ts';
+import {ServiceType} from '../modules/jsonInterface';
 
 const UPDATE = 'serviceList/UPDATE' as const;
 

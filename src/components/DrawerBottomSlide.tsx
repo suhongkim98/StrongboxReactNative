@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import BottomSlide from './BottomSlide';
 import StyledText from './StyledText';
 
@@ -24,7 +24,6 @@ const Divider = styled.View`
 const DrawerBottomSlide = ({isVisible, onClose}) => {
   return (
     <BottomSlide
-      width="100%"
       height="150px"
       isVisible={isVisible}
       onClose={onClose}>

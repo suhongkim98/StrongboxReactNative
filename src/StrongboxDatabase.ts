@@ -24,8 +24,8 @@ export class StrongboxDatabase {
     db.executeSql(
       'PRAGMA foreign_keys = ON;', //foreign key 사용 하기 위해 PRAGRA
       [],
-      (_, {rows: {_array}}) => {
-        console.log(`Enable foreign keys result: ${JSON.stringify(_array)}`);
+      (_) => {
+        console.log(`Enable foreign keys success`);
       },
       ({}, error) => {
         console.log(`Enable foreign keys error: ${error}`);
@@ -116,7 +116,7 @@ export class StrongboxDatabase {
     //사용자 있는지 여부 검사 후 true / false 반환
     let db = null;
     db = await this.connectDatabase();
-    let selectQuery = await this.executeQuery(db, 'SELECT * FROM USERS_TB');
+    let selectQuery: any = await this.executeQuery(db, 'SELECT * FROM USERS_TB');
     const rows = selectQuery.rows;
     if (rows.length <= 0) {
       return false;
@@ -128,7 +128,7 @@ export class StrongboxDatabase {
     let db = null;
 
     db = await this.connectDatabase();
-    let selectQuery = await this.executeQuery(db, 'SELECT * FROM USERS_TB');
+    let selectQuery: any = await this.executeQuery(db, 'SELECT * FROM USERS_TB');
     const rows = selectQuery.rows; // 무조건 첫번째 row를 대상으로 하자(앱은 싱글사용자모드니깐)
     if (rows.length <= 0) {
       return false;
@@ -147,12 +147,12 @@ export class StrongboxDatabase {
   public async addGroup(groupName: string) {
     let db = null;
     db = await this.connectDatabase();
-    let singleInsert = await this.executeQuery(
+    let singleInsert: any = await this.executeQuery(
       db,
       'INSERT INTO GROUPS_TB(GRP_NAME, SORT_ORDER) VALUES(?, (SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM GROUPS_TB))',
       [groupName],
     );
-    let countSelect = await this.getColumnMaxValue(
+    let countSelect: any = await this.getColumnMaxValue(
       db,
       'SORT_ORDER',
       'GROUPS_TB',
@@ -168,7 +168,7 @@ export class StrongboxDatabase {
   public async getGroup() {
     let db = null;
     db = await this.connectDatabase();
-    let selectQuery = await this.executeQuery(
+    let selectQuery: any = await this.executeQuery(
       db,
       'SELECT IDX, GRP_NAME, SORT_ORDER FROM GROUPS_TB ORDER BY SORT_ORDER ASC',
       [],
@@ -179,12 +179,12 @@ export class StrongboxDatabase {
   public async addService(groupIdx: number, name: string) {
     let db = null;
     db = await this.connectDatabase();
-    let singleInsert = await this.executeQuery(
+    let singleInsert: any = await this.executeQuery(
       db,
       'INSERT INTO SERVICES_TB(GRP_IDX, SERVICE_NAME, SORT_ORDER) VALUES(?,?,(SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM SERVICES_TB))',
       [groupIdx, name],
     );
-    let countSelect = await this.getColumnMaxValue(
+    let countSelect: any = await this.getColumnMaxValue(
       db,
       'SORT_ORDER',
       'SERVICES_TB',
@@ -200,7 +200,7 @@ export class StrongboxDatabase {
   public async getService() {
     let db = null;
     db = await this.connectDatabase();
-    let selectQuery = await this.executeQuery(
+    let selectQuery: any = await this.executeQuery(
       db,
       'SELECT IDX, SERVICE_NAME, GRP_IDX, SORT_ORDER FROM SERVICES_TB ORDER BY SORT_ORDER ASC',
       [],
@@ -219,12 +219,12 @@ export class StrongboxDatabase {
     const db = await this.connectDatabase();
     let query = null;
     let params = [];
-    let accountCount = await this.getColumnMaxValue(
+    let accountCount: any = await this.getColumnMaxValue(
       db,
       'SORT_ORDER',
       'ACCOUNTS_TB',
     );
-    let OauthAccountCount = await this.getColumnMaxValue(
+    let OauthAccountCount: any = await this.getColumnMaxValue(
       db,
       'SORT_ORDER',
       'OAUTH_ACCOUNTS_TB',
@@ -274,7 +274,7 @@ export class StrongboxDatabase {
       'SELECT * FROM ACCOUNTS_TB WHERE SERVICE_IDX = ' +
       serviceIdx +
       ' ORDER BY SORT_ORDER ASC';
-    const accountQuery = await this.executeQuery(db, query, []); // 일반계정 뽑아내기, 복호화는 메인화면에서 하자
+    const accountQuery: any = await this.executeQuery(db, query, []); // 일반계정 뽑아내기, 복호화는 메인화면에서 하자
     const accountRows = accountQuery.rows;
 
     //oauth의 account idx를 이용해 뽑아야할 것은 id, pw, oauth service idx -> oauth service name
@@ -287,7 +287,7 @@ export class StrongboxDatabase {
       serviceIdx +
       ' ORDER BY OTB.SORT_ORDER ASC';
 
-    const oauthQuery = await this.executeQuery(db, query, []);
+    const oauthQuery: any = await this.executeQuery(db, query, []);
     const oauthRows = oauthQuery.rows;
 
     //account, oauth 모두 오름차순으로 뽑았기 때문에 번갈아가며 둘을 합쳐 sort하자
@@ -366,7 +366,7 @@ export class StrongboxDatabase {
     const query = "SELECT * FROM GROUPS_TB WHERE GRP_NAME = '" + grpName + "'";
 
     const db = await this.connectDatabase();
-    const result = await this.executeQuery(db, query, []);
+    const result: any = await this.executeQuery(db, query, []);
     const rows = result.rows;
     if (rows.length > 0) {
       return rows.item(0).IDX;
@@ -384,7 +384,7 @@ export class StrongboxDatabase {
       "'";
 
     const db = await this.connectDatabase();
-    const result = await this.executeQuery(db, query, []);
+    const result: any = await this.executeQuery(db, query, []);
     const rows = result.rows;
     if (rows.length > 0) {
       return rows.item(0).IDX;
@@ -402,7 +402,7 @@ export class StrongboxDatabase {
       "'";
 
     const db = await this.connectDatabase();
-    const result = await this.executeQuery(db, query, []);
+    const result: any = await this.executeQuery(db, query, []);
     const rows = result.rows;
     if (rows.length > 0) {
       return rows.item(0).IDX;
@@ -425,7 +425,7 @@ export class StrongboxDatabase {
       accountIndex;
 
     const db = await this.connectDatabase();
-    const result = await this.executeQuery(db, query, []);
+    const result: any = await this.executeQuery(db, query, []);
     const rows = result.rows;
     if (rows.length > 0) {
       return rows.item(0).IDX;

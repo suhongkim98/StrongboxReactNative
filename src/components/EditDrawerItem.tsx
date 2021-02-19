@@ -1,15 +1,16 @@
 import React, {useState, useEffect} from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {TouchableOpacity} from 'react-native';
 import StyledText from '../components/StyledText';
 import ToggleSwitch from '../components/ToggleSwitch';
-import {pushGroup, popGroup} from '../modules/editDrawerRedux.ts';
+import {pushGroup, popGroup} from '../modules/editDrawerRedux';
 import {useDispatch, useSelector} from 'react-redux';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import {StrongboxDatabase} from '../StrongboxDatabase.ts';
-import {updateServiceAsync} from '../modules/serviceList.ts';
-import {pushService, popService} from '../modules/editDrawerRedux.ts';
+import {StrongboxDatabase} from '../StrongboxDatabase';
+import {updateServiceAsync} from '../modules/serviceList';
+import {pushService, popService} from '../modules/editDrawerRedux';
+import {RootState} from '../modules/index';
 const StyledIcon = styled(Icon)`
   font-size: 30px;
   height: 22px;

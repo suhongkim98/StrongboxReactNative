@@ -12,8 +12,9 @@ import {LogBox, ScrollView} from 'react-native';
 import AddAccountModalpopup from '../../components/AddAccountModalPopup';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
-import {updateAccountAsync} from '../../modules/accountList.ts';
+import {updateAccountAsync} from '../../modules/accountList';
 import Toast from 'react-native-root-toast';
+import { RootState } from '../../modules';
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
 const TotalWrapper = styled.View`
@@ -54,7 +55,7 @@ const MainScreen = ({navigation}) => {
   const accountList = useSelector((state: RootState) => state.accountList.list);
 
   const [toastVisible, setToastVisible] = useState(false);
-  const toastTimer = useRef<number>(-1);
+  const toastTimer: any = useRef<number>(-1);
   const [toastMessage, setToastMessage] = useState('');
 
   const showToastMessage = (message: string) => {

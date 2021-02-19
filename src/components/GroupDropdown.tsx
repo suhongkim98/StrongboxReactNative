@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Dropdown from './Dropdown';
 import DropdownItem from './DropdownItem';
 import {useSelector} from 'react-redux';
+import { RootState } from '../modules';
 
 interface GroupDropdownProps {
   setGroupFunc: (idx: number) => any;

@@ -1,6 +1,6 @@
 //그룹 리스트 상태관리 redux
 import {StrongboxDatabase} from '../StrongboxDatabase';
-import {GroupType} from '../../modules/jsonInterface.ts';
+import {GroupType} from '../modules/jsonInterface';
 
 const UPDATE = 'groupList/UPDATE' as const;
 

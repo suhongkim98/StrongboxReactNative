@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import PlusSVG from '../images/PlusSVG';
 import MinusSVG from '../images/MinusSVG';
 import StyledText from './StyledText';
 import {TouchableOpacity} from 'react-native';
 import {updateSelectedItemIndex} from '../modules/selectedService';
 import {useDispatch, useSelector} from 'react-redux';
+import { RootState } from '../modules';
 
 interface GroupFolderProps {
   groupName: string;

@@ -32,8 +32,8 @@ type EditDrawerReduxAction =
 
 type EditDrawerReduxState = {
   count: number;
-  selectedGroup: object;
-  selectedService: object;
+  selectedGroup: any;
+  selectedService: any;
 };
 
 const initialState: EditDrawerReduxState = {

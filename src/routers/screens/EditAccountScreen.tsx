@@ -3,13 +3,14 @@ import {Alert} from 'react-native';
 import EditView from '../../components/EditView';
 import StyledText from '../../components/StyledText';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import theme from '../../styles/theme';
 import {StrongboxDatabase} from '../../StrongboxDatabase';
 import ToggleSwitch from '../../components/ToggleSwitch';
 import {useSelector, useDispatch} from 'react-redux';
-import {updateAccountAsync} from '../../modules/accountList.ts';
+import {updateAccountAsync} from '../../modules/accountList';
+import { RootState } from '../../modules';
 
 const ListItemWrapper = styled.View`
   width: 100%;

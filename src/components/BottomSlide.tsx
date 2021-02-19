@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 
 interface BottomSlideProps {
   children: any;
@@ -46,7 +46,7 @@ const Arrow = styled.View`
   transform: rotate(135deg); /* 각도 */
 `;
 
-const BottomSlide = ({children, height, isVisible, onClose}: BottomSlide) => {
+const BottomSlide = ({children, height, isVisible, onClose}: BottomSlideProps) => {
   if (!isVisible) {
     return null;
   }

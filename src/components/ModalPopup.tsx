@@ -9,7 +9,7 @@ const ContainerInnerWrapper = styled.View`
 const ModalButton = styled.TouchableOpacity`
   margin: 0 20px 0 0;
 `;
-const StyleModal = styled(Modal)`
+const ModalWrapper = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
@@ -69,33 +69,35 @@ const ModalPopup = ({
   onDeny,
 }: ModalPopupProps) => {
   return (
-    <StyleModal
+    <Modal
       isVisible={isVisible}
       onBackdropPress={onBackdropPress}
       useNativeDriver={true}>
-      <ModalContainer width={containerWidth} height={containerHeight}>
-        <ContainerInnerWrapper>
-          <HeaderModal>
-            <StyledText color="black" size="20px">
-              {headerTitle}
-            </StyledText>
-          </HeaderModal>
-          <BodyModal>{children}</BodyModal>
-          <FooterModal>
-            <ModalButton onPress={onAgree}>
-              <StyledText color="navy" size="16px">
-                {onAgreeTitle}
+        <ModalWrapper>
+        <ModalContainer width={containerWidth} height={containerHeight}>
+          <ContainerInnerWrapper>
+            <HeaderModal>
+              <StyledText color="black" size="20px">
+                {headerTitle}
               </StyledText>
-            </ModalButton>
-            <ModalButton onPress={onDeny}>
-              <StyledText color="navy" size="16px">
-                {onDenyTitle}
-              </StyledText>
-            </ModalButton>
-          </FooterModal>
-        </ContainerInnerWrapper>
-      </ModalContainer>
-    </StyleModal>
+            </HeaderModal>
+            <BodyModal>{children}</BodyModal>
+            <FooterModal>
+              <ModalButton onPress={onAgree}>
+                <StyledText color="navy" size="16px">
+                  {onAgreeTitle}
+                </StyledText>
+              </ModalButton>
+              <ModalButton onPress={onDeny}>
+                <StyledText color="navy" size="16px">
+                  {onDenyTitle}
+                </StyledText>
+              </ModalButton>
+            </FooterModal>
+          </ContainerInnerWrapper>
+        </ModalContainer>
+        </ModalWrapper>
+    </Modal>
   );
 };
 

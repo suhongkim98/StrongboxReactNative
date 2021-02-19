@@ -4,11 +4,12 @@ import DraggableFlatList from 'react-native-draggable-flatlist';
 import {useSelector, useDispatch} from 'react-redux';
 import {Alert} from 'react-native';
 import EditDrawerItem from '../../components/EditDrawerItem';
-import {StrongboxDatabase} from '../../StrongboxDatabase.ts';
-import {initEditDrawerRedux} from '../../modules/editDrawerRedux.ts';
-import {updateGroupAsync} from '../../modules/groupList.ts';
-import {updateServiceAsync} from '../../modules/serviceList.ts';
-import {updateSelectedItemIndex} from '../../modules/selectedService.ts';
+import {StrongboxDatabase} from '../../StrongboxDatabase';
+import {initEditDrawerRedux} from '../../modules/editDrawerRedux';
+import {updateGroupAsync} from '../../modules/groupList';
+import {updateServiceAsync} from '../../modules/serviceList';
+import {updateSelectedItemIndex} from '../../modules/selectedService';
+import { RootState } from '../../modules';
 const EditDrawerScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const [orderList, setOrderList] = useState([]);

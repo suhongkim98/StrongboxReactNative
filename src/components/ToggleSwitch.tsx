@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import theme from '../styles/theme';
 
 interface ToggleBoxProps {
@@ -25,7 +25,7 @@ interface ToggleSwitchProps {
   onFalse: () => any;
   navigation: any;
   disabled?: boolean;
-  getToggleState?: (bool) => boolean;
+  getToggleState?: (bool: boolean) => any;
 }
 const ToggleSwitch = ({
   onTrue,

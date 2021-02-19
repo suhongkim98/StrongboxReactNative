@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Dropdown from './Dropdown';
 import DropdownItem from './DropdownItem';
-import {StrongboxDatabase} from '../StrongboxDatabase.ts';
+import {StrongboxDatabase} from '../StrongboxDatabase';
 
 interface AccountDropdownProps {
   setAccountFunc: (idx: number) => any;

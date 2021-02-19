@@ -6,7 +6,7 @@ import {Alert, Switch, View} from 'react-native';
 import StyledText from './StyledText';
 import ServiceDropdown from './ServiceDropdown';
 import AccountDropdown from './AccountDropdown';
-import {updateAccountAsync} from '../modules/accountList.ts';
+import {updateAccountAsync} from '../modules/accountList';
 import {useDispatch} from 'react-redux';
 interface AddAccountModalPopupProps {
   visible: boolean;
@@ -145,11 +145,12 @@ const AddAccountModalPopup = ({
     }
     visibleFunc(false);
   };
-  const initInputData = () => {
+  const onOauthSwitchChange = () => {
     accountValue.current = '';
     passwordValue.current = '';
     setSelectedDropboxService(-1);
     setSelectedAccount(-1);
+    setOauthMode(!isOauthMode);
   };
 
   return (
@@ -177,8 +178,7 @@ const AddAccountModalPopup = ({
               trackColor={{false: '#767577', true: '#81b0ff'}}
               thumbColor={isOauthMode ? '#f5dd4b' : '#f4f3f4'}
               ios_backgroundColor="#3e3e3e"
-              onValueChange={() => setOauthMode(!isOauthMode)}
-              onChange={() => initInputData()}
+              onValueChange={() => onOauthSwitchChange()}
               value={isOauthMode}
             />
           </OauthView>

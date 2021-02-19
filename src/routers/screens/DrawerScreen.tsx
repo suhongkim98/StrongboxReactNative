@@ -9,6 +9,7 @@ import Toast from 'react-native-root-toast';
 import BottomSlide from '../../components/BottomSlide';
 import AddGroupModalPopup from '../../components/AddGroupModalPopup';
 import AddServiceModalPopup from '../../components/AddServiceModalPopup';
+import { RootState } from '../../modules';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -55,7 +56,7 @@ const DrawerScreen = (props) => {
   const [bottomSlideVisible, setBottomSlideVisible] = useState(false);
 
   const [toastVisible, setToastVisible] = useState(false);
-  const toastTimer = useRef<number>(-1);
+  const toastTimer: any = useRef<number>(-1);
   const [toastMessage, setToastMessage] = useState('');
 
   const showToastMessage = (message: string) => {
@@ -82,7 +83,6 @@ const DrawerScreen = (props) => {
         {toastMessage}
       </Toast>
       <BottomSlide
-        width="100%"
         height="150px"
         isVisible={bottomSlideVisible}
         onClose={() => {
