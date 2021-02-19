@@ -9,7 +9,6 @@ import SettingSVG from '../../images/SettingSVG';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {LogBox, ScrollView} from 'react-native';
-import AddAccountModalpopup from '../../components/AddAccountModalPopup';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
 import {updateAccountAsync} from '../../modules/accountList';
@@ -48,7 +47,6 @@ const StyledIcon = styled(Icon)`
 
 const MainScreen = ({navigation}) => {
   const dispatch = useDispatch();
-  const [visibleAddAccountModal, setVisibleAddAccountModal] = useState(false);
   const selectedService = useSelector(
     (state: RootState) => state.selectedService.itemIndex,
   );
@@ -109,12 +107,6 @@ const MainScreen = ({navigation}) => {
         hideOnPress={true}>
         {toastMessage}
       </Toast>
-      <AddAccountModalpopup
-        visible={visibleAddAccountModal}
-        visibleFunc={setVisibleAddAccountModal}
-        selectedServiceIDX={selectedService.idx}
-        toastFunc={showToastMessage}
-      />
       <HeaderWrapper>
         <MenuButton
           onPress={() => {
@@ -148,7 +140,9 @@ const MainScreen = ({navigation}) => {
             buttonColor="#9b59b6"
             title="계정 추가"
             onPress={() => {
-              setVisibleAddAccountModal(true);
+              navigation.navigate('AddAccountScreen', {
+                serviceIdx: selectedService.idx,
+              });
             }}>
             <StyledIcon name="pluscircleo" />
           </ActionButton.Item>

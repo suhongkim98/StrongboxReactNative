@@ -1,19 +1,15 @@
-import React, {useRef, useState} from 'react';
-import ModalPopup from './ModalPopup';
-import {StrongboxDatabase} from '../StrongboxDatabase';
+import React, { useRef, useState } from 'react';
+import { Alert, Switch, View } from 'react-native';
+import { useDispatch } from 'react-redux';
+import StackScreenContainer from '../../components/StackScreenContainer';
+import { updateAccountAsync } from '../../modules/accountList';
+import { StrongboxDatabase } from '../../StrongboxDatabase';
+import Toast from 'react-native-root-toast';
 import styled from 'styled-components/native';
-import {Alert, Switch, View} from 'react-native';
-import StyledText from './StyledText';
-import ServiceDropdown from './ServiceDropdown';
-import AccountDropdown from './AccountDropdown';
-import {updateAccountAsync} from '../modules/accountList';
-import {useDispatch} from 'react-redux';
-interface AddAccountModalPopupProps {
-  visible: boolean;
-  visibleFunc: (visible: boolean) => any;
-  selectedServiceIDX: number;
-  toastFunc: (message: string) => any;
-}
+import StyledText from '../../components/StyledText';
+import ServiceDropdown from '../../components/ServiceDropdown';
+import AccountDropdown from '../../components/AccountDropdown';
+
 const AddTextInput = styled.TextInput`
   border-width: 1px;
   height: 30px;
@@ -23,8 +19,7 @@ const AddTextInput = styled.TextInput`
   background-color: #f3f3f3;
 `;
 const BodyWrapper = styled.View`
-  width: 100%;
-  height: 100%;
+  flex: 1;
   padding: 0 20px 0 20px;
 `;
 const OauthView = styled.View`
@@ -37,21 +32,53 @@ const OauthWrapper = styled.View`
   margin-bottom: 30px;
 `;
 
-const AddAccountModalPopup = ({
-  visible,
-  visibleFunc,
-  selectedServiceIDX,
-  toastFunc,
-}: AddAccountModalPopupProps) => {
-  const titleValue = useRef('');
-  const accountValue = useRef('');
-  const passwordValue = useRef('');
-  const [isOauthMode, setOauthMode] = useState(false);
-  const [selectedDropboxService, setSelectedDropboxService] = useState(-1);
-  const [selectedAccount, setSelectedAccount] = useState(-1);
-  const dispatch = useDispatch();
+const FooterWrapper = styled.View`
+  height: 80px;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px 0 20px;
+`;
+const AddButton = styled.TouchableOpacity`
+  width: 100%;
+  height: 40px;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid gray;
+`;
+const AddAccountScreen = (props: any) => {
+    const {serviceIdx} = props.route.params;
+    const titleValue = useRef('');
+    const accountValue = useRef('');
+    const passwordValue = useRef('');
+    const [isOauthMode, setOauthMode] = useState(false);
+    const [selectedDropboxService, setSelectedDropboxService] = useState(-1);
+    const [selectedAccount, setSelectedAccount] = useState(-1);
+    const dispatch = useDispatch();
 
-  const onAgreeAddAccount = () => {
+    const [toastVisible, setToastVisible] = useState(false);
+    const toastTimer: any = useRef<number>(-1);
+    const [toastMessage, setToastMessage] = useState('');
+    
+    const showToastMessage = (message: string) => {
+      // toast 보여주는 함수
+      setToastMessage(message);
+      setToastVisible(true);
+      if (toastTimer.current !== -1) {
+        clearTimeout(toastTimer.current);
+        toastTimer.current = -1;
+      }
+      toastTimer.current = setTimeout(() => {
+        setToastVisible(false);
+      }, 2000);
+    };
+
+    const onPressBackButton = () => {
+        props.navigation.goBack();
+    }
+
+  const onPressAddButton = () => {
     if (titleValue.current === '') {
       Alert.alert('타이틀을 입력해야 합니다.', '다시 입력해주세요', [
         {
@@ -89,23 +116,22 @@ const AddAccountModalPopup = ({
       database
         .isExistOauthAccountName(
           titleValue.current,
-          selectedServiceIDX,
+          serviceIdx,
           selectedAccount,
         )
         .then((result) => {
           if (result > 0) {
-            toastFunc('이미 존재하는 계정입니다.');
+            showToastMessage('이미 존재하는 계정입니다.');
           } else {
             database
               .addAccount({
                 accountName: titleValue.current,
-                serviceIDX: selectedServiceIDX,
+                serviceIDX: serviceIdx,
                 OAuthAccountIDX: selectedAccount,
               })
               .then(() => {
                 //메인스크린 계정 업데이트 함수 redux 건들기
-                dispatch(updateAccountAsync(selectedServiceIDX));
-                toastFunc('계정을 추가했습니다');
+                dispatch(updateAccountAsync(serviceIdx));
               })
               .catch((error) => {
                 console.log(error);
@@ -117,22 +143,22 @@ const AddAccountModalPopup = ({
         });
     } else {
       database
-        .isExistAccountName(titleValue.current, selectedServiceIDX)
+        .isExistAccountName(titleValue.current, serviceIdx)
         .then((result) => {
           if (result > 0) {
-            toastFunc('이미 존재하는 계정입니다.');
+            showToastMessage('이미 존재하는 계정입니다.');
           } else {
             database
               .addAccount({
                 accountName: titleValue.current,
-                serviceIDX: selectedServiceIDX,
+                serviceIDX: serviceIdx,
                 id: accountValue.current,
                 password: passwordValue.current,
               })
               .then(() => {
                 //메인스크린 계정 업데이트 함수 redux 건들기
-                dispatch(updateAccountAsync(selectedServiceIDX));
-                toastFunc('계정을 추가했습니다');
+                dispatch(updateAccountAsync(serviceIdx));
+                showToastMessage('계정을 추가했습니다');
               })
               .catch((error) => {
                 console.log(error);
@@ -143,7 +169,7 @@ const AddAccountModalPopup = ({
           console.log(error);
         });
     }
-    visibleFunc(false);
+    onPressBackButton(); //나가기
   };
   const onOauthSwitchChange = () => {
     accountValue.current = '';
@@ -152,24 +178,17 @@ const AddAccountModalPopup = ({
     setSelectedAccount(-1);
     setOauthMode(!isOauthMode);
   };
-
-  return (
-    <ModalPopup
-      containerWidth="300px"
-      containerHeight="350px"
-      isVisible={visible}
-      headerTitle="계정 추가"
-      onAgreeTitle="생성"
-      onDenyTitle="취소"
-      onAgree={onAgreeAddAccount}
-      onDeny={() => {
-        visibleFunc(false);
-        setOauthMode(false);
-      }}
-      onBackdropPress={() => {
-        visibleFunc(false);
-        setOauthMode(false);
-      }}>
+    return (<StackScreenContainer 
+        screenName="계정 추가"
+        onPressBackButton={onPressBackButton}>
+      <Toast
+        visible={toastVisible}
+        position={Toast.positions.BOTTOM}
+        shadow={true}
+        animation={true}
+        hideOnPress={true}>
+        {toastMessage}
+      </Toast>
       <BodyWrapper>
         <OauthWrapper>
           <OauthView>
@@ -229,8 +248,17 @@ const AddAccountModalPopup = ({
           />
         </View>
       </BodyWrapper>
-    </ModalPopup>
-  );
-};
+      <FooterWrapper>
+        <AddButton
+          onPress={() => {
+            onPressAddButton();
+          }}>
+          <StyledText color="black" fontWeight="700">
+            추가
+          </StyledText>
+        </AddButton>
+      </FooterWrapper>
+    </StackScreenContainer>);
+}
 
-export default AddAccountModalPopup;
+export default AddAccountScreen;

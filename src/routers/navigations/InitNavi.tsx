@@ -12,6 +12,8 @@ import StyledText from '../../components/StyledText';
 import LoadingSVG from '../../images/LoadingSVG';
 import EditDrawerScreen from '../screens/EditDrawerScreen';
 import EditAccountScreen from '../screens/EditAccountScreen';
+import AddAccountScreen from '../screens/AddAccountScreen';
+import AddServiceScreen from '../screens/AddServiceScreen';
 
 const LoadingWrapper = styled.View`
   flex: 1;
@@ -63,6 +65,8 @@ const InitNavi = () => {
         <Stack.Screen name="Main" component={MainNavi} />
         <Stack.Screen name="EditDrawerScreen" component={EditDrawerScreen} />
         <Stack.Screen name="EditAccountScreen" component={EditAccountScreen} />
+        <Stack.Screen name="AddAccountScreen" component={AddAccountScreen} />
+        <Stack.Screen name="AddServiceScreen" component={AddServiceScreen} />
       </Stack.Navigator>
     </>
   );
