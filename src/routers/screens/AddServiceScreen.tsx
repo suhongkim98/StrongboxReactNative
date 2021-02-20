@@ -3,11 +3,12 @@ import StackScreenContainer from '../../components/StackScreenContainer';
 import Toast from 'react-native-root-toast';
 import styled from 'styled-components/native';
 import StyledText from '../../components/StyledText';
-import { useDispatch } from 'react-redux';
-import { Alert, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { Alert, ScrollView, View } from 'react-native';
 import { StrongboxDatabase } from '../../StrongboxDatabase';
 import { updateServiceAsync } from '../../modules/serviceList';
-import GroupDropdown from '../../components/GroupDropdown';
+import ModalPopup from '../../components/ModalPopup';
+import { RootState } from '../../modules';
 
 const BodyWrapper = styled.View`
   flex: 1;
@@ -37,6 +38,35 @@ const ServiceTextInput = styled.TextInput`
   border-color: gray;
   border-radius: 3px;
 `;
+const SelectGroupTouchable = styled.TouchableOpacity`
+  width: 100%;
+  height: 30px;
+  border: 1px solid gray;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  padding: 0 10px 0 10px;
+`;
+const Arrow = styled.View`
+  width: 10px;
+  height: 10px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  transform: rotate(135deg); /* 각도 */
+  border-color: gray;
+`;
+const GroupListItem = styled.TouchableOpacity`
+  width: 100%;
+  height: 40px;
+  border-bottom-width: 1px;
+  border-color: gray;
+  border-style: solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
 const AddServiceScreen = (props: any) => {
 
   const [toastVisible, setToastVisible] = useState(false);
@@ -44,11 +74,15 @@ const AddServiceScreen = (props: any) => {
   const [toastMessage, setToastMessage] = useState('');
   const addServiceTextValue = useRef('');
   const [groupIdx, setGroupIdx] = useState(-1);
+  const [selectGroupName, setSelectGroupName] = useState('선택');
   const dispatch = useDispatch();
+  const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
+  const groupList = useSelector((state: RootState) => state.groupList.list);
 
   const initInputValue = () => {
     addServiceTextValue.current = '';
     setGroupIdx(-1);
+    setSelectGroupName('선택');
   };
     
     const showToastMessage = (message: string) => {
@@ -113,6 +147,17 @@ const AddServiceScreen = (props: any) => {
         });
 
     }
+    const printGroupList = () => {
+      const onPressItem = (row: any) => {
+        setGroupIdx(row.GRP_IDX);
+        setAddGroupModalVisible(false);
+        setSelectGroupName(row.GRP_NAME);
+      }
+      const list = groupList.map((row: any) => {
+        return <GroupListItem key={row.GRP_IDX} onPress={() => {onPressItem(row)}}><StyledText>{row.GRP_NAME}</StyledText></GroupListItem>;
+      });
+      return list;
+    }
 
     return (<StackScreenContainer 
         screenName="서비스 추가"
@@ -125,10 +170,26 @@ const AddServiceScreen = (props: any) => {
         hideOnPress={true}>
         {toastMessage}
       </Toast>
+      <ModalPopup
+        containerWidth="300px"
+        containerHeight="300px"
+        headerTitle="그룹 선택"
+        onBackdropPress={() => setAddGroupModalVisible(false)}
+        isVisible={addGroupModalVisible}
+        onDeny={() => setAddGroupModalVisible(false)}
+        onDenyTitle="취소"
+        >
+          <ScrollView>
+            {printGroupList()}
+          </ScrollView>
+      </ModalPopup>
       <BodyWrapper>
-        <View>
+          <View>
             <StyledText>그룹 선택</StyledText>
-            <GroupDropdown setGroupFunc={setGroupIdx} />
+            <SelectGroupTouchable onPress={() => setAddGroupModalVisible(true)}>
+              <StyledText>{selectGroupName}</StyledText>
+              <Arrow />
+            </SelectGroupTouchable>
           </View>
           <View>
             <StyledText>서비스 이름</StyledText>

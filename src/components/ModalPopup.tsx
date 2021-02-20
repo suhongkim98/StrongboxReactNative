@@ -47,11 +47,11 @@ interface ModalPopupProps {
   containerWidth: string;
   containerHeight: string;
   children: any;
-  onAgree: () => any;
-  onDeny: () => any;
+  onAgree?: () => any;
+  onDeny?: () => any;
   headerTitle: string;
-  onAgreeTitle: string;
-  onDenyTitle: string;
+  onAgreeTitle?: string;
+  onDenyTitle?: string;
   //
   isVisible: boolean;
   onBackdropPress: () => any;
@@ -83,16 +83,16 @@ const ModalPopup = ({
             </HeaderModal>
             <BodyModal>{children}</BodyModal>
             <FooterModal>
-              <ModalButton onPress={onAgree}>
+              { onAgree && <ModalButton onPress={onAgree}>
                 <StyledText color="navy" size="16px">
                   {onAgreeTitle}
                 </StyledText>
-              </ModalButton>
-              <ModalButton onPress={onDeny}>
+              </ModalButton>}
+              {onDeny && <ModalButton onPress={onDeny}>
                 <StyledText color="navy" size="16px">
                   {onDenyTitle}
                 </StyledText>
-              </ModalButton>
+              </ModalButton>}
             </FooterModal>
           </ContainerInnerWrapper>
         </ModalContainer>
