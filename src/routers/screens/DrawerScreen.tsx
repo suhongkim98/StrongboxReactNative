@@ -8,7 +8,6 @@ import {useSelector} from 'react-redux';
 import Toast from 'react-native-root-toast';
 import BottomSlide from '../../components/BottomSlide';
 import AddGroupModalPopup from '../../components/AddGroupModalPopup';
-import AddServiceModalPopup from '../../components/AddServiceModalPopup';
 import { RootState } from '../../modules';
 
 const TotalWrapper = styled.View`
@@ -51,7 +50,6 @@ const Hr = styled.View`
 
 const DrawerScreen = (props) => {
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
-  const [addServiceModalVisible, setAddServiceModalVisible] = useState(false);
   const groupList = useSelector((state: RootState) => state.groupList.list);
   const [bottomSlideVisible, setBottomSlideVisible] = useState(false);
 
@@ -99,7 +97,7 @@ const DrawerScreen = (props) => {
           <SlideItem
             onPress={() => {
               setBottomSlideVisible(false);
-              setAddServiceModalVisible(true);
+              props.navigation.navigate('AddServiceScreen');
             }}>
             <StyledText>서비스 추가</StyledText>
           </SlideItem>
@@ -116,11 +114,6 @@ const DrawerScreen = (props) => {
       <AddGroupModalPopup
         visible={addGroupModalVisible}
         visibleFunc={setAddGroupModalVisible}
-        toastFunc={showToastMessage}
-      />
-      <AddServiceModalPopup
-        visible={addServiceModalVisible}
-        visibleFunc={setAddServiceModalVisible}
         toastFunc={showToastMessage}
       />
       <HeaderWrapper>
