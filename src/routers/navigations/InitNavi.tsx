@@ -14,6 +14,7 @@ import EditDrawerScreen from '../screens/EditDrawerScreen';
 import EditAccountScreen from '../screens/EditAccountScreen';
 import AddAccountScreen from '../screens/AddAccountScreen';
 import AddServiceScreen from '../screens/AddServiceScreen';
+import SettingScreen from '../screens/SettingScreen';
 
 const LoadingWrapper = styled.View`
   flex: 1;
@@ -67,6 +68,7 @@ const InitNavi = () => {
         <Stack.Screen name="EditAccountScreen" component={EditAccountScreen} />
         <Stack.Screen name="AddAccountScreen" component={AddAccountScreen} />
         <Stack.Screen name="AddServiceScreen" component={AddServiceScreen} />
+        <Stack.Screen name="SettingScreen" component={SettingScreen} />
       </Stack.Navigator>
     </>
   );

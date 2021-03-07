@@ -119,7 +119,9 @@ const MainScreen = ({navigation}) => {
             {selectedService.name}
           </StyledText>
         )}
-        <MenuButton onPress={() => {}}>
+        <MenuButton onPress={() => {
+          navigation.navigate('SettingScreen');
+        }}>
           <SettingSVG width="20px" height="20px" color="black" />
         </MenuButton>
       </HeaderWrapper>
