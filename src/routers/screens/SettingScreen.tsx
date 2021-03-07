@@ -21,8 +21,12 @@ const MenuItem = styled.TouchableOpacity`
 const SettingScreen = (props: any) => {
     return (<StackScreenContainer screenName="설정" onPressBackButton={() => {props.navigation.goBack();}}>
         <TotalWrapper>
-            <MenuItem><StyledText>계정 동기화 요청하기</StyledText></MenuItem>
-            <MenuItem><StyledText>계정 동기화 응답하기</StyledText></MenuItem>
+            <MenuItem onPress={() => {
+                props.navigation.navigate('SyncRequestScreen');
+            }}><StyledText>계정 동기화 요청하기</StyledText></MenuItem>
+            <MenuItem onPress={() => {
+                props.navigation.navigate('SyncResponseScreen');
+            }}><StyledText>계정 동기화 응답하기</StyledText></MenuItem>
         </TotalWrapper>
     </StackScreenContainer>);
 }
