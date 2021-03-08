@@ -46,6 +46,7 @@ const SyncRequestScreen = (props: any) => {
             return;
         }
         //ajax로 서버에 요청
+        global.name = name;
         props.navigation.navigate('SyncRequestPinScreen');
         //
     }

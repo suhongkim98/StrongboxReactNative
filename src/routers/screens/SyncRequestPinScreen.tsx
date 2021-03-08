@@ -49,7 +49,7 @@ const SyncRequestPinScreen = (props: any) => {
         <TotalWrapper>
             <InnerItem>
                 <StyledText size="25px" fontWeight="700">ACCONG BOX</StyledText>
-                <StyledText>홍길동</StyledText>
+                <StyledText>{global.name}</StyledText>
                 </InnerItem>
             <InnerItem>
                 <StyledText size="20px">인증 번호</StyledText>

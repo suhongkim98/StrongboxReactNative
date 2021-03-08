@@ -5,7 +5,7 @@ declare global{
         interface Global {
             key: string
             name: string
-            syncInfo: any
+            syncInfo: {token: string, roomId: string}
         }
     }
 }
