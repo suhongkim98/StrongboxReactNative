@@ -10,11 +10,13 @@ import {composeWithDevTools} from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
 
 //폰트 로드
 AntIcon.loadFont();
 MaterialIcon.loadFont();
+Ionicons.loadFont();
 
 const SafeView = styled.SafeAreaView`
   flex: 1;

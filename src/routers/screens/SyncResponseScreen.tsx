@@ -55,7 +55,7 @@ const SyncResponseScreen = (props: any) => {
             return;
         }
         //ajax로 서버에 요청
-        
+        props.navigation.navigate('SyncConnectSuccess');
         //
     }
     return (<StackScreenContainer screenName="동기화 응답하기" onPressBackButton={() => {props.navigation.goBack();}}>
