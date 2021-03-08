@@ -17,6 +17,7 @@ import AddServiceScreen from '../screens/AddServiceScreen';
 import SettingScreen from '../screens/SettingScreen';
 import SyncRequestScreen from '../screens/SyncRequestScreen';
 import SyncResponseScreen from '../screens/SyncResponseScreen';
+import SyncRequestPinScreen from '../screens/SyncRequestPinScreen';
 
 const LoadingWrapper = styled.View`
   flex: 1;
@@ -73,6 +74,7 @@ const InitNavi = () => {
         <Stack.Screen name="SettingScreen" component={SettingScreen} />
         <Stack.Screen name="SyncRequestScreen" component={SyncRequestScreen}/>
         <Stack.Screen name="SyncResponseScreen" component={SyncResponseScreen}/>
+        <Stack.Screen name="SyncRequestPinScreen" component={SyncRequestPinScreen} />
       </Stack.Navigator>
     </>
   );

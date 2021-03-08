@@ -46,7 +46,7 @@ const SyncRequestScreen = (props: any) => {
             return;
         }
         //ajax로 서버에 요청
-        
+        props.navigation.navigate('SyncRequestPinScreen');
         //
     }
     return (<StackScreenContainer screenName="동기화 요청하기" onPressBackButton={() => {props.navigation.goBack();}}>
