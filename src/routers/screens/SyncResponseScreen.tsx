@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
+import Toast from 'react-native-root-toast';
 import styled from 'styled-components/native';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
@@ -35,6 +37,23 @@ const InputItem = styled.View `
 const SyncResponseScreen = (props: any) => {
     const [name, setName] = useState('');
     const [vertificationCode, setVertificationCode] = useState('');
+
+    const [toastVisible, setToastVisible] = useState(false);
+    const toastTimer: any = useRef<number>(-1);
+    const [toastMessage, setToastMessage] = useState('');
+  
+    const showToastMessage = (message: string) => {
+      // toast 보여주는 함수
+      setToastMessage(message);
+      setToastVisible(true);
+      if (toastTimer.current !== -1) {
+        clearTimeout(toastTimer.current);
+        toastTimer.current = -1;
+      }
+      toastTimer.current = setTimeout(() => {
+        setToastVisible(false);
+      }, 2000);
+    };
     const onPressSyncButton = () => {
         if(name === '') {
             Alert.alert('이름을 입력해야 합니다.', '다시 입력해주세요', [
@@ -55,10 +74,42 @@ const SyncResponseScreen = (props: any) => {
             return;
         }
         //ajax로 서버에 요청
-        props.navigation.navigate('SyncConnectSuccess');
+        const params = new URLSearchParams();
+        params.append('name', global.name);
+        params.append('vertificationCode', vertificationCode);
+        axios.post('http://localhost:8080/sync/responseSync', params).then((response: any) => {
+            const roomId = response.data.data[0].roomId;
+            const vertificationCode = response.data.data[0].vertificationCode;
+            const token = response.data.data[1].token;
+            const requestorName = response.data.data[0].requestorName;
+
+            global.syncInfo = {roomId: roomId, token: token};
+
+            props.navigation.navigate('SyncConnectSuccess',{
+                otherPartName: requestorName,
+                vertificationCode: vertificationCode,
+            });
+        }).catch((error) => {
+            if(error.response) {
+                showToastMessage('인증번호가 일치하지 않습니다.');
+            }
+            else if(error.request) {
+                showToastMessage('동기화 서버가 점검 중입니다.');
+            } else {
+                showToastMessage('잘못된 요청입니다.');
+            }
+        });
         //
     }
     return (<StackScreenContainer screenName="동기화 응답하기" onPressBackButton={() => {props.navigation.goBack();}}>
+        <Toast
+        visible={toastVisible}
+        position={Toast.positions.BOTTOM}
+        shadow={true}
+        animation={true}
+        hideOnPress={true}>
+        {toastMessage}
+        </Toast>
         <TotalWrapper>
             <View>
                 <InputItem>

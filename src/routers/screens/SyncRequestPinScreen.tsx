@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import { useInterval } from '../../modules/customHook';
+import { stompConnect, stompDisconnect } from '../../modules/SyncWebsocketContainer';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -20,20 +21,36 @@ const CancelButton = styled.TouchableOpacity``;
 
 const SyncRequestPinScreen = (props: any) => {
     const [count, setCount] = useState(30);
+    const {vertificationCode} = props.route.params;
     
     useInterval(() =>{ // 커스텀 훅 사용
         setCount(count - 1);
     }, count > 0 ? 1000 : null); // 카운트가 0보다 크면 1초마다 반복
 
     useEffect(() => {
-        console.log('진입');
-        const unsubscribe = props.navigation.addListener('blur', () => {
-          //화면 이탈 시 발생 이벤트
-          console.log('이탈');
+        stompConnect(onResponseMessage).then((result) => {
+            // 화면 연결 시 소켓 연결
+            console.log('소켓 연결');
+        }).catch((error) => {
+            console.log(error);
         });
-        return unsubscribe;
-      }, [props.navigation]);
 
+        return () => {
+            console.log('소켓 연결 해제');
+            stompDisconnect();
+        }
+    }, []);
+    const onResponseMessage = (response: any) => {
+        const message = JSON.parse(response.body);
+        console.log(message);
+        if(message.type === "CONNECT_SUCCESS") {
+            // 동기화 응답자가 핀번호를 제대로 입력했다는 메시지를 보내 올 경우
+            props.navigation.navigate('SyncConnectSuccess', {
+                otherPartName: message.sender,
+                vertificationCode: vertificationCode,
+            });
+        }
+    }
     const onPressBackButtonEvent = () => {
         props.navigation.goBack();
     }
@@ -53,7 +70,7 @@ const SyncRequestPinScreen = (props: any) => {
                 </InnerItem>
             <InnerItem>
                 <StyledText size="20px">인증 번호</StyledText>
-                <StyledText size="50px" fontWeight="700">123456</StyledText>
+                <StyledText size="50px" fontWeight="700">{vertificationCode}</StyledText>
                 <StyledText size="12px">유효시간 내에 인증 번호를 입력하세요.</StyledText>
             </InnerItem>
             <InnerItem>

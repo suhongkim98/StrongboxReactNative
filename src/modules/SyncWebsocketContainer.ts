@@ -1,7 +1,7 @@
 import SockJS from 'sockjs-client';
-import Stomp from 'stompjs';
+const Stomp = require("stompjs/lib/stomp.js").Stomp;
 
-let stompClient :Stomp.Client;
+let stompClient :any;
 
 export const stompConnect = (onResponseMessage: (response: any) => any) => {
     return new Promise((succ, fail) => {

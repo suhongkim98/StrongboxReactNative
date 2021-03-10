@@ -20,6 +20,7 @@
     "@types/redux-thunk": "^2.1.0",
     "@types/sockjs-client": "^1.5.0",
     "@types/stompjs": "^2.3.4",
+    "axios": "^0.21.1",
     "react": "16.13.1",
     "react-native": "0.63.4",
     "react-native-action-button": "^2.8.5",

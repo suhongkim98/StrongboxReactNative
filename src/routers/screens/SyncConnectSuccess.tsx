@@ -4,6 +4,7 @@ import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { stompConnect, stompDisconnect } from '../../modules/SyncWebsocketContainer';
 const TotalWrapper = styled.View`
   flex: 1;
   display: flex;
@@ -26,15 +27,29 @@ const SyncButton = styled.TouchableOpacity`
   padding: 0 20px 0 20px;
 `;
 const SyncConnectSuccess = (props: any) => {
+  
+    const {otherPartName, vertificationCode} = props.route.params; // 상대방 이름과 코드
 
     useEffect(() => {
-        console.log('진입');
-        const unsubscribe = props.navigation.addListener('blur', () => {
-          //화면 이탈 시 발생 이벤트
-          console.log('이탈');
-        });
-        return unsubscribe;
-      }, [props.navigation]);
+      stompConnect(onResponseMessage).then((result) => {
+          // 화면 연결 시 소켓 연결
+          console.log('소켓 연결');
+      }).catch((error) => {
+          console.log(error);
+      });
+
+      return () => {
+          console.log('소켓 연결 해제');
+          stompDisconnect();
+      }
+  }, []);
+  const onResponseMessage = (response: any) => {
+      const message = JSON.parse(response.body);
+      console.log(message);
+      
+      //상대방이 동기화 버튼을 누르면
+      //상대방이 취소버튼을 누르면
+  }
 
     const onPressBackButtonEvent = () => {
         props.navigation.goBack();
@@ -44,8 +59,8 @@ const SyncConnectSuccess = (props: any) => {
             <InnerItem><StyledText size="20px" fontWeight="700">연결 성공!</StyledText></InnerItem>
             <InnerItem>
                 <Icon name="person" size={50} color="black" />
-                <StyledText size="20px">이름: aa</StyledText>
-                <StyledText size="20px">인증 번호: 123123</StyledText>
+                <StyledText size="20px">이름: {otherPartName}</StyledText>
+                <StyledText size="20px">인증 번호: {vertificationCode}</StyledText>
             </InnerItem>
             <InnerItem>
                 <StyledText center>
