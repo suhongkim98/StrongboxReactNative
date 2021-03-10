@@ -432,4 +432,157 @@ export class StrongboxDatabase {
     }
     return -1;
   }
+  public async syncData(data: any) {
+    const groups = data.groups;
+    const services = data.services;
+    const accounts = data.accounts;
+    const oauthAccounts = data.oauthAccounts;
+    
+    const addGroupData = (group: any) => {
+      return new Promise((succ, fail) => {
+        this.addGroup(group.GRP_NAME).then((result) => {
+          succ(result.rowid);
+        }).catch((error) => {
+          fail(error);
+        });
+      });
+    }
+    const addServiceData = (service: any, targetGroupIdx: number) => {
+      return new Promise((succ, fail) => {
+        this.addService(targetGroupIdx, service.SERVICE_NAME).then((result) => {
+          succ(result.rowid);
+        }).catch((error) => {
+          fail(error);
+        });
+      });
+    }
+    const addAccountData = (account: any, targetServiceIdx: number) => {
+      return new Promise((succ, fail) => {
+        this.addAccount({accountName: account.ACCOUNT_NAME, serviceIDX: targetServiceIdx}).then((result: any) => {
+          succ(result.insertId);
+        }).catch((error) => {
+          fail(error);
+        });
+      });
+    }
+    const addOauthAccountData = (oauthAccount: any, targetServiceIdx: number, targetAccountIdx: number) => {
+      return new Promise((succ, fail) => {
+        this.addAccount({accountName: oauthAccount.ACCUNT_NAME, serviceIDX: targetServiceIdx, OAuthAccountIDX: targetAccountIdx}).then((result: any) => {
+          succ(result.insertId);
+        }).catch((error) => {
+          fail(error);
+        });
+      });
+    }
+    const updateAccountData = (account: any, targetAccountIdx: number) => {
+      const id = account.ID;
+      const encrypedPassword = CryptoJS.AES.encrypt(account.PASSWORD, global.key).toString();
+
+      const query = "UPDATE ACCOUNTS_TB SET (ID, PASSWORD, DATE) = ('" + id + "', '" + encrypedPassword + "', datetime('now', 'localtime')) "
+      + "WHERE IDX = " + targetAccountIdx;
+
+      const db = this.connectDatabase();
+      return this.executeQuery(db, query, []);
+    }
+    const updateOauthAccountData = (oauthAccount: any, targetServiceIdx: number, targetAccountIdx: number) => {
+      //target서비스idx, target계정idx로 oauth 계정 업데이트
+      const query = "UPDATE OAUTH_ACCOUNTS_TB SET (ACCOUNT_NAME, DATE) = (" + oauthAccount.ACCOUNT_NAME + ", datetime('now', 'localtime')) "
+      + "WHERE ACCOUNT_IDX = " + targetAccountIdx + " AND SERVICE_IDX = " + targetServiceIdx;
+
+      const db = this.connectDatabase();
+      return this.executeQuery(db, query, []);
+    }
+    const splitDate = (date: string) => {
+        //문자열 가져와 잘라 json 반환
+        const split = date.split(' ');
+        const [calendar, time] = [split[0].split('-'), split[1].split(':')];
+        return {year: parseInt(calendar[0]), month: parseInt(calendar[1]), day: parseInt(calendar[2]), hour: parseInt(time[0]), min: parseInt(time[1]), sec: parseInt(time[2])};
+    }
+
+    const db = this.connectDatabase();
+    for(let i = 0 ; i < groups.length ; i++) {
+      if (groups[i] === undefined) continue; //delete된 요소라면 통과
+
+      const groupIdx: number = await this.isExistGroupName(groups[i].GRP_NAME);
+      if(groupIdx > 0) { // 그룹이 존재
+          for(let j = 0 ; j < services.length ; j++) {
+              if (services[j] === undefined) continue; //delete된 요소라면 통과
+
+              const serviceIdx: number = await this.isExistServiceName(services[j].SERVICE_NAME, groupIdx);
+              if(serviceIdx > 0) { //서비스 존재
+                  for(let k = 0 ; k < accounts.length ; k++) {
+                      if (accounts[k] === undefined) continue; //delete된 요소라면 통과
+
+                      const accountIdx: number = await this.isExistAccountName(accounts[k].ACCOUNT_NAME, serviceIdx);
+                      if(accountIdx > 0) {
+                          // 가져온 데이터가 date최신이면 그 데이터로 계정 업데이트하기
+                          const select: any = await this.executeQuery(db,'SELECT DATE FROM ACCOUNTS_TB WHERE IDX = ' + accountIdx,[]); // date꺼내오기
+                          const [previousDataSplitDate, newDataSplitDate] = [splitDate(select[0].DATE), splitDate(accounts[k].DATE)];
+                          const previousDataDate = new Date(previousDataSplitDate.year, previousDataSplitDate.month, previousDataSplitDate.day, previousDataSplitDate.hour, previousDataSplitDate.min, previousDataSplitDate.sec);
+                          const newDataDate = new Date(newDataSplitDate.year, newDataSplitDate.month, newDataSplitDate.day, newDataSplitDate.hour, newDataSplitDate.min, newDataSplitDate.sec);
+                          
+                          if(previousDataDate.getTime() < newDataDate.getTime()) {
+                              //새로운 데이터가 더 최신인 경우 업데이트
+                              await updateAccountData(accounts[k], accountIdx); 
+                          }
+                          //oauth계정 검사
+                          for(let q = 0 ; q < oauthAccounts.length ; q++) {
+                              if (oauthAccounts[q] === undefined) continue; //delete된 요소라면 통과
+
+                              const oauthAccountIdx: number = await this.isExistOauthAccountName(oauthAccounts[q].ACCOUNT_NAME, serviceIdx, accountIdx);
+                              if(oauthAccountIdx > 0) {
+                                  await updateOauthAccountData(oauthAccounts[q], serviceIdx, accountIdx); //date만 최신으로 업데이트
+
+                                  delete oauthAccounts[q]; // 업데이트된 요소는 다시는 추가 안 되게 undefined 처리
+                              }
+                          }
+                          delete accounts[k]; // 업데이트된 요소는 다시는 추가 안 되게 undefined 처리
+                      }
+                  }
+                  delete services[j]; // 업데이트된 요소는 다시는 추가 안 되게 undefined 처리
+              }
+          }
+          delete groups[i]; // 업데이트된 요소는 다시는 추가 안 되게 undefined 처리
+      }
+    }
+    //중복된 것은 다 업데이트 되었고 아직도 남아있는 그룹, 서비스, 계정, oauth계정 요소들은 검사 없이 새로 추가해야할 데이터임
+    const addServiceKeyMap: any = {}; // keyIndex: newDataIndex
+    const addAccountKeyMap: any = {};
+    for(let i = 0 ; i < groups.length; i++) {
+        if(groups[i] === undefined) continue;
+
+        const groupKey = groups[i].IDX;
+        const newGroupIdx: any = await addGroupData(groups[i]);
+        for(let j = 0 ; j < services.length ; j++) {
+            if(services[j] === undefined) continue;
+
+            if(services[j].GRP_IDX === groupKey) {
+                const serviceKey = services[j].IDX;
+                const newServiceIdx: any = await addServiceData(services[j], newGroupIdx);
+                addServiceKeyMap['key' + serviceKey] = newServiceIdx;
+
+                for(let k = 0 ; k < accounts.length ; k++) {
+                    if(accounts[k] === undefined) continue;
+
+                    if(accounts[k].SERVICE_IDX === serviceKey) {
+                        const accountKey = accounts[k].IDX;
+                        const newAccountIdx = await addAccountData(accounts[k], newServiceIdx);
+                        addAccountKeyMap['key' + accountKey] = newAccountIdx;
+
+                    }
+                }
+            }
+        }
+    }
+    ///keyMap 이용해 oauth 계정 추가
+    for(let i = 0 ; i < oauthAccounts.length ; i++) {
+        if(oauthAccounts[i] === undefined) continue;
+
+        const serviceKey = oauthAccounts[i].SERVICE_IDX;
+        const accountKey = oauthAccounts[i].ACCOUNT_IDX;
+        await addOauthAccountData(oauthAccounts[i], addServiceKeyMap['key' + serviceKey], addAccountKeyMap['key' + accountKey]);
+    }
+    //나중엔 업데이트, 추가 모두 위처럼 key value 형태로 알고리즘을 개선하자
+
+  }
 }
