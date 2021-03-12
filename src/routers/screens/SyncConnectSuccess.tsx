@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { stompConnect, stompDisconnect } from '../../modules/SyncWebsocketContainer';
+import { stompConnect, stompDisconnect, stompSendMessage } from '../../modules/SyncWebsocketContainer';
+import {StrongboxDatabase} from '../../StrongboxDatabase';
+import {updateGroupAsync} from '../../modules/groupList';
+import {updateServiceAsync} from '../../modules/serviceList';
+import CryptoJS from 'react-native-crypto-js';
+
 const TotalWrapper = styled.View`
   flex: 1;
   display: flex;
@@ -29,30 +33,87 @@ const SyncButton = styled.TouchableOpacity`
 const SyncConnectSuccess = (props: any) => {
   
     const {otherPartName, vertificationCode} = props.route.params; // 상대방 이름과 코드
+    const [isSyncAgree, setSyncAgree] = useState(false);
+    const [isOtherPartAgree, setOtherPartAgree] = useState(false);
+    const [isFinish, setFinish] = useState(false);
 
     useEffect(() => {
-      stompConnect(onResponseMessage).then((result) => {
-          // 화면 연결 시 소켓 연결
-          console.log('소켓 연결');
-      }).catch((error) => {
-          console.log(error);
-      });
+        stompConnect(onResponseMessage).then((result) => {
+            // 화면 연결 시 소켓 연결
+            console.log('소켓 연결');
+            stompSendMessage('CONNECT_SUCCESS', '연결 성공');
+        }).catch((error) => {
+            console.log(error);
+        });
 
-      return () => {
-          console.log('소켓 연결 해제');
-          stompDisconnect();
-      }
-  }, []);
-  const onResponseMessage = (response: any) => {
-      const message = JSON.parse(response.body);
-      console.log(message);
-      
-      //상대방이 동기화 버튼을 누르면
-      //상대방이 취소버튼을 누르면
-  }
+        return () => {
+            console.log('소켓 연결 해제');
+            if(isFinish) {
+                stompSendMessage('SYNC_FINISH', "동기화 종료");
+            } else {
+                stompSendMessage('SYNC_DENY', '동기화 거부');
+            }
+            stompDisconnect();
+        }
+    }, []);
+    useEffect(() => {
+        if(isFinish) {
+            onPressBackButtonEvent();
+        }
+    }, [isFinish]);
+    useEffect(() => {
+        if(isOtherPartAgree && isSyncAgree) {
+            const database = StrongboxDatabase.getInstance();
+            database.getAllSyncData().then((result: any) => {
+                //계정정보 상대방에게 건내주기
+                const data = result;
+                const accounts: any = result.accounts;
+                for(let i = 0 ; i < accounts.length ; i++) {
+                    let bytes = CryptoJS.AES.decrypt(accounts[i].PASSWORD, global.key);
+                    let decrypted = bytes.toString(CryptoJS.enc.Utf8);
 
+                    accounts[i].PASSWORD = decrypted; // 복호화
+                }
+                data.accounts = accounts;
+
+                stompSendMessage("DATA", JSON.stringify(data));
+            }).catch((error) => {
+                console.error(error);
+                onPressBackButtonEvent();
+            });
+            setSyncAgree(false); // 나는 동의여부 false로 바꾸어주고
+        }
+        
+    }, [isOtherPartAgree, isSyncAgree]);
+    const onResponseMessage = (response: any) => {
+        const message = JSON.parse(response.body);
+        console.log(message);
+
+        if(message.senderToken === global.syncInfo.token) {
+            return;
+        }
+        if(message.type === 'SYNC_DENY') {
+            onPressBackButtonEvent();
+        } else if(message.type === 'SYNC_AGREE') {
+            setOtherPartAgree(true);
+        } else if(message.type === 'DATA') {
+            const data = JSON.parse(message.message);
+            const database = StrongboxDatabase.getInstance();
+            database.syncData(data).then((result) => {
+                updateGroupAsync();
+                updateServiceAsync();
+                setFinish(true);
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+    }
+    const onAgreeSync = () => {
+        stompSendMessage('SYNC_AGREE', '동기화 찬성');
+        setSyncAgree(true);
+    }
     const onPressBackButtonEvent = () => {
-        props.navigation.goBack();
+        props.navigation.reset({routes: [{name: 'Main'}]});
     }
     return (<StackScreenContainer screenName="연결 성공" onPressBackButton={onPressBackButtonEvent}>
         <TotalWrapper>
@@ -69,7 +130,7 @@ const SyncConnectSuccess = (props: any) => {
                 </StyledText>
             </InnerItem>
             <InnerButtonItem>
-                <SyncButton><StyledText>동기화</StyledText></SyncButton>
+                <SyncButton onPress={onAgreeSync}><StyledText>동기화</StyledText></SyncButton>
                 <SyncButton onPress={onPressBackButtonEvent}><StyledText>취소</StyledText></SyncButton>
             </InnerButtonItem>
         </TotalWrapper>

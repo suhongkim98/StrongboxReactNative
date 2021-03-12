@@ -432,6 +432,32 @@ export class StrongboxDatabase {
     }
     return -1;
   }
+  public async getAllSyncData() {
+    // 그룹리스트 뽑기
+    const groupQuery = "SELECT IDX, GRP_NAME FROM GROUPS_TB";
+    // 서비스 리스트 뽑기
+    const serviceQuery = "SELECT IDX, GRP_IDX, SERVICE_NAME "
+    + "FROM SERVICES_TB" ;
+    // 계정리스트 뽑기
+    const accountQuery = "SELECT IDX, DATE, SERVICE_IDX, ACCOUNT_NAME, ID, PASSWORD FROM ACCOUNTS_TB "
+    + "ORDER BY DATE ASC "
+    // oauth계정 뽑기"
+    const oauthAccountQuery = "SELECT IDX, ACCOUNT_IDX, ACCOUNT_NAME, SERVICE_IDX, DATE FROM OAUTH_ACCOUNTS_TB "
+    + "ORDER BY DATE ASC ";
+    const db = this.connectDatabase();
+    const groups: any = await this.executeQuery(db, groupQuery, []);
+    const services: any = await this.executeQuery(db, serviceQuery, []);
+    const accounts: any = await this.executeQuery(db, accountQuery, []);
+    const oauths: any = await this.executeQuery(db, oauthAccountQuery, []);
+
+    const result = {
+      groups: groups.rows.raw(),
+      services: services.rows.raw(),
+      accounts: accounts.rows.raw(),
+      oauthAccounts: oauths.rows.raw(),
+    }
+    return result;
+  }
   public async syncData(data: any) {
     const groups = data.groups;
     const services = data.services;
@@ -451,6 +477,7 @@ export class StrongboxDatabase {
       return new Promise((succ, fail) => {
         this.addService(targetGroupIdx, service.SERVICE_NAME).then((result) => {
           succ(result.rowid);
+          console.log('키는' + result.rowid);
         }).catch((error) => {
           fail(error);
         });
@@ -458,7 +485,7 @@ export class StrongboxDatabase {
     }
     const addAccountData = (account: any, targetServiceIdx: number) => {
       return new Promise((succ, fail) => {
-        this.addAccount({accountName: account.ACCOUNT_NAME, serviceIDX: targetServiceIdx}).then((result: any) => {
+        this.addAccount({accountName: account.ACCOUNT_NAME, id: account.ID, password: account.PASSWORD, serviceIDX: targetServiceIdx}).then((result: any) => {
           succ(result.insertId);
         }).catch((error) => {
           fail(error);
@@ -517,7 +544,7 @@ export class StrongboxDatabase {
                       if(accountIdx > 0) {
                           // 가져온 데이터가 date최신이면 그 데이터로 계정 업데이트하기
                           const select: any = await this.executeQuery(db,'SELECT DATE FROM ACCOUNTS_TB WHERE IDX = ' + accountIdx,[]); // date꺼내오기
-                          const [previousDataSplitDate, newDataSplitDate] = [splitDate(select[0].DATE), splitDate(accounts[k].DATE)];
+                          const [previousDataSplitDate, newDataSplitDate] = [splitDate(select.rows.item(0).DATE), splitDate(accounts[k].DATE)];
                           const previousDataDate = new Date(previousDataSplitDate.year, previousDataSplitDate.month, previousDataSplitDate.day, previousDataSplitDate.hour, previousDataSplitDate.min, previousDataSplitDate.sec);
                           const newDataDate = new Date(newDataSplitDate.year, newDataSplitDate.month, newDataSplitDate.day, newDataSplitDate.hour, newDataSplitDate.min, newDataSplitDate.sec);
                           
