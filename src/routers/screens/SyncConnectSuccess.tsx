@@ -104,7 +104,7 @@ const SyncConnectSuccess = (props: any) => {
                 updateServiceAsync();
                 setFinish(true);
             }).catch((error) => {
-                console.log(error);
+                console.error(error);
             });
         }
     }
