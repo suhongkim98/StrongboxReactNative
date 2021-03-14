@@ -42,11 +42,14 @@ const SyncRequestPinScreen = (props: any) => {
     }, []);
     const onResponseMessage = (response: any) => {
         const message = JSON.parse(response.body);
+        if(message.senderToken === global.syncInfo.token) {
+            return;
+        }
         console.log(message);
         if(message.type === "CONNECT_SUCCESS") {
             // 동기화 응답자가 핀번호를 제대로 입력했다는 메시지를 보내 올 경우
             props.navigation.navigate('SyncConnectSuccess', {
-                otherPartName: message.sender,
+                otherPartName: message.message,
                 vertificationCode: vertificationCode,
             });
         }

@@ -41,7 +41,7 @@ const SyncConnectSuccess = (props: any) => {
         stompConnect(onResponseMessage).then((result) => {
             // 화면 연결 시 소켓 연결
             console.log('소켓 연결');
-            stompSendMessage('CONNECT_SUCCESS', '연결 성공');
+            stompSendMessage('CONNECT_SUCCESS', global.name);
         }).catch((error) => {
             console.log(error);
         });
