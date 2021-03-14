@@ -48,6 +48,7 @@ const SyncRequestPinScreen = (props: any) => {
         console.log(message);
         if(message.type === "CONNECT_SUCCESS") {
             // 동기화 응답자가 핀번호를 제대로 입력했다는 메시지를 보내 올 경우
+            props.navigation.popToTop();
             props.navigation.navigate('SyncConnectSuccess', {
                 otherPartName: message.message,
                 vertificationCode: vertificationCode,
