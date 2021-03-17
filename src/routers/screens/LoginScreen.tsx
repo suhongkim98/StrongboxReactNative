@@ -6,6 +6,8 @@ import theme from '../../styles/theme';
 import PinBox from '../../components/PinBox';
 import StyledText from '../../components/StyledText';
 import InputNumberKeyboard from '../../components/InputNumberKeyboard';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import ModalPopup from '../../components/ModalPopup';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -36,6 +38,7 @@ const InputView = styled.View`
 const LoginScreen = ({navigation}) => {
   const PIN_LENGTH = 6;
   const [pin, setPin] = useState('');
+  const [losePasswordModal, setLosePasswordModal] = useState(false);
 
   useEffect(() => {
     if (pin.length === PIN_LENGTH) {
@@ -68,6 +71,19 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <TotalWrapper>
+      <ModalPopup
+        containerWidth="400px"
+        containerHeight="200px"
+        headerTitle="비밀번호 분실"
+        onBackdropPress={() => {setLosePasswordModal(false)}}
+        onAgree={() => {setLosePasswordModal(false)}}
+        onAgreeTitle="확인"
+        isVisible={losePasswordModal}>
+          <StyledText>
+            모든 계정 정보는 암호화가 되어있어 복구가 불가능합니다. 앱을 삭제하고 다시 설치해주세요. 계정정보는 사라집니다.
+            {'\n\n'}만약 Accong Box 데스크톱 응용프로그램에 계정 정보가 살아있고 핀번호를 알고 있다면 동기화 기능을 통해 복구가 가능합니다.
+          </StyledText>
+      </ModalPopup>     
       <ViewBody>
         <StyledText color="white" fontWeight="700" size="30px">
           Accong Box
@@ -81,9 +97,12 @@ const LoginScreen = ({navigation}) => {
           </PinView>
         </PaddingView>
         <View style={{paddingBottom: 50}}>
-          <StyledText color="lightyellow" fontWeight="600" size="13px" center>
-            (!) 비밀번호를 분실하셨나요?
-          </StyledText>
+          <TouchableOpacity onPress={() => {setLosePasswordModal(true);}}>
+            <StyledText color="lightyellow" fontWeight="600" size="13px" center>
+              (!) 비밀번호를 분실하셨나요?
+            </StyledText>  
+          </TouchableOpacity>
+          
         </View>
       </ViewBody>
       <InputView>
