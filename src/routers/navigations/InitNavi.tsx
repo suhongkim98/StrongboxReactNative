@@ -19,6 +19,7 @@ import SyncRequestScreen from '../screens/SyncRequestScreen';
 import SyncResponseScreen from '../screens/SyncResponseScreen';
 import SyncRequestPinScreen from '../screens/SyncRequestPinScreen';
 import SyncConnectSuccess from '../screens/SyncConnectSuccess';
+import SearchServiceScreen from '../screens/SearchServiceScreen';
 
 const LoadingWrapper = styled.View`
   flex: 1;
@@ -77,6 +78,7 @@ const InitNavi = () => {
         <Stack.Screen name="SyncResponseScreen" component={SyncResponseScreen}/>
         <Stack.Screen name="SyncRequestPinScreen" component={SyncRequestPinScreen} />
         <Stack.Screen name="SyncConnectSuccess" component={SyncConnectSuccess}/>
+        <Stack.Screen name="SearchServiceScreen" component={SearchServiceScreen}/>
       </Stack.Navigator>
     </>
   );

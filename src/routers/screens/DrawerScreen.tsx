@@ -9,6 +9,7 @@ import Toast from 'react-native-root-toast';
 import BottomSlide from '../../components/BottomSlide';
 import AddGroupModalPopup from '../../components/AddGroupModalPopup';
 import { RootState } from '../../modules';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -17,6 +18,7 @@ const TotalWrapper = styled.View`
 `;
 const HeaderWrapper = styled.View`
   flex: 0.1;
+  justify-content:space-between;
 `;
 const BodyWrapper = styled.View`
   flex: 0.9;
@@ -46,6 +48,16 @@ const Hr = styled.View`
   width: 100%;
   border-bottom-width: 1px;
   border-color: gray;
+`;
+const SearchBar = styled.TouchableOpacity`
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px 0 10px;
+  background-color: white;
+  border-radius: 5px;
 `;
 
 const DrawerScreen = (props) => {
@@ -120,9 +132,12 @@ const DrawerScreen = (props) => {
         <StyledText color="white" size="20px">
           Accong Box
         </StyledText>
-        <StyledText color="red" size="20px">
-          검색바 넣을 곳
-        </StyledText>
+        <SearchBar onPress={() => {
+          props.navigation.navigate('SearchServiceScreen');
+        }}>
+          <StyledText color="gray">검색..</StyledText>
+          <Icon color="black" name="search1"></Icon>
+        </SearchBar>
       </HeaderWrapper>
       <BodyWrapper>
         <DrawerContentScrollView {...props}>
