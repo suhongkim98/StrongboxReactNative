@@ -66,7 +66,7 @@ const SearchServiceScreen = (props: any) => {
             return row.SERVICE_NAME.indexOf(text) > -1;
         });
         const list = services.map((row: any) => {
-            return <SearchItem onPress={() => {
+            return <SearchItem key={row.SERVICE_IDX} onPress={() => {
                 dispatch(
                   updateSelectedItemIndex({
                     idx: row.SERVICE_IDX,
