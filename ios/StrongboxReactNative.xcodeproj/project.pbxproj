@@ -205,7 +205,6 @@
 				27A70D83256D466A19D3513E /* Pods-StrongboxReactNative-tvOSTests.debug.xcconfig */,
 				79F4C4EF132B9797DB971669 /* Pods-StrongboxReactNative-tvOSTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
