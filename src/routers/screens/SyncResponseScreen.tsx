@@ -20,6 +20,7 @@ const InputBox = styled.TextInput`
   border-color: gray;
   border-bottom-width: 1px;
   margin: 10px 0 0 0;
+  padding: 0 10px 0 10px;
 `;
 const SyncButton = styled.TouchableOpacity`
   border: solid gray 1px;
@@ -123,9 +124,8 @@ const SyncResponseScreen = (props: any) => {
             </View>
             <View>
                 <StyledText center>상대방과 계정 정보를 동기화할 수 있습니다.{'\n'}이름을 입력한 후 동기화버튼을 눌러주세요.
-                {'\n\n'}아이디가 일치한데 비밀번호가 다른경우{'\n'}
-                <StyledText color='red' fontWeight="700">가장 최근에 추가된 계정 정보로</StyledText> 업데이트 되니
-                {'\n'}참고하시기 바랍니다.
+                {'\n\n'}<StyledText color='black' fontWeight="700">계정 이름이 같은 경우 </StyledText>
+                <StyledText color='red' fontWeight="700">가장 최근에 추가된 계정 정보로</StyledText>{'\n'} 업데이트 되니 참고하시기 바랍니다.
                 </StyledText>
             </View>
             <SyncButton onPress={() => {onPressSyncButton();}}><StyledText color='white' fontWeight="700">동기화하기</StyledText></SyncButton>

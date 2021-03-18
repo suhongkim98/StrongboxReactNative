@@ -11,6 +11,7 @@ import { updateSelectedItemIndex } from '../../modules/selectedService';
 const SearchInput = styled.TextInput`
    height: 100%;
    width: 90%;
+   padding: 0 10px 0 10px;
 `;
 const SearchBar = styled.View`
   height: 30px;
