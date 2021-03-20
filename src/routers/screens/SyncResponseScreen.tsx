@@ -6,7 +6,7 @@ import styled from 'styled-components/native';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import theme from '../../styles/theme';
-
+import {SERVER_NAME} from '../../global.d.ts';
 const TotalWrapper = styled.View`
   flex: 1;
   display: flex;
@@ -78,7 +78,7 @@ const SyncResponseScreen = (props: any) => {
         const params = new URLSearchParams();
         params.append('name', global.name);
         params.append('vertificationCode', vertificationCode);
-        axios.post('http://localhost:8080/sync/responseSync', params).then((response: any) => {
+        axios.post(SERVER_NAME + '/sync/responseSync', params).then((response: any) => {
             const roomId = response.data.data[0].roomId;
             const vertificationCode = response.data.data[0].vertificationCode;
             const token = response.data.data[1].token;

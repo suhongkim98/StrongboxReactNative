@@ -1,11 +1,13 @@
 import SockJS from 'sockjs-client';
+import {SERVER_NAME} from '../global.d';
+
 const Stomp = require("stompjs/lib/stomp.js").Stomp;
 
 let stompClient :any;
 
 export const stompConnect = (onResponseMessage: (response: any) => any) => {
     return new Promise((succ, fail) => {
-        const sockJS = new SockJS("http://localhost:8080/socket");
+        const sockJS = new SockJS(SERVER_NAME + "/socket");
         stompClient = Stomp.over(sockJS);
 
         const headers = {
