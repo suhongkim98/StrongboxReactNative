@@ -46,14 +46,13 @@ const LoginScreen = ({navigation}) => {
       const database = StrongboxDatabase.getInstance();
       database
         .validUser(pin)
-        .then((result) => {
-          if (result !== false) {
+        .then((result: any) => {
+          if (result === true) {
             // 로그인 성공
-            global.key = result;
             navigation.reset({routes: [{name: 'Main'}]});
           } else {
             //로그인 실패 // 비밀번호 틀림
-            Alert.alert('비밀번호가 일치하지 않습니다.', '다시 입력해주세요', [
+            Alert.alert(result, '다시 입력해주세요', [
               {
                 text: '확인',
                 onPress: () => {

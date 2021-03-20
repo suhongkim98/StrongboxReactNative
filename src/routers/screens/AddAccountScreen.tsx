@@ -346,7 +346,7 @@ const AddAccountScreen = (props: any) => {
           )}
         </OauthWrapper>
         <View>
-          <StyledText fontWeight="700">계정 이름 입력</StyledText>
+          <StyledText fontWeight="700">별명 입력</StyledText>
           <AddTextInput
             onChangeText={(text) => {
               titleValue.current = text;

@@ -127,11 +127,26 @@ export class StrongboxDatabase {
   public async validUser(password: string) {
     let db = null;
 
-    db = await this.connectDatabase();
+    db = this.connectDatabase();
+    const banInfo = await this.getBanInfo();
+    const current = new Date();
+    const banDate = new Date(banInfo.banDate);
+    if(current.getTime() < banDate.getTime()) {
+      //밴 되어 있다면
+      const delay = (banDate.getTime() - current.getTime()) / 1000;
+      return '입력 제한 횟수를 초과하여 ' + delay + '초 동안 기다리셔야 합니다.';
+    }
+    if(banInfo.count > 5) {
+      //초기화하고 밴
+      await this.resetCount();
+      await this.banUser();
+      return '입력 제한 횟수를 초과하여 5분간 입력이 제한됩니다.';
+    }
+
     let selectQuery: any = await this.executeQuery(db, 'SELECT * FROM USERS_TB');
     const rows = selectQuery.rows; // 무조건 첫번째 row를 대상으로 하자(앱은 싱글사용자모드니깐)
     if (rows.length <= 0) {
-      return false;
+      return "사용자가 없음";
     } // 사용자가 없다면 로그인 실패
 
     const salt = rows.item(0).SALT;
@@ -139,9 +154,13 @@ export class StrongboxDatabase {
     await sha256(password + salt).then((hash) => (encryptedPassword = hash));
 
     if (encryptedPassword !== rows.item(0).PASSWORD) {
-      return false;
+      await this.countUp(); // 카운트 업
+      return "비밀번호가 일치하지 않습니다.";
     } // 일치하지 않으면 로그인 실패
-    return password + salt; // 로그인 성공 시 key 반환
+
+    await this.resetCount();
+    global.key = password + salt;// 로그인 성공 시 key 반환
+    return true; 
   }
 
   public async addGroup(groupName: string) {
@@ -591,5 +610,31 @@ export class StrongboxDatabase {
         oauthAccountKeyMap['key' + oauthAccount.IDX] = newOauthAccountIdx;
       }
     }
+  }
+  public async resetCount() {
+    const query = 'UPDATE USERS_TB SET COUNT = 0 ';
+    const db = this.connectDatabase();
+    const result = await this.executeQuery(db, query, []);
+    return result;
+  }
+  public async countUp() {
+    const db = this.connectDatabase();
+    const countQuery: any = await this.executeQuery(db, 'SELECT COUNT FROM USERS_TB',[]);
+    const count = countQuery.rows.item(0).COUNT;
+    const result = await this.executeQuery(db, 'UPDATE USERS_TB SET COUNT = ' + (count + 1), []);
+    return result;
+  }
+  public async banUser() {
+    const db = this.connectDatabase();
+    const banDate = new Date();
+    banDate.setMinutes(banDate.getMinutes() + 5);
+    const result = await this.executeQuery(db, "UPDATE USERS_TB SET BAN = '" + banDate.toISOString() + "'", []);
+    return result;
+  }
+  public async getBanInfo() {
+    // 밴 시간, 카운트 반환
+    const db = this.connectDatabase();
+    const query: any = await this.executeQuery(db, 'SELECT BAN, COUNT FROM USERS_TB', []);
+    return {banDate: query.rows.item(0).BAN, count: query.rows.item(0).COUNT};
   }
 }
