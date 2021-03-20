@@ -68,13 +68,13 @@ const AccountView = ({
         </OauthArea>
         <BodyItem>
           <StyledText fontWeight="700" size="16px">
-            아이디
+            {oauthServiceName && oauthServiceName + ' '}아이디
           </StyledText>
           <StyledText size="16px">{id}</StyledText>
         </BodyItem>
         <BodyItem>
           <StyledText fontWeight="700" size="16px">
-            패스워드
+            {oauthServiceName && oauthServiceName + ' '}패스워드
           </StyledText>
           <StyledText size="16px">{password}</StyledText>
         </BodyItem>
