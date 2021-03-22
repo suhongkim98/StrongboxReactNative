@@ -5,6 +5,7 @@ export {};
 declare global{
     namespace NodeJS{
         interface Global {
+            idx: number
             key: string
             name: string
             syncInfo: {token: string, roomId: string}

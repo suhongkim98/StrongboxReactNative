@@ -159,6 +159,7 @@ export class StrongboxDatabase {
     } // 일치하지 않으면 로그인 실패
 
     await this.resetCount();
+    global.idx = rows.item(0).IDX;
     global.key = password + salt;// 로그인 성공 시 key 반환
     return true; 
   }
@@ -168,8 +169,8 @@ export class StrongboxDatabase {
     db = await this.connectDatabase();
     let singleInsert: any = await this.executeQuery(
       db,
-      'INSERT INTO GROUPS_TB(GRP_NAME, SORT_ORDER) VALUES(?, (SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM GROUPS_TB))',
-      [groupName],
+      'INSERT INTO GROUPS_TB(GRP_NAME, OWNER_IDX, SORT_ORDER) VALUES(?, ?, (SELECT IFNULL(MAX(SORT_ORDER), 0) + 1 FROM GROUPS_TB))',
+      [groupName, global.idx],
     );
     let countSelect: any = await this.getColumnMaxValue(
       db,
@@ -512,7 +513,7 @@ export class StrongboxDatabase {
     }
     const addOauthAccountData = (oauthAccount: any, targetServiceIdx: number, targetAccountIdx: number) => {
       return new Promise((succ, fail) => {
-        this.addAccount({ accountName: oauthAccount.ACCUNT_NAME, serviceIDX: targetServiceIdx, OAuthAccountIDX: targetAccountIdx }).then((result: any) => {
+        this.addAccount({ accountName: oauthAccount.ACCOUNT_NAME, serviceIDX: targetServiceIdx, OAuthAccountIDX: targetAccountIdx }).then((result: any) => {
           succ(result.insertId);
         }).catch((error) => {
           fail(error);
@@ -534,12 +535,6 @@ export class StrongboxDatabase {
         + "WHERE ACCOUNT_IDX = " + targetAccountIdx + " AND SERVICE_IDX = " + targetServiceIdx;
 
       return this.executeQuery(db, query, []);
-    }
-    const splitDate = (date: string) => {
-      //문자열 가져와 잘라 json 반환
-      const split = date.split(' ');
-      const [calendar, time] = [split[0].split('-'), split[1].split(':')];
-      return { year: parseInt(calendar[0]), month: parseInt(calendar[1]), day: parseInt(calendar[2]), hour: parseInt(time[0]), min: parseInt(time[1]), sec: parseInt(time[2]) };
     }
     const getAccountDateQuery = (accountIdx: any) => {
       const query = 'SELECT DATE FROM ACCOUNTS_TB WHERE IDX = ' + accountIdx;
@@ -583,9 +578,8 @@ export class StrongboxDatabase {
         // 해당 서비스에 계정이 이미 존재하는 경우
         // date 비교 후 동기화 하고자 하는 계정이 최신인 경우 교체 아니면 냅두기
         const select: any = await getAccountDateQuery(accountIdx);
-        const [previousDataSplitDate, newDataSplitDate] = [splitDate(select.rows.item(0).DATE), splitDate(account.DATE)];
-        const previousDataDate = new Date(previousDataSplitDate.year, previousDataSplitDate.month, previousDataSplitDate.day, previousDataSplitDate.hour, previousDataSplitDate.min, previousDataSplitDate.sec);
-        const newDataDate = new Date(newDataSplitDate.year, newDataSplitDate.month, newDataSplitDate.day, newDataSplitDate.hour, newDataSplitDate.min, newDataSplitDate.sec);
+        const previousDataDate = new Date(select.rows.item(0).DATE);
+        const newDataDate = new Date(account.DATE);
 
         if (previousDataDate.getTime() < newDataDate.getTime()) {
           //새로운 데이터가 더 최신인 경우
