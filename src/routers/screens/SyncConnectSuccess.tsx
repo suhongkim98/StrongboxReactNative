@@ -166,12 +166,14 @@ const SyncConnectSuccess = (props: any) => {
             </InnerItem>
             <InnerItem>
                 <StyledText center>
-                상대방의 이름과 인증 번호를 <StyledText color="red" fontWeight="700">꼭</StyledText> 확인하신 후 {'\n'}동기화 버튼을 눌러주세요.{'\n\n'}이 단계에서 동기화를 하는 순간
+                상대방의 이름과 인증 번호를 <StyledText color="red" fontWeight="700">꼭</StyledText> 확인하신 후 {'\n'}동의 버튼을 눌러주세요.{'\n\n'}이 단계에서 동기화를 하는 순간
                 {'\n'}상대방에게 계정정보가 보내집니다.
                 </StyledText>
             </InnerItem>
             <InnerButtonItem>
-                <SyncButton onPress={onAgreeSync}><StyledText>동기화</StyledText></SyncButton>
+                <SyncButton onPress={onAgreeSync}>
+                    {!agreeFlag ? <StyledText>동의</StyledText> : <StyledText>동의완료</StyledText>}
+                </SyncButton>
                 <SyncButton onPress={onPressBackButtonEvent}><StyledText>취소</StyledText></SyncButton>
             </InnerButtonItem>
         </TotalWrapper>
