@@ -394,11 +394,10 @@ export class StrongboxDatabase {
   }
   public async isExistServiceName(serviceName: string, groupIndex: number) {
     const query =
-      'SELECT * FROM SERVICES_TB STB ' +
-      'JOIN GROUPS_TB GTB ON STB.GRP_IDX = GTB.IDX ' +
-      'WHERE GTB.IDX = ' +
+      'SELECT * FROM SERVICES_TB ' +
+      'WHERE GRP_IDX = ' +
       groupIndex +
-      " AND STB.SERVICE_NAME = '" +
+      " AND SERVICE_NAME = '" +
       serviceName +
       "'";
 
@@ -412,11 +411,10 @@ export class StrongboxDatabase {
   }
   public async isExistAccountName(accountName: string, serviceIndex: number) {
     const query =
-      'SELECT * FROM ACCOUNTS_TB ATB ' +
-      'JOIN SERVICES_TB STB ON STB.IDX = ATB.SERVICE_IDX ' +
-      'WHERE STB.IDX = ' +
+      'SELECT * FROM ACCOUNTS_TB ' +
+      'WHERE SERVICE_IDX = ' +
       serviceIndex +
-      " AND ATB.ACCOUNT_NAME = '" +
+      " AND ACCOUNT_NAME = '" +
       accountName +
       "'";
 
@@ -434,13 +432,12 @@ export class StrongboxDatabase {
     accountIndex: number,
   ) {
     const query =
-      'SELECT * FROM OAUTH_ACCOUNTS_TB OTB ' +
-      'JOIN SERVICES_TB STB ON STB.IDX = OTB.SERVICE_IDX ' +
-      'WHERE STB.IDX = ' +
+      'SELECT * FROM OAUTH_ACCOUNTS_TB ' +
+      'WHERE SERVICE_IDX = ' +
       serviceIndex +
-      " AND OTB.ACCOUNT_NAME = '" +
+      " AND ACCOUNT_NAME = '" +
       oauthAccountName +
-      "' AND OTB.ACCOUNT_IDX = " +
+      "' AND ACCOUNT_IDX = " +
       accountIndex;
 
     const db = await this.connectDatabase();
@@ -573,7 +570,6 @@ export class StrongboxDatabase {
         }
       }
     }
-
     if(accounts != null) {
       /* 계정 동기화 */
       for (let i = 0; i < accounts.length; i++) {
