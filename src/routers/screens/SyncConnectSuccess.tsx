@@ -8,6 +8,7 @@ import {StrongboxDatabase} from '../../StrongboxDatabase';
 import {updateGroupAsync} from '../../modules/groupList';
 import {updateServiceAsync} from '../../modules/serviceList';
 import CryptoJS from 'react-native-crypto-js';
+import { ActivityIndicator } from 'react-native';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -30,6 +31,27 @@ const InnerButtonItem = styled.View`
 const SyncButton = styled.TouchableOpacity`
   padding: 0 20px 0 20px;
 `;
+const LoadingWrapper = styled.View`
+  flex: 1;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+  justify-content: center;
+  align-items: center;
+`;
+const LoadingBackground = styled.View`
+  flex: 1;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: black;
+  opacity: 0.1;
+`;
 const SyncConnectSuccess = (props: any) => {
   
     const {otherPartName, vertificationCode} = props.route.params; // 상대방 이름과 코드
@@ -38,6 +60,7 @@ const SyncConnectSuccess = (props: any) => {
     const [receiveFlag, setReceiveFlag] = useState(false); // 상대방으로부터 데이터를 성공적으로 받았을 때
     const [dataSendFlag, setDataSendFlag] = useState(false); // 내가 보낸 데이터를 상대방이 받았을 때
     const syncData = useRef();
+    const [isLoading, setLoading] = useState(false);
 
     useEffect(() => {
         stompConnect(onResponseMessage).then((result) => {
@@ -87,10 +110,12 @@ const SyncConnectSuccess = (props: any) => {
         // 내가 보낸 데이터가 상대방이 잘 받았을 경우
         if(receiveFlag && dataSendFlag) {
             //데이터를 잘 받았으므로 동기화 함수 호출하고 disconnect
+            setLoading(true);
             stompDisconnect(); // 연결 종료
 
             const database = StrongboxDatabase.getInstance();
             database.syncData(syncData.current).then((result) => {
+                setLoading(false);
                 updateGroupAsync();
                 updateServiceAsync();
                 onPressBackButtonEvent(); // 동기화 완료 후 나가기
@@ -128,6 +153,10 @@ const SyncConnectSuccess = (props: any) => {
         props.navigation.reset({routes: [{name: 'Main'}]});
     }
     return (<StackScreenContainer screenName="연결 성공" onPressBackButton={onPressBackButtonEvent}>
+        {isLoading && <LoadingWrapper>
+            <LoadingBackground />
+            <StyledText size="17px" fontWeight="700" color="black">동기화 진행 중</StyledText><ActivityIndicator color="black"/>
+        </LoadingWrapper>}
         <TotalWrapper>
             <InnerItem><StyledText size="20px" fontWeight="700">연결 성공!</StyledText></InnerItem>
             <InnerItem>
