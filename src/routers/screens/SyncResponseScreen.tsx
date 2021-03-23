@@ -76,7 +76,8 @@ const SyncResponseScreen = (props: any) => {
         }
         //ajax로 서버에 요청
         const params = new URLSearchParams();
-        params.append('name', global.name);
+        params.append('name', name);
+        global.name = name;
         params.append('vertificationCode', vertificationCode);
         axios.post(SERVER_NAME + '/sync/responseSync', params).then((response: any) => {
             const roomId = response.data.data[0].roomId;

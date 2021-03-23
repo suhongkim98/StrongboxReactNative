@@ -3,7 +3,7 @@ import {SERVER_NAME} from '../global.d';
 
 const Stomp = require("stompjs/lib/stomp.js").Stomp;
 
-let stompClient :any;
+let stompClient :any = null;
 
 export const stompConnect = (onResponseMessage: (response: any) => any) => {
     return new Promise((succ, fail) => {
@@ -38,9 +38,12 @@ export const stompSubscribe = (path: string, onResponseMessage: (response: any) 
 }
 
 export const stompDisconnect = () => {
-    if (stompClient.connected) {
-        stompClient.disconnect(()=>{});
-    }
+    if(stompClient != null) {
+        if (stompClient.connected) {
+            stompClient.disconnect(()=>{});
+        }
+        stompClient = null;
+        }
 }
 
 export const stompSendMessage = (type: string, message: string) => {
@@ -52,4 +55,8 @@ export const stompSendMessage = (type: string, message: string) => {
         message: message,
     };
 	stompClient.send("/app/syncPub",{'token': global.syncInfo.token}, JSON.stringify(body)); 
+}
+
+export const isWebsocketConnected = () => {
+    return stompClient != null;
 }
