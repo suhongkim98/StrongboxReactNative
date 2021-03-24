@@ -6,7 +6,7 @@ import styled from 'styled-components/native';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import theme from '../../styles/theme';
-import {SERVER_NAME} from '../../global.d.ts';
+import {SERVER_NAME} from '../../global.d';
 const TotalWrapper = styled.View`
   flex: 1;
   display: flex;

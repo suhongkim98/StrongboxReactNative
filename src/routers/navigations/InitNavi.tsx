@@ -10,7 +10,6 @@ import styled from 'styled-components/native';
 import theme from '../../styles/theme';
 import StyledText from '../../components/StyledText';
 import LoadingSVG from '../../images/LoadingSVG';
-import EditDrawerScreen from '../screens/EditDrawerScreen';
 import EditAccountScreen from '../screens/EditAccountScreen';
 import AddAccountScreen from '../screens/AddAccountScreen';
 import AddServiceScreen from '../screens/AddServiceScreen';
@@ -20,6 +19,9 @@ import SyncResponseScreen from '../screens/SyncResponseScreen';
 import SyncRequestPinScreen from '../screens/SyncRequestPinScreen';
 import SyncConnectSuccess from '../screens/SyncConnectSuccess';
 import SearchServiceScreen from '../screens/SearchServiceScreen';
+import EditGroupListScreen from '../screens/EditGroupListScreen';
+import EditGroupScreen from '../screens/EditGroupScreen';
+import EditServiceScreen from '../screens/EditServiceScreen';
 
 const LoadingWrapper = styled.View`
   flex: 1;
@@ -69,7 +71,6 @@ const InitNavi = () => {
         )}
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Main" component={MainNavi} />
-        <Stack.Screen name="EditDrawerScreen" component={EditDrawerScreen} />
         <Stack.Screen name="EditAccountScreen" component={EditAccountScreen} />
         <Stack.Screen name="AddAccountScreen" component={AddAccountScreen} />
         <Stack.Screen name="AddServiceScreen" component={AddServiceScreen} />
@@ -79,6 +80,9 @@ const InitNavi = () => {
         <Stack.Screen name="SyncRequestPinScreen" component={SyncRequestPinScreen} />
         <Stack.Screen name="SyncConnectSuccess" component={SyncConnectSuccess}/>
         <Stack.Screen name="SearchServiceScreen" component={SearchServiceScreen}/>
+        <Stack.Screen name="EditGroupListScreen" component={EditGroupListScreen} />
+        <Stack.Screen name="EditGroupScreen" component={EditGroupScreen} />
+        <Stack.Screen name="EditServiceScreen" component={EditServiceScreen} />
       </Stack.Navigator>
     </>
   );

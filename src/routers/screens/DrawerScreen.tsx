@@ -117,7 +117,7 @@ const DrawerScreen = (props) => {
           <SlideItem
             onPress={() => {
               setBottomSlideVisible(false);
-              props.navigation.navigate('EditDrawerScreen');
+              props.navigation.navigate('EditGroupListScreen');
             }}>
             <StyledText>편집</StyledText>
           </SlideItem>

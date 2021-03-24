@@ -5,7 +5,6 @@ import counter from './counter';
 import groupList from './groupList';
 import serviceList from './serviceList';
 import selectedService from './selectedService';
-import editDrawerRedux from './editDrawerRedux';
 import accountList from './accountList';
 
 const rootReducer = combineReducers({
@@ -13,7 +12,6 @@ const rootReducer = combineReducers({
   groupList,
   serviceList,
   selectedService,
-  editDrawerRedux,
   accountList,
 });
 

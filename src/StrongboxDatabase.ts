@@ -635,4 +635,22 @@ export class StrongboxDatabase {
     const query: any = await this.executeQuery(db, 'SELECT BAN, COUNT FROM USERS_TB', []);
     return {banDate: query.rows.item(0).BAN, count: query.rows.item(0).COUNT};
   }
+  public async changeGroupName(groupIdx: number, name: string) {
+    const db = this.connectDatabase();
+    const isExist = await this.isExistGroupName(name);
+    if(isExist > 0) {
+      return false; // 이미 존재
+    }
+    const query: any = await this.executeQuery(db, "UPDATE GROUPS_TB SET GRP_NAME = '" + name +"' WHERE IDX = " + groupIdx);
+    return true;
+  }
+  public async changeServiceName(serviceIdx: number, targetGroupIdx:number, name: string) {
+    const db = this.connectDatabase();
+    const isExist = await this.isExistServiceName(name, targetGroupIdx);
+    if(isExist > 0) {
+      return false;
+    }
+    const query: any = await this.executeQuery(db, "UPDATE SERVICES_TB SET SERVICE_NAME = '" + name + "', GRP_IDX = " + targetGroupIdx + " WHERE IDX = " + serviceIdx);
+    return true;
+  }
 }
