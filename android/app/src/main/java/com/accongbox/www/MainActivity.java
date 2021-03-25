@@ -1,4 +1,4 @@
-package com.strongboxreactnative;
+package com.accongbox.www;
 
 import com.facebook.react.ReactActivity;
 

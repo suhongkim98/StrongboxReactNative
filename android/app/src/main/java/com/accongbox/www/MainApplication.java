@@ -1,4 +1,4 @@
-package com.strongboxreactnative;
+package com.accongbox.www;
 
 import android.app.Application;
 import android.content.Context;
@@ -46,6 +46,8 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    
+    MobileAds.initialize(this, "YOUR_ADMOB_APP_ID");
   }
 
   /**

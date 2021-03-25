@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "639130262875",
+    "project_id": "accongbox",
+    "storage_bucket": "accongbox.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639130262875:android:8766e168b23cb828500e7e",
+        "android_client_info": {
+          "package_name": "com.accongbox.www"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639130262875-ndf2fd5vatkom87t38porlhs33u7s43q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBdN5A6c4mp6LpdHOX7wf0edhELDx7vqA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639130262875-ndf2fd5vatkom87t38porlhs33u7s43q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "639130262875-5m4aokurh9r3fhcb434tpd3g3hd3c0hi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.accongbox.www"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
