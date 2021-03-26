@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import StyledText from '../components/StyledText';
 import theme from '../styles/theme';
 import Icon from 'react-native-vector-icons/AntDesign';
+import BannerContainer from './BannerContainer';
 
 const TotalWrapper = styled.View`
   width: 100%;
@@ -88,7 +89,9 @@ const EditView = ({
           </StyledText>
         </DeleteButton>
       </FooterWrapper>
-      <AdvertisementView />
+      <AdvertisementView>
+        <BannerContainer/>
+      </AdvertisementView>
     </TotalWrapper>
   );
 };

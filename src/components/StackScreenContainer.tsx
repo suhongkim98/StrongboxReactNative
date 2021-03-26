@@ -2,6 +2,7 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/AntDesign';
 import styled from 'styled-components/native';
 import theme from '../styles/theme';
+import BannerContainer from './BannerContainer';
 import StyledText from './StyledText';
 
 const TotalWrapper = styled.View`
@@ -53,6 +54,7 @@ const StackScreenContainer = ({onPressBackButton, screenName, children}: StackSc
         </HeaderItemButton>
       </HeaderWrapper>
       <BodyWrapper>{children}</BodyWrapper>
+      <BannerContainer/>
     </TotalWrapper>);
 }
 

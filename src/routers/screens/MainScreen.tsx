@@ -1,19 +1,21 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components/native';
 import StyledText from '../../components/StyledText';
-import {useDispatch, useSelector} from 'react-redux';
-import {updateGroupAsync} from '../../modules/groupList';
-import {updateServiceAsync} from '../../modules/serviceList';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateGroupAsync } from '../../modules/groupList';
+import { updateServiceAsync } from '../../modules/serviceList';
 import MenuSVG from '../../images/MenuSVG';
 import SettingSVG from '../../images/SettingSVG';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {LogBox, ScrollView} from 'react-native';
+import { LogBox } from 'react-native';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
-import {updateAccountAsync} from '../../modules/accountList';
+import { updateAccountAsync } from '../../modules/accountList';
 import Toast from 'react-native-root-toast';
 import { RootState } from '../../modules';
+import BannerContainer from '../../components/BannerContainer';
+import { ScrollView } from 'react-native-gesture-handler';
 LogBox.ignoreLogs(['Animated: `useNativeDriver` was not specified.']); // 일단 경고무시하자 ActionButton 라이브러리 문제
 
 const TotalWrapper = styled.View`
@@ -35,7 +37,6 @@ const MenuButton = styled.TouchableOpacity``;
 const BodyWrapper = styled.View`
   flex: 1;
   flex-direction: column;
-  align-items: center;
   padding: 30px 20px 0 20px;
 `;
 const AdvertisementView = styled.View``; // 추후 광고 추가 예정
@@ -45,7 +46,7 @@ const StyledIcon = styled(Icon)`
   color: white;
 `;
 
-const MainScreen = ({navigation}) => {
+const MainScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const selectedService = useSelector(
     (state: RootState) => state.selectedService.itemIndex,
@@ -125,8 +126,8 @@ const MainScreen = ({navigation}) => {
           <SettingSVG width="20px" height="20px" color="black" />
         </MenuButton>
       </HeaderWrapper>
-      <ScrollView>
-        <BodyWrapper>
+      <BodyWrapper>
+        <ScrollView>
           {selectedService.idx > 0 ? (
             printAccountView()
           ) : (
@@ -134,33 +135,38 @@ const MainScreen = ({navigation}) => {
               선택한 서비스가 없습니다.
             </StyledText>
           )}
-        </BodyWrapper>
-      </ScrollView>
-      {selectedService.idx > 0 && (
-        <ActionButton buttonColor="rgba(231,76,60,1)">
-          <ActionButton.Item
-            buttonColor="#9b59b6"
-            title="계정 추가"
-            onPress={() => {
-              navigation.navigate('AddAccountScreen', {
-                serviceIdx: selectedService.idx,
-              });
-            }}>
-            <StyledIcon name="pluscircleo" />
-          </ActionButton.Item>
-          <ActionButton.Item
-            buttonColor="#3498db"
-            title="편집"
-            onPress={() => {
-              navigation.navigate('EditAccountScreen', {
-                serviceIdx: selectedService.idx,
-              });
-            }}>
-            <StyledIcon name="delete" />
-          </ActionButton.Item>
-        </ActionButton>
-      )}
-      <AdvertisementView />
+        </ScrollView>
+
+        {selectedService.idx > 0 && (
+          <ActionButton buttonColor="rgba(231,76,60,1)">
+            <ActionButton.Item
+              buttonColor="#9b59b6"
+              title="계정 추가"
+              onPress={() => {
+                navigation.navigate('AddAccountScreen', {
+                  serviceIdx: selectedService.idx,
+                });
+              }}>
+              <StyledIcon name="pluscircleo" />
+            </ActionButton.Item>
+            <ActionButton.Item
+              buttonColor="#3498db"
+              title="편집"
+              onPress={() => {
+                navigation.navigate('EditAccountScreen', {
+                  serviceIdx: selectedService.idx,
+                });
+              }}>
+              <StyledIcon name="delete" />
+            </ActionButton.Item>
+          </ActionButton>
+        )}
+      </BodyWrapper>
+
+
+      <AdvertisementView>
+        <BannerContainer />
+      </AdvertisementView>
     </TotalWrapper>
   );
 };
