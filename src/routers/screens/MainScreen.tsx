@@ -82,7 +82,7 @@ const MainScreen = ({ navigation }) => {
   const printAccountView = () => {
     console.log(accountList);
     if (accountList.length <= 0) {
-      return <StyledText fontWeight="700">계정을 추가해주세요.</StyledText>;
+      return <StyledText fontWeight="700" center>계정을 추가해주세요.</StyledText>;
     }
     return accountList.map((row) => {
       return (
@@ -131,7 +131,7 @@ const MainScreen = ({ navigation }) => {
           {selectedService.idx > 0 ? (
             printAccountView()
           ) : (
-            <StyledText size="16px" fontWeight="700">
+            <StyledText size="16px" fontWeight="700" center>
               선택한 서비스가 없습니다.
             </StyledText>
           )}
