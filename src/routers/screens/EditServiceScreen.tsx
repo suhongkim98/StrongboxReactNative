@@ -68,7 +68,7 @@ const EditServiceScreen = (props: any) => {
     const groupList = useSelector((state: RootState) => state.groupList.list);
 
     const [selectGroupIdx, setSelectGroupIdx] = useState(-1);
-    const [selectGroupName, setSelectGroupName] = useState('');
+    const [selectGroupName, setSelectGroupName] = useState('변경 원할 시 선택');
     
     const dispatch = useDispatch();
 
