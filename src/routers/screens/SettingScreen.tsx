@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
+import {Linking} from 'react-native';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -27,6 +28,9 @@ const SettingScreen = (props: any) => {
             <MenuItem onPress={() => {
                 props.navigation.navigate('SyncResponseScreen');
             }}><StyledText>계정 동기화 응답하기</StyledText></MenuItem>
+            <MenuItem onPress={() => {
+                Linking.openURL('http://accongbox.com');
+            }}><StyledText>PC버전 다운로드 하기</StyledText></MenuItem>
         </TotalWrapper>
     </StackScreenContainer>);
 }
