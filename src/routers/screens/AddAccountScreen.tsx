@@ -7,7 +7,6 @@ import { StrongboxDatabase } from '../../StrongboxDatabase';
 import Toast from 'react-native-root-toast';
 import styled from 'styled-components/native';
 import StyledText from '../../components/StyledText';
-import ModalPopup from '../../components/ModalPopup';
 import SelectServiceModalPopup from '../../components/SelectServiceModalPopup';
 import SelectAccountModalPopup from '../../components/SelectAccountModalPopup';
 
@@ -294,7 +293,7 @@ const AddAccountScreen = (props: any) => {
             onChangeText={(text) => {
               titleValue.current = text;
             }}
-            placeholder="입력"
+            placeholder="ex) 메인, 업무용, 본계정, 부계정.."
           />
         </View>
       </BodyWrapper>

@@ -78,7 +78,7 @@ const AddGroupModalPopup = ({
         onChangeText={(text) => {
           addGroupTextValue.current = text;
         }}
-        placeholder="이름을 입력해주세요"
+        placeholder="ex) 게임, 포털, sns.."
       />
     </ModalPopup>
   );

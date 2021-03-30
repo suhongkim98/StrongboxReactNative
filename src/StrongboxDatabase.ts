@@ -109,6 +109,8 @@ export class StrongboxDatabase {
       'INSERT INTO USERS_TB(PASSWORD, SALT) VALUES' + val,
     );
     global.idx = singleInsert.insertId;
+
+    await this.addGroup('기본 폴더'); // 기본폴더 자동생성d
     return key;
   }
 

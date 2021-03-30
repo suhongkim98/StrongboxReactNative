@@ -56,12 +56,11 @@ const SetPinScreen = ({navigation}) => {
             .createUser(pin)
             .then((result) => {
               global.key = result; // 유저 등록 성공하면 키를 받아 글로벌 변수에 저장한다
+              navigation.reset({routes: [{name: 'Main'}]});
             })
             .catch((error: any) => {
               console.log(error);
             });
-          //스크린 이동
-          navigation.reset({routes: [{name: 'Main'}]});
         } else {
           Alert.alert('비밀번호가 일치하지 않습니다.', '다시 입력해주세요', [
             {

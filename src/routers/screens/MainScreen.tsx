@@ -8,7 +8,7 @@ import MenuSVG from '../../images/MenuSVG';
 import SettingSVG from '../../images/SettingSVG';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { LogBox } from 'react-native';
+import { LogBox, View } from 'react-native';
 import AccountView from '../../components/AccountView';
 import theme from '../../styles/theme';
 import { updateAccountAsync } from '../../modules/accountList';
@@ -82,7 +82,7 @@ const MainScreen = ({ navigation }) => {
   const printAccountView = () => {
     console.log(accountList);
     if (accountList.length <= 0) {
-      return <StyledText fontWeight="700" center>계정을 추가해주세요.</StyledText>;
+      return <StyledText fontWeight="700" center>존재하는 계정이 없습니다.{'\n\n'}+버튼을 눌러 계정을 추가해주세요.</StyledText>;
     }
     return accountList.map((row) => {
       return (
@@ -131,9 +131,12 @@ const MainScreen = ({ navigation }) => {
           {selectedService.idx > 0 ? (
             printAccountView()
           ) : (
+            <View>
             <StyledText size="16px" fontWeight="700" center>
               선택한 서비스가 없습니다.
             </StyledText>
+            <StyledText center fontWeight="700">{'\n\n\n'}메뉴 -&gt; 수정하기를 눌러 폴더 및 서비스를 추가한 후{'\n\n'}계정을 추가해주세요.</StyledText>
+            </View>
           )}
         </ScrollView>
 

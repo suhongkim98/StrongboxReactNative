@@ -177,29 +177,29 @@ const ChangeAccountScreen = (props: any) => {
         <TotalWrapper>
             <InnerWrapper>
                 <Item>
-                <StyledText>그룹 선택</StyledText>
+                <StyledText fontWeight="700">그룹 선택</StyledText>
                 <SelectGroupTouchable onPress={() => onPressSelectGroupButton()}>
                     <StyledText>{selectGroupName}</StyledText>
                     <Arrow />
                 </SelectGroupTouchable>
                 </Item>
                 <Item>
-                <StyledText>서비스 변경</StyledText>
+                <StyledText  fontWeight="700">서비스 변경</StyledText>
                 <SelectGroupTouchable onPress={() => onPressSelectServiceButton()}>
                     <StyledText>{selectServiceName}</StyledText>
                     <Arrow />
                 </SelectGroupTouchable>
                 </Item>
                 <Item>
-                <StyledText>별명</StyledText>
+                <StyledText fontWeight="700">별명</StyledText>
                 <InputBox placeholder={inputAccountName} onChangeText={(text)=>setInputAccountName(text)} />
                 </Item>
                 <Item>
                 {
                     oauthServiceName == null && <View>
-                    <StyledText>아이디</StyledText>
+                    <StyledText fontWeight="700">아이디</StyledText>
                     <InputBox placeholder={inputId} onChangeText={(text)=>setInputId(text)} />
-                    <StyledText>패스워드</StyledText>
+                    <StyledText fontWeight="700">패스워드</StyledText>
                     <InputBox placeholder={inputPassword} onChangeText={(text)=>setInputPassword(text)} />
                 </View>
                 }

@@ -158,21 +158,23 @@ const AddServiceScreen = (props: any) => {
       />
       <BodyWrapper>
           <View>
-            <StyledText>그룹 선택</StyledText>
+            <StyledText fontWeight="700">그룹 선택</StyledText>
             <SelectGroupTouchable onPress={() => setAddGroupModalVisible(true)}>
               <StyledText>{selectGroupName}</StyledText>
               <Arrow />
             </SelectGroupTouchable>
           </View>
           <View>
-            <StyledText>서비스 이름</StyledText>
+            <StyledText fontWeight="700">서비스 이름</StyledText>
             <ServiceTextInput
               onChangeText={(text) => {
                 addServiceTextValue.current = text;
               }}
-              placeholder="이름을 입력해주세요"
+              placeholder="ex) 페이스북, 네이버, 다음, 리그 오브 레전드..."
             />
           </View>
+          <StyledText>{'\n\n'}서비스 이름은 <StyledText fontWeight="700">페이스북, 구글, 네이버</StyledText> 형식으로 적어주세요.{'\n'}먼저 그룹이 추가되어 있어야 합니다.{'\n'}
+          그룹이 추가되어있지 않다면 그룹을 먼저 추가해주세요.</StyledText>
       </BodyWrapper>
       <FooterWrapper>
         <AddButton
