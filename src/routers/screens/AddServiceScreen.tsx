@@ -9,6 +9,7 @@ import { StrongboxDatabase } from '../../StrongboxDatabase';
 import { updateServiceAsync } from '../../modules/serviceList';
 import ModalPopup from '../../components/ModalPopup';
 import { RootState } from '../../modules';
+import SelectGroupModalPopup from '../../components/SelectGroupModalPopup';
 
 const BodyWrapper = styled.View`
   flex: 1;
@@ -57,21 +58,9 @@ const Arrow = styled.View`
   transform: rotate(135deg); /* 각도 */
   border-color: gray;
 `;
-const GroupListItem = styled.TouchableOpacity`
-  width: 100%;
-  height: 40px;
-  border-bottom-width: 1px;
-  border-color: gray;
-  border-style: solid;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
+
 const AddServiceScreen = (props: any) => {
 
-  const [toastVisible, setToastVisible] = useState(false);
-  const toastTimer: any = useRef<number>(-1);
-  const [toastMessage, setToastMessage] = useState('');
   const addServiceTextValue = useRef('');
   const [groupIdx, setGroupIdx] = useState(-1);
   const [selectGroupName, setSelectGroupName] = useState('선택');
@@ -79,11 +68,9 @@ const AddServiceScreen = (props: any) => {
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
   const groupList = useSelector((state: RootState) => state.groupList.list);
 
-  const initInputValue = () => {
-    addServiceTextValue.current = '';
-    setGroupIdx(-1);
-    setSelectGroupName('선택');
-  };
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimer: any = useRef<number>(-1);
+  const [toastMessage, setToastMessage] = useState('');
     
     const showToastMessage = (message: string) => {
       // toast 보여주는 함수
@@ -98,6 +85,11 @@ const AddServiceScreen = (props: any) => {
       }, 2000);
     };
 
+    const initInputValue = () => {
+      addServiceTextValue.current = '';
+      setGroupIdx(-1);
+      setSelectGroupName('선택');
+    };
     const onPressBackButton = () => {
         props.navigation.goBack();
     }
@@ -147,18 +139,6 @@ const AddServiceScreen = (props: any) => {
         });
 
     }
-    const printGroupList = () => {
-      const onPressItem = (row: any) => {
-        setGroupIdx(row.GRP_IDX);
-        setAddGroupModalVisible(false);
-        setSelectGroupName(row.GRP_NAME);
-      }
-      const list = groupList.map((row: any) => {
-        return <GroupListItem key={row.GRP_IDX} onPress={() => {onPressItem(row)}}><StyledText>{row.GRP_NAME}</StyledText></GroupListItem>;
-      });
-      return list;
-    }
-
     return (<StackScreenContainer 
         screenName="서비스 추가"
         onPressBackButton={onPressBackButton}>
@@ -170,19 +150,12 @@ const AddServiceScreen = (props: any) => {
         hideOnPress={true}>
         {toastMessage}
       </Toast>
-      <ModalPopup
-        containerWidth="300px"
-        containerHeight="300px"
-        headerTitle="그룹 선택"
-        onBackdropPress={() => setAddGroupModalVisible(false)}
-        isVisible={addGroupModalVisible}
-        onDeny={() => setAddGroupModalVisible(false)}
-        onDenyTitle="취소"
-        >
-          <ScrollView>
-            {printGroupList()}
-          </ScrollView>
-      </ModalPopup>
+      <SelectGroupModalPopup 
+        visibleFunc={setAddGroupModalVisible}
+        visible={addGroupModalVisible}
+        setGroupIdxFunc={setGroupIdx}
+        setGroupNameFunc={setSelectGroupName}
+      />
       <BodyWrapper>
           <View>
             <StyledText>그룹 선택</StyledText>

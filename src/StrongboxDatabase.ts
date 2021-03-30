@@ -641,7 +641,7 @@ export class StrongboxDatabase {
     if(isExist > 0) {
       return false; // 이미 존재
     }
-    const query: any = await this.executeQuery(db, "UPDATE GROUPS_TB SET GRP_NAME = '" + name +"' WHERE IDX = " + groupIdx);
+    const update: any = await this.executeQuery(db, "UPDATE GROUPS_TB SET GRP_NAME = '" + name +"' WHERE IDX = " + groupIdx);
     return true;
   }
   public async changeServiceName(serviceIdx: number, targetGroupIdx:number, name: string) {
@@ -650,7 +650,68 @@ export class StrongboxDatabase {
     if(isExist > 0) {
       return false;
     }
-    const query: any = await this.executeQuery(db, "UPDATE SERVICES_TB SET SERVICE_NAME = '" + name + "', GRP_IDX = " + targetGroupIdx + " WHERE IDX = " + serviceIdx);
+    const update: any = await this.executeQuery(db, "UPDATE SERVICES_TB SET SERVICE_NAME = '" + name + "', GRP_IDX = " + targetGroupIdx + " WHERE IDX = " + serviceIdx);
     return true;
+  }
+  public async changeAccountInfo(accountIdx: number, isOauth: boolean, serviceIdx: number, name: string, id?: string, password?: string) {
+    const db = this.connectDatabase();
+    
+    if(isOauth) {
+      const accountQuery = 'SELECT ACCOUNT_IDX FROM OAUTH_ACCOUNTS_TB WHERE IDX = ' + accountIdx;
+      const select:any = await this.executeQuery(db, accountQuery, []);
+      const idx = select.rows.item(0).ACCOUNT_IDX;
+      
+      const isExist = await this.isExistOauthAccountName(name, serviceIdx, idx);
+      if(isExist > 0) {
+        return false;
+      }
+
+      const query = 
+      "UPDATE OAUTH_ACCOUNTS_TB SET(ACCOUNT_NAME, SERVICE_IDX, DATE) = (?,?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx;
+      await this.executeQuery(db, query, [name, serviceIdx]);
+    } else {
+      let isExist = await this.isExistAccountName(name, serviceIdx);
+      if(isExist > 0) {
+        return false;
+      }  
+      const key = global.key;
+      let ciphertext = CryptoJS.AES.encrypt(password, key).toString(); // AES암호화
+      const query = 
+      "UPDATE ACCOUNTS_TB SET(ACCOUNT_NAME,SERVICE_IDX,ID,PASSWORD,DATE) = (?,?,?,?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx;
+      await this.executeQuery(db,query,[name,serviceIdx,id,ciphertext]);
+    }
+    return true;
+  }
+  public async getAccountInfo(accountIdx: number, isOauth: boolean) {
+    const db = this.connectDatabase();
+    let result = null;
+    if(isOauth) {
+      const query = 
+        'SELECT S.SERVICE_NAME AS SERVICE_NAME, OTB.ACCOUNT_IDX, G.GRP_NAME AS GRP_NAME, OTB.SERVICE_IDX, G.IDX AS GRP_IDX FROM OAUTH_ACCOUNTS_TB OTB '
+        + 'JOIN SERVICES_TB S ON S.IDX = OTB.SERVICE_IDX '
+        + 'JOIN GROUPS_TB G ON G.IDX = S.GRP_IDX '
+        + 'WHERE OTB.IDX = ' + accountIdx;
+        const select:any = await this.executeQuery(db, query, []);
+        result = {
+          serviceName: select.rows.item(0).SERVICE_NAME,
+          groupName: select.rows.item(0).GRP_NAME,
+          serviceIdx: select.rows.item(0).SERVICE_IDX,
+          groupIdx: select.rows.item(0).GRP_IDX,
+        };
+    } else {
+      const query = 
+      'SELECT S.SERVICE_NAME AS SERVICE_NAME, G.GRP_NAME AS GRP_NAME, ATB.SERVICE_IDX, G.IDX AS GRP_IDX FROM ACCOUNTS_TB ATB '
+      + 'JOIN SERVICES_TB S ON S.IDX = ATB.SERVICE_IDX '
+      + 'JOIN GROUPS_TB G ON G.IDX = S.GRP_IDX '
+      + 'WHERE ATB.IDX = ' + accountIdx;
+      const select:any = await this.executeQuery(db, query, []);
+        result = {
+          serviceName: select.rows.item(0).SERVICE_NAME,
+          groupName: select.rows.item(0).GRP_NAME,
+          serviceIdx: select.rows.item(0).SERVICE_IDX,
+          groupIdx: select.rows.item(0).GRP_IDX,
+        };
+    }
+    return result;
   }
 }

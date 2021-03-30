@@ -4,6 +4,7 @@ import Toast from 'react-native-root-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/native';
 import ModalPopup from '../../components/ModalPopup';
+import SelectGroupModalPopup from '../../components/SelectGroupModalPopup';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import { RootState } from '../../modules';
@@ -30,16 +31,6 @@ const InputBox = styled.TextInput`
 
   width: 100%;
 `;
-const GroupListItem = styled.TouchableOpacity`
-  width: 100%;
-  height: 40px;
-  border-bottom-width: 1px;
-  border-color: gray;
-  border-style: solid;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
 const SelectGroupTouchable = styled.TouchableOpacity`
   width: 100%;
   height: 30px;
@@ -64,8 +55,6 @@ const EditServiceScreen = (props: any) => {
     const { groupIdx, serviceIdx, serviceName } = props.route.params;
     const [serviceText, setServiceText] = useState('');
     const [groupModalVisible, setGroupModalVisible] = useState(false);
-
-    const groupList = useSelector((state: RootState) => state.groupList.list);
 
     const [selectGroupIdx, setSelectGroupIdx] = useState(-1);
     const [selectGroupName, setSelectGroupName] = useState('변경 원할 시 선택');
@@ -120,17 +109,6 @@ const EditServiceScreen = (props: any) => {
             });
         }
     };
-    const printGroupList = () => {
-        const onPressItem = (row: any) => {
-            setSelectGroupIdx(row.GRP_IDX);
-            setGroupModalVisible(false);
-            setSelectGroupName(row.GRP_NAME);
-        }
-        const list = groupList.map((row: any) => {
-            return <GroupListItem key={row.GRP_IDX} onPress={() => { onPressItem(row) }}><StyledText>{row.GRP_NAME}</StyledText></GroupListItem>;
-        });
-        return list;
-    }
     return <StackScreenContainer screenName="서비스 수정" onPressBackButton={() => { props.navigation.goBack(); }}>
         <Toast
             visible={toastVisible}
@@ -140,18 +118,12 @@ const EditServiceScreen = (props: any) => {
             hideOnPress={true}>
             {toastMessage}
         </Toast>
-        <ModalPopup
-            containerWidth="300px"
-            containerHeight="300px"
-            headerTitle="그룹 선택"
-            onBackdropPress={() => setGroupModalVisible(false)}
-            isVisible={groupModalVisible}
-            onDeny={() => setGroupModalVisible(false)}
-            onDenyTitle="취소"
-        ><ScrollView>
-                {printGroupList()}
-            </ScrollView>
-        </ModalPopup>
+        <SelectGroupModalPopup
+            visibleFunc={setGroupModalVisible}
+            visible={groupModalVisible}
+            setGroupIdxFunc={setSelectGroupIdx}
+            setGroupNameFunc={setSelectGroupName}
+        />
         <TotalWrapper>
             <InnerWrapper>
                 <StyledText>그룹 변경</StyledText>

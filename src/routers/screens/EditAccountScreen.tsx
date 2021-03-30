@@ -1,16 +1,17 @@
-import React, {useEffect, useState, useRef} from 'react';
-import {Alert} from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Alert } from 'react-native';
 import EditView from '../../components/EditView';
 import StyledText from '../../components/StyledText';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import theme from '../../styles/theme';
-import {StrongboxDatabase} from '../../StrongboxDatabase';
+import { StrongboxDatabase } from '../../StrongboxDatabase';
 import ToggleSwitch from '../../components/ToggleSwitch';
-import {useSelector, useDispatch} from 'react-redux';
-import {updateAccountAsync} from '../../modules/accountList';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateAccountAsync } from '../../modules/accountList';
 import { RootState } from '../../modules';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const ListItemWrapper = styled.View`
   width: 100%;
@@ -39,8 +40,8 @@ const ItemView = styled.View`
   align-items: center;
 `;
 
-const EditAccountScreen = ({navigation, route}) => {
-  const {serviceIdx} = route.params;
+const EditAccountScreen = ({ navigation, route }) => {
+  const { serviceIdx } = route.params;
   const [targetList, setTargetList] = useState([]);
   const [orderList, setOrderList] = useState([]);
   const [count, setCount] = useState(0);
@@ -58,7 +59,6 @@ const EditAccountScreen = ({navigation, route}) => {
       //화면 이탈 시 발생 이벤트 초기화하자
       console.log('이탈');
     });
-    setTargetList(accountList);
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, navigation]);
@@ -70,8 +70,9 @@ const EditAccountScreen = ({navigation, route}) => {
       tmp.push(element.SORT_ORDER);
     }
     setOrderList(tmp);
+    setTargetList(accountList);
   }, [accountList]);
-  const renderItem = ({item, drag}) => {
+  const renderItem = ({ item, drag }) => {
     return (
       <ListItemWrapper>
         <ItemView>
@@ -79,6 +80,15 @@ const EditAccountScreen = ({navigation, route}) => {
             <StyledIcon name="drag-handle" />
           </Draggable>
           <StyledText size="20px">{item.ACCOUNT_NAME}</StyledText>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate('ChangeAccountScreen', {
+              accountIdx: item.IDX,
+              accountName: item.ACCOUNT_NAME,
+              oauthServiceName: item.OAUTH_SERVICE_NAME,
+            })
+          }}>
+            <Icon name="edit" size={20} />
+          </TouchableOpacity>
         </ItemView>
         <ToggleSwitch
           navigation={navigation}
@@ -194,16 +204,16 @@ const EditAccountScreen = ({navigation, route}) => {
             },
             {
               text: '취소',
-              onPress: () => {},
+              onPress: () => { },
             },
           ],
-          {cancelable: true},
+          { cancelable: true },
         );
       }}>
       <DraggableFlatList
         data={targetList}
         renderItem={renderItem}
-        onDragEnd={({data}) => onDragEnd(data)}
+        onDragEnd={({ data }) => onDragEnd(data)}
         keyExtractor={(item) => `draggable-item-${item.SORT_ORDER}`}
       />
     </EditView>

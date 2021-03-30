@@ -22,6 +22,7 @@ import SearchServiceScreen from '../screens/SearchServiceScreen';
 import EditGroupListScreen from '../screens/EditGroupListScreen';
 import EditGroupScreen from '../screens/EditGroupScreen';
 import EditServiceScreen from '../screens/EditServiceScreen';
+import ChangeAccountScreen from '../screens/ChangeAccountScreen';
 
 const LoadingWrapper = styled.View`
   flex: 1;
@@ -83,6 +84,7 @@ const InitNavi = () => {
         <Stack.Screen name="EditGroupListScreen" component={EditGroupListScreen} />
         <Stack.Screen name="EditGroupScreen" component={EditGroupScreen} />
         <Stack.Screen name="EditServiceScreen" component={EditServiceScreen} />
+        <Stack.Screen name="ChangeAccountScreen" component={ChangeAccountScreen} />
       </Stack.Navigator>
     </>
   );

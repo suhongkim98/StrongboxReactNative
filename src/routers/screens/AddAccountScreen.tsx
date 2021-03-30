@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert, ScrollView, Switch, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import { updateAccountAsync } from '../../modules/accountList';
 import { StrongboxDatabase } from '../../StrongboxDatabase';
@@ -8,7 +8,8 @@ import Toast from 'react-native-root-toast';
 import styled from 'styled-components/native';
 import StyledText from '../../components/StyledText';
 import ModalPopup from '../../components/ModalPopup';
-import { RootState } from '../../modules';
+import SelectServiceModalPopup from '../../components/SelectServiceModalPopup';
+import SelectAccountModalPopup from '../../components/SelectAccountModalPopup';
 
 const AddTextInput = styled.TextInput`
   border-width: 1px;
@@ -66,19 +67,9 @@ const Arrow = styled.View`
   transform: rotate(135deg); /* 각도 */
   border-color: gray;
 `;
-const SelectListItem = styled.TouchableOpacity`
-  width: 100%;
-  height: 40px;
-  border-bottom-width: 1px;
-  border-color: gray;
-  border-style: solid;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
+
 const AddAccountScreen = (props: any) => {
     const {serviceIdx} = props.route.params;
-    const serviceList = useSelector((state: RootState) => state.serviceList.list);
     const titleValue = useRef('');
     const accountValue = useRef('');
     const passwordValue = useRef('');
@@ -95,7 +86,6 @@ const AddAccountScreen = (props: any) => {
     const toastTimer: any = useRef<number>(-1);
     const [toastMessage, setToastMessage] = useState('');
     
-    const [accountDropList, setAccountDropList] = useState([]);
     const showToastMessage = (message: string) => {
       // toast 보여주는 함수
       setToastMessage(message);
@@ -113,32 +103,7 @@ const AddAccountScreen = (props: any) => {
         props.navigation.goBack();
     }
 
-    useEffect(() => {
-      const onPressItem = (row: any) => {
-        setSelectedAccount(row.IDX);
-        setSelectedDropboxAccountName(row.ACCOUNT_NAME);
-        setSelectAccountModalVisible(false);
-      }
-      const database = StrongboxDatabase.getInstance();
-        database
-        .getAccount(selectedDropboxService)
-        .then((result) => {
-          const list = result.filter((row) => {
-            //Oauth계정 선택 못하게하기
-            return row.OAUTH_SERVICE_NAME === undefined;
-          });
-          setAccountDropList(list.map((row) => {
-            return <SelectListItem 
-              key={row.SORT_ORDER}
-              onPress={() => {onPressItem(row)}}>
-                <StyledText>{row.ACCOUNT_NAME}</StyledText>
-              </SelectListItem>;
-            }));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }, [selectedDropboxService]);
+    
     
   const onPressAddButton = () => {
     if (titleValue.current === '') {
@@ -247,19 +212,6 @@ const AddAccountScreen = (props: any) => {
       showToastMessage('서비스 선택을 먼저 해주세요');
     }
   }
-  const printServiceList = () => {
-    const onPressItem = (row: any) => {
-      setSelectedDropboxServiceName(row.SERVICE_NAME);
-      setSelectedDropboxService(row.SERVICE_IDX);
-      setSelectServiceModalVisible(false);
-    }
-    const list = serviceList.map((row: any) => {
-      return <SelectListItem onPress={() => {onPressItem(row)}} key={row.SERVICE_IDX}>
-          <StyledText>{row.SERVICE_NAME}</StyledText>
-        </SelectListItem>;
-    });
-    return list;
-  }
     return (<StackScreenContainer 
         screenName="계정 추가"
         onPressBackButton={onPressBackButton}>
@@ -271,28 +223,19 @@ const AddAccountScreen = (props: any) => {
         hideOnPress={true}>
         {toastMessage}
       </Toast>
-      <ModalPopup
-        containerWidth="300px"
-        containerHeight="300px"
-        headerTitle="서비스 선택"
-        onBackdropPress={() => {setSelectServiceModalVisible(false)}}
-        onDeny={() => {setSelectServiceModalVisible(false)}}
-        onDenyTitle="취소"
-        isVisible={selectServiceModalVisible}>
-          <ScrollView>
-            {printServiceList()}
-          </ScrollView>
-      </ModalPopup>
-      <ModalPopup
-        containerWidth="300px"
-        containerHeight="300px"
-        headerTitle="계정 선택"
-        onBackdropPress={() => {setSelectAccountModalVisible(false)}}
-        onDeny={() => {setSelectAccountModalVisible(false)}}
-        onDenyTitle="취소"
-        isVisible={selectAccountModalVisible}>
-          <ScrollView>{accountDropList}</ScrollView>
-      </ModalPopup>
+      <SelectServiceModalPopup 
+        setServiceNameFunc={setSelectedDropboxServiceName}
+        setServiceIdxFunc={setSelectedDropboxService}
+        visibleFunc={setSelectServiceModalVisible}
+        visible={selectServiceModalVisible}
+      />
+      <SelectAccountModalPopup 
+        selectService={selectedDropboxService}
+        setAccountIdxFunc={setSelectedAccount}
+        setAccountNameFunc={setSelectedDropboxAccountName}
+        visible={selectAccountModalVisible}
+        visibleFunc={setSelectAccountModalVisible}
+      />
       <BodyWrapper>
         <OauthWrapper>
           <OauthView>
