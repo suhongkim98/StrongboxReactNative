@@ -1,4 +1,4 @@
-export const SERVER_NAME = 'http://192.168.0.15:8080';
+export const SERVER_NAME = 'https://sync.accongbox.com';
 
 export {};
 //글로벌 변수
