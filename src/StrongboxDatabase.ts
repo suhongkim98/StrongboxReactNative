@@ -655,32 +655,53 @@ export class StrongboxDatabase {
     const update: any = await this.executeQuery(db, "UPDATE SERVICES_TB SET SERVICE_NAME = '" + name + "', GRP_IDX = " + targetGroupIdx + " WHERE IDX = " + serviceIdx);
     return true;
   }
-  public async changeAccountInfo(accountIdx: number, isOauth: boolean, serviceIdx: number, name: string, id?: string, password?: string) {
+  public async changeAccountInfo(accountIdx: number, isOauth: boolean, serviceIdx: number, name?: string, id?: string, password?: string) {
     const db = this.connectDatabase();
     
     if(isOauth) {
-      const accountQuery = 'SELECT ACCOUNT_IDX FROM OAUTH_ACCOUNTS_TB WHERE IDX = ' + accountIdx;
-      const select:any = await this.executeQuery(db, accountQuery, []);
-      const idx = select.rows.item(0).ACCOUNT_IDX;
-      
-      const isExist = await this.isExistOauthAccountName(name, serviceIdx, idx);
-      if(isExist > 0) {
-        return false;
+      if(name != null) {
+        //자기 자신의 정보를 변경하는게 아니라면 중복검사
+        const accountQuery = 'SELECT ACCOUNT_IDX FROM OAUTH_ACCOUNTS_TB WHERE IDX = ' + accountIdx;
+        const select:any = await this.executeQuery(db, accountQuery, []);
+        const idx = select.rows.item(0).ACCOUNT_IDX;
+        
+        const isExist = await this.isExistOauthAccountName(name, serviceIdx, idx);
+        if(isExist > 0) {
+          return false;
+        }
       }
 
-      const query = 
-      "UPDATE OAUTH_ACCOUNTS_TB SET(ACCOUNT_NAME, SERVICE_IDX, DATE) = (?,?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx;
-      await this.executeQuery(db, query, [name, serviceIdx]);
+      let query;
+      if(name != null) {
+        query = 
+        "UPDATE OAUTH_ACCOUNTS_TB SET(ACCOUNT_NAME, SERVICE_IDX, DATE) = (?,?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx;
+        await this.executeQuery(db, query, [name, serviceIdx]);
+      } else {
+        query =
+        "UPDATE OAUTH_ACCOUNTS_TB SET(SERVICE_IDX, DATE) = (?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx; 
+        await this.executeQuery(db, query, [serviceIdx]);
+      }
+      
     } else {
-      let isExist = await this.isExistAccountName(name, serviceIdx);
-      if(isExist > 0) {
-        return false;
-      }  
+      if(name != null) {
+        let isExist = await this.isExistAccountName(name, serviceIdx);
+        if(isExist > 0) {
+          return false;
+        }  
+      }
       const key = global.key;
       let ciphertext = CryptoJS.AES.encrypt(password, key).toString(); // AES암호화
-      const query = 
-      "UPDATE ACCOUNTS_TB SET(ACCOUNT_NAME,SERVICE_IDX,ID,PASSWORD,DATE) = (?,?,?,?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx;
-      await this.executeQuery(db,query,[name,serviceIdx,id,ciphertext]);
+      let query;
+      if(name != null) {
+        query = 
+        "UPDATE ACCOUNTS_TB SET(ACCOUNT_NAME,SERVICE_IDX,ID,PASSWORD,DATE) = (?,?,?,?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx;
+        await this.executeQuery(db,query,[name,serviceIdx,id,ciphertext]);
+      } else {
+        query = 
+        "UPDATE ACCOUNTS_TB SET(SERVICE_IDX,ID,PASSWORD,DATE) = (?,?,?,datetime('now', 'localtime')) WHERE IDX = " + accountIdx;
+        await this.executeQuery(db,query,[serviceIdx,id,ciphertext]);
+      }
+      
     }
     return true;
   }

@@ -67,6 +67,9 @@ const ChangeAccountScreen = (props: any) => {
     const [inputId, setInputId] = useState('');
     const [inputPassword, setInputPassword] = useState('');
     const [inputAccountName, setInputAccountName] = useState('');
+    const [inputPlaceholdId, setInputPlaceholdId] = useState('');
+    const [inputPlaceholdPassword, setInputPlaceholdPassword] = useState('');
+    const [inputPlaceholdAccountName, setInputPlaceholdAccountName] = useState('');
     const dispatch = useDispatch();
 
     const [toastVisible, setToastVisible] = useState(false);
@@ -93,15 +96,15 @@ const ChangeAccountScreen = (props: any) => {
             setSelectServiceName(result.serviceName);
             setSelectGroupIdx(result.groupIdx);
             setSelectServiceIdx(result.serviceIdx);
-            setInputAccountName(accountName);
+            setInputPlaceholdAccountName(accountName);
         }).catch((error) => {
             console.error(error);
         });
         if(oauthServiceName == null) {
             for(let i = 0 ; i < accountList.length ; i++) {
                 if(accountList[i].IDX === accountIdx) {
-                    setInputId(accountList[i].ID);
-                    setInputPassword(accountList[i].PASSWORD);
+                    setInputPlaceholdId(accountList[i].ID);
+                    setInputPlaceholdPassword(accountList[i].PASSWORD);
                     break;
                 }
             }
@@ -113,10 +116,22 @@ const ChangeAccountScreen = (props: any) => {
             return;
         }
         const db = StrongboxDatabase.getInstance();
+
+        let id: string, pw: string;
+        if(inputId === '') {
+            id = inputPlaceholdId;
+        } else {
+            id = inputId;
+        }
+        if(inputPassword === '') {
+            pw = inputPlaceholdPassword;
+        } else {
+            pw = inputPassword;
+        }
         
         if(oauthServiceName) {
             //oauth
-            db.changeAccountInfo(accountIdx, oauthServiceName != null, selectServiceIdx, inputAccountName).then((result) => {
+            db.changeAccountInfo(accountIdx, oauthServiceName != null, selectServiceIdx, inputAccountName != '' ? inputAccountName : null).then((result) => {
                 if(result) {
                     showToastMessage("변경 성공하였습니다.");
                     dispatch(updateAccountAsync(selectedService.idx));  
@@ -126,7 +141,7 @@ const ChangeAccountScreen = (props: any) => {
                 }
             }).catch((error) => {console.error(error);});
         } else {
-            db.changeAccountInfo(accountIdx, oauthServiceName != null, selectServiceIdx, inputAccountName,inputId,inputPassword).then((result) => {
+            db.changeAccountInfo(accountIdx, oauthServiceName != null, selectServiceIdx, inputAccountName != '' ? inputAccountName : null,id,pw).then((result) => {
                 if(result) {
                     showToastMessage("변경 성공하였습니다.");
                     dispatch(updateAccountAsync(selectedService.idx));  
@@ -177,7 +192,7 @@ const ChangeAccountScreen = (props: any) => {
         <TotalWrapper>
             <InnerWrapper>
                 <Item>
-                <StyledText fontWeight="700">그룹 선택</StyledText>
+                <StyledText fontWeight="700">그룹 변경</StyledText>
                 <SelectGroupTouchable onPress={() => onPressSelectGroupButton()}>
                     <StyledText>{selectGroupName}</StyledText>
                     <Arrow />
@@ -192,15 +207,15 @@ const ChangeAccountScreen = (props: any) => {
                 </Item>
                 <Item>
                 <StyledText fontWeight="700">별명</StyledText>
-                <InputBox placeholder={inputAccountName} onChangeText={(text)=>setInputAccountName(text)} />
+                <InputBox placeholder={inputPlaceholdAccountName} onChangeText={(text)=>setInputAccountName(text)} />
                 </Item>
                 <Item>
                 {
                     oauthServiceName == null && <View>
                     <StyledText fontWeight="700">아이디</StyledText>
-                    <InputBox placeholder={inputId} onChangeText={(text)=>setInputId(text)} />
+                    <InputBox placeholder={inputPlaceholdId} onChangeText={(text)=>setInputId(text)} />
                     <StyledText fontWeight="700">패스워드</StyledText>
-                    <InputBox placeholder={inputPassword} onChangeText={(text)=>setInputPassword(text)} />
+                    <InputBox placeholder={inputPlaceholdPassword} onChangeText={(text)=>setInputPassword(text)} />
                 </View>
                 }
                 </Item>
