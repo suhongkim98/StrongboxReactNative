@@ -6,7 +6,7 @@ import styled from 'styled-components/native';
 import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import theme from '../../styles/theme';
-import {SERVER_NAME} from '../../global.d.ts';
+import {SERVER_NAME} from '../../global.d';
 const TotalWrapper = styled.View`
   flex: 1;
   display: flex;
@@ -115,16 +115,16 @@ const SyncResponseScreen = (props: any) => {
         <TotalWrapper>
             <View>
                 <InputItem>
-                    <StyledText>상대방에게 보여줄 이름을 입력해주세요.</StyledText>
+                    <StyledText>다른 기기에게 보여줄 이름을 입력해주세요.</StyledText>
                     <InputBox onChangeText={text => setName(text)}/>
                 </InputItem>
                 <InputItem>
-                    <StyledText>상대방이 제공한 인증번호를 입력해주세요.</StyledText>
+                    <StyledText>다른 기기가 제공한 인증번호를 입력해주세요.</StyledText>
                     <InputBox onChangeText={text => setVertificationCode(text)}/>
                 </InputItem>
             </View>
             <View>
-                <StyledText center>상대방과 계정 정보를 동기화할 수 있습니다.{'\n'}이름을 입력한 후 동기화버튼을 눌러주세요.
+                <StyledText center>다른 기기와 계정 정보를 동기화할 수 있습니다.{'\n'}이름을 입력한 후 동기화버튼을 눌러주세요.
                 {'\n\n'}<StyledText color='black' fontWeight="700">계정 이름이 같은 경우 </StyledText>
                 <StyledText color='red' fontWeight="700">가장 최근에 추가된 계정 정보로</StyledText>{'\n'} 업데이트 되니 참고하시기 바랍니다.
                 </StyledText>

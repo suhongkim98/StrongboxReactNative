@@ -9,6 +9,7 @@ import {updateGroupAsync} from '../../modules/groupList';
 import {updateServiceAsync} from '../../modules/serviceList';
 import CryptoJS from 'react-native-crypto-js';
 import { ActivityIndicator } from 'react-native';
+import Loading from '../../components/Loading';
 
 const TotalWrapper = styled.View`
   flex: 1;
@@ -31,27 +32,7 @@ const InnerButtonItem = styled.View`
 const SyncButton = styled.TouchableOpacity`
   padding: 0 20px 0 20px;
 `;
-const LoadingWrapper = styled.View`
-  flex: 1;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
 
-  justify-content: center;
-  align-items: center;
-`;
-const LoadingBackground = styled.View`
-  flex: 1;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: black;
-  opacity: 0.1;
-`;
 const SyncConnectSuccess = (props: any) => {
   
     const {otherPartName, vertificationCode} = props.route.params; // 상대방 이름과 코드
@@ -153,10 +134,7 @@ const SyncConnectSuccess = (props: any) => {
         props.navigation.reset({routes: [{name: 'Main'}]});
     }
     return (<StackScreenContainer screenName="연결 성공" onPressBackButton={onPressBackButtonEvent}>
-        {isLoading && <LoadingWrapper>
-            <LoadingBackground />
-            <StyledText size="17px" fontWeight="700" color="black">동기화 진행 중</StyledText><ActivityIndicator color="black"/>
-        </LoadingWrapper>}
+        {isLoading && <Loading text="동기화 진행 중" />}
         <TotalWrapper>
             <InnerItem><StyledText size="20px" fontWeight="700">연결 성공!</StyledText></InnerItem>
             <InnerItem>
@@ -166,8 +144,8 @@ const SyncConnectSuccess = (props: any) => {
             </InnerItem>
             <InnerItem>
                 <StyledText center>
-                상대방의 이름과 인증 번호를 <StyledText color="red" fontWeight="700">꼭</StyledText> 확인하신 후 {'\n'}동의 버튼을 눌러주세요.{'\n\n'}이 단계에서 동기화를 하는 순간
-                {'\n'}상대방에게 계정정보가 보내집니다.
+                다른 기기의 이름과 인증 번호를 <StyledText color="red" fontWeight="700">꼭</StyledText> 확인하신 후 {'\n'}동의 버튼을 눌러주세요.{'\n\n'}이 단계에서 동기화를 하는 순간
+                {'\n'}다른 기기에게 계정정보가 보내집니다.
                 </StyledText>
             </InnerItem>
             <InnerButtonItem>

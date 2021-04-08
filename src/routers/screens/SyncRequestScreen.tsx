@@ -7,6 +7,7 @@ import StackScreenContainer from '../../components/StackScreenContainer';
 import StyledText from '../../components/StyledText';
 import theme from '../../styles/theme';
 import {SERVER_NAME} from '../../global.d';
+import Loading from '../../components/Loading';
 const TotalWrapper = styled.View`
   flex: 1;
   display: flex;
@@ -37,6 +38,7 @@ const InputItem = styled.View `
 
 const SyncRequestScreen = (props: any) => {
     const [name, setName] = useState('');
+    const [isLoading, setLoading] = useState(false);
 
     const [toastVisible, setToastVisible] = useState(false);
     const toastTimer: any = useRef<number>(-1);
@@ -67,9 +69,11 @@ const SyncRequestScreen = (props: any) => {
         //ajax로 서버에 요청
         global.name = name;
         //
+        setLoading(true);
         const params = new URLSearchParams();
         params.append('name', global.name);
         axios.post(SERVER_NAME + '/sync/requestSync',params).then((response) => {
+          setLoading(false);
             const roomId = response.data.data[0].roomId;
             const vertificationCode = response.data.data[0].vertificationCode;
             const token = response.data.data[1].token;
@@ -79,6 +83,7 @@ const SyncRequestScreen = (props: any) => {
                 vertificationCode: vertificationCode,
             });
         }).catch((error) => {
+          setLoading(false);
             if (error.response) {
                 // 요청이 이루어졌으며 서버가 2xx의 범위를 벗어나는 상태 코드로 응답했습니다.
                 console.log(error.response.data);
@@ -110,15 +115,16 @@ const SyncRequestScreen = (props: any) => {
         hideOnPress={true}>
         {toastMessage}
         </Toast>
+        {isLoading && <Loading text="로딩 중" />}
         <TotalWrapper>
             <View>
                 <InputItem>
-                    <StyledText>상대방에게 보여줄 이름을 입력해주세요.</StyledText>
+                    <StyledText>다른 기기에게 보여줄 이름을 입력해주세요.</StyledText>
                     <InputBox onChangeText={text => setName(text)}/>
                 </InputItem>
             </View>
             <View>
-                <StyledText center>상대방과 계정 정보를 동기화할 수 있습니다.{'\n'}이름을 입력한 후 동기화버튼을 눌러주세요.
+                <StyledText center>다른 기기와 계정 정보를 동기화할 수 있습니다.{'\n'}이름을 입력한 후 동기화버튼을 눌러주세요.
                 {'\n\n'}<StyledText color='black' fontWeight="700">계정 이름이 같은 경우 </StyledText>
                 <StyledText color='red' fontWeight="700">가장 최근에 추가된 계정 정보로</StyledText>{'\n'} 업데이트 되니 참고하시기 바랍니다.
                 </StyledText>
