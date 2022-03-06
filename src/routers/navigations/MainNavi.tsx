@@ -8,6 +8,9 @@ const MainNavi = () => {
   return (
     <>
       <Drawer.Navigator
+        screenOptions={
+          {headerShown: false}
+        }
         initialRouteName="MainScreen"
         drawerContent={(props) => <DrawerScreen {...props} />}>
         <Drawer.Screen name="MainScreen" component={MainScreen} />

@@ -63,7 +63,7 @@ const InitNavi = () => {
 
   return (
     <>
-      <Stack.Navigator headerMode="none">
+      <Stack.Navigator screenOptions={{headerShown: false}}>
         {!isExistUser && (
           <>
             <Stack.Screen name="Init" component={InitScreen} />
